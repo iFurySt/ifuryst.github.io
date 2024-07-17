@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://ifuryst.github.io/al-folio/sitemap.xml
+Sitemap: https://ifuryst.github.io/sitemap.xml
