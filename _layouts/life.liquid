@@ -1,0 +1,80 @@
+---
+layout: default
+---
+<style>
+  .container {
+    max-width: 90vw;
+  }
+  .story {
+    margin-top: 50px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .story .images {
+    list-style: none;
+    padding: 0;
+    column-count: 1;
+    column-gap: 20px;
+  }
+  .story .images .image {
+    break-inside: avoid;
+    margin: 0 0 20px 0;
+  }
+  .story .images img {
+    width: 100%;
+    height: auto;
+    padding: 0;
+    box-sizing: border-box;
+    border: 1px solid #333;
+    break-inside: avoid;
+  }
+  .story .images .desc {
+    font-size: 18px;
+    font-style: italic;
+    margin-top: 3px;
+  }
+
+  @media (min-width: 760px) and (max-width: 979.5px) {
+    .story .images {
+      column-count: 2;
+    }
+  }
+  @media (min-width: 980px) and (max-width: 1499.5px) {
+    .story .images {
+      column-count: 3;
+    }
+  }
+  @media (min-width: 1500px) {
+    .story .images {
+      column-count: 4;
+    }
+  }
+</style>
+<div>
+  {% if page.stories %}
+    {% for story in page.stories %}
+      <div class="story">
+        <h2>{{ story.subtitle }}</h2>
+        <p>{{ story.description }}</p>
+        {% if story.images %}
+          <div class="images">
+            {% for image in story.images %}
+              <div class="image">
+                {% if image.url contains 'http' %}
+                  {% assign image_url = image.url %}
+                  {% comment %}<img src="{{ image.url }}" alt="{{ image.description }}">{% endcomment %}
+                  {% include figure.liquid url=image_url class="img-fluid rounded z-depth-1" zoomable=true %}
+                {% else %}
+                  <img src="{{ '/assets/img/' | append: image.url }}" alt="{{ image.description }}">
+                {% endif %}
+                <div class="desc">{{ image.description }}</div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
