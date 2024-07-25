@@ -691,6 +691,8 @@ footer.sticky-bottom {
         abbr {
           display: inline-block;
           background-color: var(--global-theme-color);
+          padding: 6px 0;
+          font-size: 1.1rem;
           margin-bottom: 0.5rem;
 
           a {
@@ -709,7 +711,8 @@ footer.sticky-bottom {
       }
 
       .title {
-        font-weight: bolder;
+        font-weight: 700;
+        font-size: 1.2rem;
       }
 
       .author {
@@ -737,6 +740,12 @@ footer.sticky-bottom {
             border-bottom: 1px dashed var(--global-text-color);
           }
         }
+      }
+
+      .periodical {
+        font-style: italic;
+        font-weight: bold;
+        font-size: 1rem;
       }
 
       .links {
