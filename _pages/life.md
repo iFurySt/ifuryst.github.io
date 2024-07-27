@@ -23,6 +23,8 @@ stories:
         description: "King's College, Cambridge. Fall 2023."
       - url: "https://images.unsplash.com/photo-1721454769330-0be63997a808?q=80&w=2970&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         description: "Tranquil Waters of Queen Adelaide's Hill, Windermere. Fall 2023."
+      - url: "https://images.unsplash.com/photo-1722105344016-0df8537c1799?q=80&w=4170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        description: "Chip n Fish 🤤. Fall 2023."
       - url: "https://images.unsplash.com/photo-1721404724071-db7e1f87dfa6?q=80&w=4287&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         description: "Building around Leeds Corn Exchange. Fall 2023."
   - subtitle: "Daily Picks 🥱"
