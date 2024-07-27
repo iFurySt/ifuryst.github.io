@@ -32,4 +32,7 @@ stories:
         description: "Oil painting for Lin. Painted in the summer of 2024."
   - subtitle: "Reading 📚"
     description: "I can't stand bookworms or studying just to ace exams. My reading tastes are pretty wide-ranging. I used to love novels, literature, biographies, and history books, but now I'm all about history, finance, economics, tech, and non-fiction bestsellers. I've been hooked on financial magazines for years and now get a kick out of world-class news with deep, objective reporting."
+    images:
+      - url: "https://images.unsplash.com/photo-1722105350593-0a95a3e81376?q=80&w=4280&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        description: "Books I read in the 1st half of 2024(purchased from 3 countries), all worth reading."
 ---
