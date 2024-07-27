@@ -25,6 +25,13 @@ stories:
         description: "Tranquil Waters of Queen Adelaide's Hill, Windermere. Fall 2023."
       - url: "https://images.unsplash.com/photo-1721404724071-db7e1f87dfa6?q=80&w=4287&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         description: "Building around Leeds Corn Exchange. Fall 2023."
+  - subtitle: "Daily Picks 🥱"
+    description: "Daily life is like a rerun marathon, but there are still some gems if you’ve got the eye for them!"
+    images:
+      - url: "https://images.unsplash.com/photo-1722105341044-5c9efb07b061?q=80&w=3456&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        description: "Dragon Boat Pond hosts dragon boat races every year during the Dragon Boat Festival. Winter 2023."
+      - url: "https://images.unsplash.com/photo-1721454769089-78f45587ec52?q=80&w=4170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        description: "A lake for kayaking training, walking, cycling, and camping. Winter 2023."
   - subtitle: "Creativeness 🤡"
     description: "I'm no Picasso, but I love jamming to music, belting out tunes, doodling, gaming, and messing around with quirky stuff. These hobbies make me feel creative and keep the stress at bay."
     images:
