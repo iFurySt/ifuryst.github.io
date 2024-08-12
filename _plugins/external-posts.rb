@@ -37,11 +37,11 @@ module ExternalPosts
           content: e.content,
           summary: e.summary,
           published: e.published
-        })
+        }, [])
       end
     end
 
-    def create_document(site, source_name, url, content)
+    def create_document(site, source_name, url, content, tags)
       slug = content[:title].downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
       path = site.in_source_dir("_posts/#{slug}.md")
       doc = Jekyll::Document.new(
@@ -53,6 +53,7 @@ module ExternalPosts
       doc.data['description'] = content[:summary]
       doc.data['date'] = content[:published]
       doc.data['redirect'] = url
+      doc.data['tags'] = tags
       site.collections['posts'].docs << doc
     end
 
@@ -61,7 +62,7 @@ module ExternalPosts
         puts "...fetching #{post['url']}"
         content = fetch_content_from_url(post['url'])
         content[:published] = parse_published_date(post['published_date'])
-        create_document(site, src['name'], post['url'], content)
+        create_document(site, src['name'], post['url'], content, post['tags'])
       end
     end
 
