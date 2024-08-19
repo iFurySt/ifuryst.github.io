@@ -176,11 +176,6 @@ external_sources:
       - url: https://medium.com/@ifuryst./zsh-nice-5-f520a70d0f90
         published_date: 2024-08-07
         tags: [linux, casual-tech]
-  - name: Never Missing Out(Insightful Articles)
-    posts:
-      - url: https://smudge.ai/blog/ratelimit-algorithms
-        published_date: 2024-08-12
-        tags: [never-miss-insight]
 
 # -----------------------------------------------------------------------------
 # Newsletter

@@ -1,0 +1,35 @@
+---
+layout: default
+---
+<style>
+  .tag {
+    color: var(--global-card-bg-color);
+    background-color: var(--global-theme-color);
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-size: 0.7rem;
+    font-weight: bold;
+  }
+  .paper {
+    background-color: silver;
+  }
+  .article {
+    background-color: indianred;
+  }
+</style>
+<div>
+  {% if page.links %}
+    {% for link in page.links %}
+      <div>
+        <div style="display: flex; align-items: center; column-gap: 10px">
+          <a href="{{ link.url }}" target="_blank">{{ link.title }}</a>
+          <div style="opacity: 60%">{{ link.added_at }}</div>
+          <div class="tag {{ link.tag }}">{{ link.tag | upcase }}</div>
+        </div>
+        <div style="display: flex; align-items: center; column-gap: 10px">
+          <p>{{ link.reason }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
