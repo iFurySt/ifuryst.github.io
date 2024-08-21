@@ -6,6 +6,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "In Search of an Understandable Consensus Algorithm"
+    url: "https://raft.github.io/raft.pdf"
+    reason: "Raft is a great algorithm for understanding the consensus algorithm of distributed systems."
+    added_at: "2024-08-21"
+    tag: "paper"
   - title: "Teach Yourself Computer Science"
     url: "https://teachyourselfcs.com/"
     reason: "I think it's a great resource for learning CS."
