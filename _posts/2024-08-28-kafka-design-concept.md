@@ -7,6 +7,8 @@ tags: distributed-systems
 categories: distributed-systems
 giscus_comments: true
 tabs: true
+toc:
+  sidebar: left
 pretty_table: true
 ---
 
