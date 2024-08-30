@@ -305,7 +305,7 @@ jekyll-archives:
     tag: "/blog/tag/:name/"
     category: "/blog/category/:name/"
 
-display_tags: ["linux", "distributed-systems"] # these tags will be displayed on the front page of your blog
+display_tags: ["linux", "distributed-systems", "thoughts"] # these tags will be displayed on the front page of your blog
 display_categories: ["casual-tech"] # these categories will be displayed on the front page of your blog
 
 # -----------------------------------------------------------------------------
