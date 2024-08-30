@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Kafka Design Concept 📝
+title: Kafka设计理念 / Kafka Design Concept 📝
 date: 2024-08-29T22:18:27+08:00
 description: 从Kafka Paper中感受其设计思想
 tags: distributed-systems
