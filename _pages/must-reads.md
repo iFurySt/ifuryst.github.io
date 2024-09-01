@@ -6,6 +6,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "Kafka: a Distributed Messaging System for Log Processing"
+    url: "https://notes.stephenholiday.com/Kafka.pdf"
+    reason: "The original design concept for Kafka."
+    added_at: "2024-08-29"
+    tag: "paper"
   - title: "In Search of an Understandable Consensus Algorithm"
     url: "https://raft.github.io/raft.pdf"
     reason: "Raft is a great algorithm for understanding the consensus algorithm of distributed systems."
