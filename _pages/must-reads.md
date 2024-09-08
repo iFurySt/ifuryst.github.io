@@ -6,6 +6,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "How SSH Secures Your Connection"
+    url: "https://noratrieb.dev/blog/posts/ssh-security/"
+    reason: "Better understanding of how SSH(or TLS) works(and why it is designed the way it is), even I think it can be better if it can attach some more diagrams :)"
+    added_at: "2024-09-08"
+    tag: "article"
   - title: "Kafka: a Distributed Messaging System for Log Processing"
     url: "https://notes.stephenholiday.com/Kafka.pdf"
     reason: "The original design concept for Kafka."
