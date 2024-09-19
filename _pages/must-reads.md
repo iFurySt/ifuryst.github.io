@@ -6,6 +6,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "Creating a Git commit: The Hard Way"
+    url: "https://avestura.dev/blog/creating-a-git-commit-the-hard-way"
+    reason: "A great article that explains the internals of Git commits. Interesting read!"
+    added_at: "2024-09-19"
+    tag: "article"
   - title: "How SSH Secures Your Connection"
     url: "https://noratrieb.dev/blog/posts/ssh-security/"
     reason: "Better understanding of how SSH(or TLS) works(and why it is designed the way it is), even I think it can be better if it can attach some more diagrams :)"
