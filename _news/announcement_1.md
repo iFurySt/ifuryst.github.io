@@ -5,7 +5,6 @@ inline: true
 related_posts: false
 ---
 
-My blog is back in action! It’s been a whopping 15 years since my very first blog post.
-Time flies when you’re having fun (or just trying to remember your old password)!
+重新把我的Blog带回来了！距离上次已经过去了15年了，15年前的兄弟们，早已消失在互联网的各个角落里了😭
 
-Stay tuned for more ramblings and musings. Here’s to another 15 years of blog-tastic adventures! ✨
+希望下个十五年也能遇到十五年前的那份感动和快乐✨

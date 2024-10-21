@@ -132,7 +132,7 @@ bing_site_verification: # out your bing-site-verification ID (Bing Webmaster)
 # Blog
 # -----------------------------------------------------------------------------
 
-blog_name: Ramblings n Musings # blog_name will be displayed in your blog page
+blog_name: 逼逼赖赖 # blog_name will be displayed in your blog page
 blog_description:
 permalink: /blog/:year/:title/
 lsi: false # produce an index for related posts
@@ -168,14 +168,6 @@ disqus_shortname: al-folio # put your disqus shortname
 # If you have blog posts published on medium.com or other external sources,
 # you can display them in your blog by adding a link to the RSS feed.
 external_sources:
-  - name: Medium Posts
-    posts:
-      - url: https://medium.com/@ifuryst./tcp-congestion-control-311abf0967ca
-        published_date: 2024-03-12
-        tags: [TCP, networking]
-      - url: https://medium.com/@ifuryst./zsh-nice-5-f520a70d0f90
-        published_date: 2024-08-07
-        tags: [linux, casual-tech]
 
 # -----------------------------------------------------------------------------
 # Newsletter
