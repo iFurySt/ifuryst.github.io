@@ -136,6 +136,6 @@ I define the screenshot hotkey as `Option+Command+A`, and then bind the `Option+
 
 # References
 
-- https://www.reddit.com/r/macapps/comments/1fjpiiw/psa_macos_15_breaks_optionkey_hotkeys/
-- https://developer.apple.com/forums/thread/763878?answerId=804374022#804374022
-- https://www.hammerspoon.org/
+- [https://www.reddit.com/r/macapps/comments/1fjpiiw/psa_macos_15_breaks_optionkey_hotkeys/](https://www.reddit.com/r/macapps/comments/1fjpiiw/psa_macos_15_breaks_optionkey_hotkeys/)
+- [https://developer.apple.com/forums/thread/763878?answerId=804374022#804374022](https://developer.apple.com/forums/thread/763878?answerId=804374022#804374022)
+- [https://www.hammerspoon.org/](https://www.hammerspoon.org/)
