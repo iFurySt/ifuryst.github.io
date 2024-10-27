@@ -28,4 +28,3 @@ social: true # includes social icons at the bottom of the page
 我会在这里分享一些随笔或者技术杂谈，不期望能帮助到别人什么，只是给这个无聊的世界增加一点点偏见。
 
 我挺喜欢和别人尤其是有思想的人聊天，如果你有什么有趣或者无聊的想法，随时给我发邮件👹
-

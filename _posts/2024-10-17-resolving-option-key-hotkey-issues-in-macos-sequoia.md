@@ -29,7 +29,7 @@ https://github.com/Hammerspoon/hammerspoon
 具体方式如下
 
 1.  安装应用，Release里下载或者brew安装
-2. 配置，写lua，保存到`~/.hammerspoon/init.lua`
+2.  配置，写lua，保存到`~/.hammerspoon/init.lua`
 
 可以参考官方的[指导](https://www.hammerspoon.org/go/)
 
@@ -182,6 +182,6 @@ end)
 
 # 参考
 
-- https://www.reddit.com/r/macapps/comments/1fjpiiw/psa_macos_15_breaks_optionkey_hotkeys/
-- https://developer.apple.com/forums/thread/763878?answerId=804374022#804374022
-- https://www.hammerspoon.org/
+- [https://www.reddit.com/r/macapps/comments/1fjpiiw/psa_macos_15_breaks_optionkey_hotkeys/](https://www.reddit.com/r/macapps/comments/1fjpiiw/psa_macos_15_breaks_optionkey_hotkeys/)
+- [https://developer.apple.com/forums/thread/763878?answerId=804374022#804374022](https://developer.apple.com/forums/thread/763878?answerId=804374022#804374022)
+- [https://www.hammerspoon.org/](https://www.hammerspoon.org/)
