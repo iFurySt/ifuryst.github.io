@@ -73,7 +73,7 @@ ok      command-line-arguments  3.856s
 
 # Benchstat
 
-https://github.com/iFurySt/go-benchstat-demo
+[https://github.com/iFurySt/go-benchstat-demo](https://github.com/iFurySt/go-benchstat-demo)
 
 这一节相关的代码和命令我都整理在这个repo里了
 

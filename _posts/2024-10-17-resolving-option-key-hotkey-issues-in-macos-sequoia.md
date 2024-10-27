@@ -14,7 +14,7 @@ toc:
 
 问题是15.0.1禁用`Option+*`或者`Option+Shift+*`热键绑定，相关讨论看这里
 
-https://www.reddit.com/r/macapps/comments/1fjpiiw/psa_macos_15_breaks_optionkey_hotkeys/
+[https://www.reddit.com/r/macapps/comments/1fjpiiw/psa_macos_15_breaks_optionkey_hotkeys/](https://www.reddit.com/r/macapps/comments/1fjpiiw/psa_macos_15_breaks_optionkey_hotkeys/)
 
 官方对此的说法是：[这是一个有意为之的改变](https://developer.apple.com/forums/thread/763878?answerId=804374022#804374022)
 
@@ -22,7 +22,7 @@ https://www.reddit.com/r/macapps/comments/1fjpiiw/psa_macos_15_breaks_optionkey_
 
 相信很多人都会用`Option`来绑定自定义的热键，因为`Command`和`Control`键已经被大量场景占用了。我也是以前经常会使用`Option+*` 来快速切换应用的焦点，比如C代表Chrome，S代表Sublime Text，现在不能用了略难受，发现了一个方式可以实现，就是用`Hammerspoon` （Reddit里[danrnx](https://www.reddit.com/r/macapps/comments/1fjpiiw/comment/lolslnm/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)的回复给了我灵感）
 
-https://github.com/Hammerspoon/hammerspoon
+[https://github.com/Hammerspoon/hammerspoon](https://github.com/Hammerspoon/hammerspoon)
 
 ## 安装
 
