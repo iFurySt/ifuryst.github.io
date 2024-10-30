@@ -8,7 +8,7 @@ nav_order: 4
 links:
   - title: "Why everyone should learn to code"
     url: "https://blog.apiad.net/p/why-everyone-should-learn-to-code"
-    reason: 'A great article! I like the a lot of points, like what is coding, the abstraction, LLMs don’t make bad programmers better, and two schools of thought about how to learn to code. It definitely worth reading.'
+    reason: "A great article! I like the a lot of points, like what is coding, the abstraction, LLMs don’t make bad programmers better, and two schools of thought about how to learn to code. It definitely worth reading."
     added_at: "2024-10-29"
     tag: "article"
   - title: "Why GitHub Actually Won"
