@@ -6,6 +6,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "Year in Review 2024"
+    url: "https://radar.cloudflare.com/year-in-review/2024"
+    reason: "Cloudflare针对2024输出的一份报告，内容信息量充足，非常值得看一下"
+    added_at: "2024-12-26"
+    tag: "report"
   - title: "Why everyone should learn to code"
     url: "https://blog.apiad.net/p/why-everyone-should-learn-to-code"
     reason: "非常棒的一篇文章，我很喜欢里面的一些点，比如什么是coding，coding中关于抽象的应用和类比，LLMs不会让写垃圾的人变得更好，两种学习语言的方式等等，非常值得一读"
