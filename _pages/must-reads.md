@@ -6,6 +6,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "Animal Spirits View-Master"
+    url: "https://dylanhughes.shinyapps.io/flashcrash/"
+    reason: "Flip through a few, and you'll have a different perspective on investing.🤯"
+    added_at: "2025-01-24"
+    tag: "finance"
   - title: "Why everyone should learn to code"
     url: "https://blog.apiad.net/p/why-everyone-should-learn-to-code"
     reason: "A great article! I like the a lot of points, like what is coding, the abstraction, LLMs don’t make bad programmers better, and two schools of thought about how to learn to code. It definitely worth reading."
