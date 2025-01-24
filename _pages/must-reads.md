@@ -6,6 +6,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "Animal Spirits View-Master"
+    url: "https://dylanhughes.shinyapps.io/flashcrash/"
+    reason: "翻看几张，对于投资会有不一样的想法"
+    added_at: "2025-01-24"
+    tag: "finance"
   - title: "Year in Review 2024"
     url: "https://radar.cloudflare.com/year-in-review/2024"
     reason: "Cloudflare针对2024输出的一份报告，内容信息量充足，非常值得看一下"
