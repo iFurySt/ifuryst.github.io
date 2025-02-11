@@ -6,6 +6,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "Why blog if nobody reads it?"
+    url: "https://andysblog.uk/why-blog-if-nobody-reads-it/"
+    reason: "挺好的点，关于我们为什么要写作、摄影。"
+    added_at: "2025-02-11"
+    tag: "article"
   - title: "Animal Spirits View-Master"
     url: "https://dylanhughes.shinyapps.io/flashcrash/"
     reason: "翻看几张，对于投资会有不一样的想法"
