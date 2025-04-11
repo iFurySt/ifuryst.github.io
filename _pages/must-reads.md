@@ -6,6 +6,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "My first memoir is now available"
+    url: "https://www.gatesnotes.com/home/home-page-topic/reader/my-first-memoir-source-code"
+    reason: "比尔盖茨的博客，里面很多文章都很棒，我觉得很值得去看看！"
+    added_at: "2025-04-11"
+    tag: "article"
   - title: "Animal Spirits View-Master"
     url: "https://dylanhughes.shinyapps.io/flashcrash/"
     reason: "翻看几张，对于投资会有不一样的想法"
