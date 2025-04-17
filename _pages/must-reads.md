@@ -6,6 +6,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "Home-Cooked Software and Barefoot Developers"
+    url: "https://maggieappleton.com/home-cooked-software"
+    reason: "作者对于未来AI时代赤脚开发者的蓬勃发展以及通用软件到专用软件和本地优先的应用的思考，很有启发性，非常值得一看"
+    added_at: "2025-04-18"
+    tag: "article"
   - title: "My first memoir is now available"
     url: "https://www.gatesnotes.com/home/home-page-topic/reader/my-first-memoir-source-code"
     reason: "比尔盖茨的博客，里面很多文章都很棒，我觉得很值得去看看！"
