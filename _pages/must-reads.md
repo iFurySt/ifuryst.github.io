@@ -6,6 +6,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "20 years to give away virtually all my wealth"
+    url: "https://www.gatesnotes.com/home/home-page-topic/reader/n20-years-to-give-away-virtually-all-my-wealth"
+    reason: "对于比尔盖茨只有respect，对于他的一生、微软的50年和他的慈善事业，尤其是他的习惯、思想和见解，值得敬佩"
+    added_at: "2025-05-15"
+    tag: "article"
   - title: "Home-Cooked Software and Barefoot Developers"
     url: "https://maggieappleton.com/home-cooked-software"
     reason: "作者对于未来AI时代赤脚开发者的蓬勃发展以及通用软件到专用软件和本地优先的应用的思考，很有启发性，非常值得一看"
@@ -33,7 +38,7 @@ links:
     tag: "article"
   - title: "Why GitHub Actually Won"
     url: "https://blog.gitbutler.com/why-github-actually-won/"
-    reason: '一点关于如何创业的后发思考：<br />"...Big hosts didn’t care and smaller players weren’t serious...So, to sum up, we won because we started at the right time and we had taste...".'
+    reason: '一点关于如何创业的后发思考：<br />"...Big hosts didn't care and smaller players weren't serious...So, to sum up, we won because we started at the right time and we had taste...".'
     added_at: "2024-09-29"
     tag: "article"
   - title: "Creating a Git commit: The Hard Way"
