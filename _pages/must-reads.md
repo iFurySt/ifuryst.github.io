@@ -6,6 +6,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "Human"
+    url: "https://quarter--mile.com/Human"
+    reason: "用科幻的手法描述人与AI/机器人，有点惊悚，但也引发很多思考，当我们用不同的视角来看待一个东西时，往往会有不同的想法产生"
+    added_at: "2025-05-20"
+    tag: "article"
   - title: "20 years to give away virtually all my wealth"
     url: "https://www.gatesnotes.com/home/home-page-topic/reader/n20-years-to-give-away-virtually-all-my-wealth"
     reason: "对于比尔盖茨只有respect，对于他的一生、微软的50年和他的慈善事业，尤其是他的习惯、思想和见解，值得敬佩"
