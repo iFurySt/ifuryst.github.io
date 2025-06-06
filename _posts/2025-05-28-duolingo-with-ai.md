@@ -31,7 +31,6 @@ pretty_table: true
 2025年4月底的时候就是Duolingo账号在LinkedIn发了CEO Luis von Ahn的全员信说要公司要逐步用AI替代外包，AI优先的战略
 
 > Duolingo is going to be Al-first.
->
 
 然后在几天前，也就是一个月后的5月底，CEO自己出来发了Post，试图挽回….
 
