@@ -6,6 +6,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "Snorting the AGI with Claude Code"
+    url: "https://kadekillary.work/blog/#2025-06-16-snorting-the-agi-with-claude-code"
+    reason: "进一步感受claude code的一些使用姿势，拓宽思路"
+    added_at: "2025-06-18"
+    tag: "article"
   - title: "Human"
     url: "https://quarter--mile.com/Human"
     reason: "用科幻的手法描述人与AI/机器人，有点惊悚，但也引发很多思考，当我们用不同的视角来看待一个东西时，往往会有不同的想法产生"
