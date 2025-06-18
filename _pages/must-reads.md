@@ -6,6 +6,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "Thoughts on thinking"
+    url: "https://dcurt.is/thinking"
+    reason: "在AI时代，某些场景下脑子似乎在生锈，深远影响？留给时间吧"
+    added_at: "2025-06-18"
+    tag: "article"
   - title: "Snorting the AGI with Claude Code"
     url: "https://kadekillary.work/blog/#2025-06-16-snorting-the-agi-with-claude-code"
     reason: "进一步感受claude code的一些使用姿势，拓宽思路"
