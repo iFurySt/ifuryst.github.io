@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "历史刚被创造出来，而世界上只有少数人知道"
-date: 2025-06-22T20:30:00+08:00
+date: 2025-07-02T22:30:00+08:00
 tags: AI Thoughts Insights
 categories: AI Thoughts Insights
 giscus_comments: true
@@ -23,7 +23,7 @@ Andrej Karpathy最近在YC AI Startup School里的演讲[Software Is Changing(Ag
 
 <div class="row mt-3">
     <div class="col-sm mt-0 mb-0">
-        {% include figure.liquid loading="eager" path="/assets/img/2025-06-22-a-new-history-begins-known-only-to-a-few/software3.0.png" class="img-fluid rounded z-depth-1" zoomable=true %}
+        {% include figure.liquid loading="eager" path="/assets/img/2025-07-02-a-new-history-begins-known-only-to-a-few/software3.0.png" class="img-fluid rounded z-depth-1" zoomable=true %}
     </div>
 </div>
 <div class="caption mt-0">
@@ -34,7 +34,7 @@ Andrej Karpathy最近在YC AI Startup School里的演讲[Software Is Changing(Ag
 
 <div class="row mt-3">
     <div class="col-sm mt-0 mb-0">
-        {% include figure.liquid loading="eager" path="/assets/img/2025-06-22-a-new-history-begins-known-only-to-a-few/vibecoding.png" class="img-fluid rounded z-depth-1" zoomable=true %}
+        {% include figure.liquid loading="eager" path="/assets/img/2025-07-02-a-new-history-begins-known-only-to-a-few/vibecoding.png" class="img-fluid rounded z-depth-1" zoomable=true %}
     </div>
 </div>
 <div class="caption mt-0">
