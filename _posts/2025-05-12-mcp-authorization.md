@@ -341,9 +341,9 @@ npm run deploy
 npx @modelcontextprotocol/inspector@latest
 ```
 
-通过SSE来连接，比如 https://mcp-github-oauth.ifuryst.workers.dev/sse
+通过SSE来连接，比如 `https://mcp-github-oauth.ifuryst.workers.dev/sse`（注意：这是一个演示链接，可能已经失效）
 
-大体流程是：连接后因为没有认证授权所以会返回401，这个时候MCP Client会根据MCP Servers暴露的Server Metadata Discovery（在 https://mcp-github-oauth.ifuryst.workers.dev/.well-known/oauth-authorization-server ）去发现认证的信息，然后跳转到对应的地址去做认证。这里会先到CF Worker上部署的这个服务的页面，然后点击确认后会跳到GitHub做实际的认证，最后跳回MCP Client的callback接口，通常是 `/oauth/callback`，比如Inspector这里是 `http://127.0.0.1:6274/oauth/callback`
+大体流程是：连接后因为没有认证授权所以会返回401，这个时候MCP Client会根据MCP Servers暴露的Server Metadata Discovery（在 `https://mcp-github-oauth.ifuryst.workers.dev/.well-known/oauth-authorization-server`，演示链接可能已失效）去发现认证的信息，然后跳转到对应的地址去做认证。这里会先到CF Worker上部署的这个服务的页面，然后点击确认后会跳到GitHub做实际的认证，最后跳回MCP Client的callback接口，通常是 `/oauth/callback`，比如Inspector这里是 `http://127.0.0.1:6274/oauth/callback`
 
 <div class="row mt-3">
   <div class="row mt-3">
