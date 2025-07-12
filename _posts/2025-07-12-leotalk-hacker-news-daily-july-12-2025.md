@@ -12,11 +12,14 @@ toc:
 ---
 
 ## 🔥 今日重点（Top Picks）
+
 - **Grok 4 内容争议**: xAI 的 Grok 4 被发现其答案受Elon Musk个人偏好影响，在涉及敏感话题时引发关注。([Simon Willison](https://simonwillison.net/2025/Jul/11/grok-musk/)、[TechCrunch](https://techcrunch.com/2025/07/10/grok-4-seems-to-consult-elon-musk-to-answer-controversial-questions/)、[Politico](https://www.politico.com/news/magazine/2025/07/10/musk-grok-hitler-ai-00447055))
 - **英国邮局丑闻致多人自杀**: 报告显示，英国邮局IT系统故障导致的错判丑闻已造成至少13人自杀。([NYT](https://www.nytimes.com/2025/07/10/world/europe/uk-post-office-scandal-report.html)、[NBC News](https://www.nbcnews.com/world/united-kingdom/least-13-killed-uks-post-office-wrongful-convictions-scandal-rcna217676))
 - **欧盟首次以太阳能为主力能源**: 2025年6月，太阳能首次成为欧盟最大的电力来源。([Yale E360](https://e360.yale.edu/digest/solar-biggest-power-source-europe-june-2025)、[Ember](https://ember-energy.org/latest-updates/solar-is-eus-biggest-power-source-for-the-first-time-ever-in-june-2025/))
 - **“一键取消”订阅规则受阻**: 美国联邦贸易委员会的“一键取消”订阅规则被法院推翻，引来对大企业影响力的关注。([PennLive](https://www.pennlive.com/news/2025/07/pa-house-passes-click-to-cancel-subscription-bills-as-court-throws-out-federal-rule.html)、[AP News](https://apnews.com/article/ftc-click-to-cancel-30db2be07fdcb8aefd0d4835abdb116a)、[Yahoo News](https://www.yahoo.com/news/hiltzik-big-business-killed-click-100000373.html))
+
 ## 📦 AI & 开发工具
+
 - **LLM 推理手册**: BentoML 发布了一份深入的LLM推理技术指南。 [bentoml.com](https://bentoml.com/llm/)
 - **苏黎世联邦理工学院和洛桑联邦理工学院发布公共LLM**: 两所瑞士顶尖学府将推出基于公共基础设施开发的LLM。 [ethz.ch](https://ethz.ch/en/news-and-events/eth-news/news/2025/07/a-language-model-built-for-the-public-good.html)
 - **OpenAI Windsurf 交易告吹**: Windsurf 的CEO转投Google，此前与OpenAI的合作谈判破裂。 [theverge.com](https://www.theverge.com/openai/705999/google-windsurf-ceo-openai)
@@ -26,7 +29,9 @@ toc:
 - **RULER - 轻松为任何Agent应用RL**: OpenPipe发布新工具RULER，简化AI agent的强化学习应用。 [openpipe.ai](https://openpipe.ai/blog/ruler)
 - **Google GenAI 处理器**: Google推出 GenAI 处理器，用于构建强大灵活的Gemini应用。 [developers.googleblog.com](https://developers.googleblog.com/en/genai-processors/)
 - **Google Research：关系数据的图基础模型**: Google研究团队发布了用于关系数据的新型图基础模型。 [research.google](https://research.google/blog/graph-foundation-models-for-relational-data/)
+
 ## 🧠 思维激荡（Mind Food）
+
 - **Bill Atkinson 的迷幻用户界面**: 探讨Macintosh早期UI设计师Bill Atkinson从Apple到神秘主义的旅程。 [patternproject.substack.com](https://patternproject.substack.com/p/from-the-mac-to-the-mystical-bill)
 - **从AI成瘾中恢复**: 揭示AI成瘾的迹象及其恢复方法。 [internetaddictsanonymous.org](https://internetaddictsanonymous.org/internet-and-technology-addiction/signs-of-an-addiction-to-ai/)
 - **我不再使用社交媒体了**: 作者分享了放弃社交媒体转而写博客的理由和感受。 [carolinecrampton.com](https://www.carolinecrampton.com/im-done-with-social-media/)
@@ -43,7 +48,9 @@ toc:
 - **Figma 每天30万美元的AWS账单并非丑闻**: 分析Figma高昂AWS账单的合理性，而非负面新闻。 [duckbillgroup.com](https://www.duckbillgroup.com/blog/figmas-300k-daily-aws-bill-isnt-the-scandal-you-think-it-is/)
 - **SEO已死，Geo万岁**: 探讨在LLM和AI概览时代，搜索和信息获取方式的转变。 [substack.gauravvohra.com](https://substack.gauravvohra.com/p/search-is-dead-long-live-llms-winning-in-the-era-of-llms-ai-overviews-and-geo)
 - **AI 是否真的能提升生产力？**: 一篇分析AI对生产力影响的学术观点，认为证据尚不明确。 [theconversation.com](https://theconversation.com/does-ai-actually-boost-productivity-the-evidence-is-murky-260690)
+
 ## 🌐 科技与社会趋势
+
 - **Apple 与法律**: 探讨Apple在多国面临的法律和监管挑战。 [formularsumo.co.uk](https://formularsumo.co.uk/blog/2025/apple-vs-the-law/)
 - **日本过度旅游的代价**: 探讨日本旅游业的过度发展对小企业和当地社区的负面影响。 [craigmod.com](https://craigmod.com/ridgeline/210/)
 - **澳大利亚将引入搜索引擎年龄验证**: 澳大利亚将强制要求Google等搜索引擎实施年龄验证。 [abc.net.au](https://www.abc.net.au/news/2025-07-11/age-verification-search-engines/105516256)
@@ -62,11 +69,15 @@ toc:
 - **美国新造船战略恐难奏效**: 专家分析美国新提出的造船战略可能无法有效振兴本土造船业。 [bloomberg.com](https://www.bloomberg.com/news/articles/2025-07/11/trump-s-fees-on-china-s-cargo-ships-aren-t-enough-to-revive-us-shipyards)
 - **中国首次尝试卫星轨道加油**: 中国可能已成功进行首次卫星轨道加油，在太空回收技术方面取得突破。 [arstechnica.com](https://arstechnica.com/space/2025/07/china-jumps-ahead-in-the-race-to-achieve-a-new-kind-of-reuse-in-space/)
 - **FBI 爱泼斯坦监狱视频或被修改**: 元数据显示，FBI关于Jeffrey Epstein的原始监狱视频可能被修改。 [wired.com](https://www.wired.com/story/metadata-shows-the-dojs-raw-jeffrey-epstein-prison-video-was-likely-modified/)
+
 ## 📱 新奇项目 / Show HN
+
 - **OpenFront: 浏览器版即时战棋游戏**: 一款在浏览器中运行的实时类《风险》多人策略游戏。 [openfront.io](https://openfront.io/)
 - **Vibe Kanban – AI编码Agent看板**: 一个用于管理AI编码Agent的看板工具。 [GitHub](https://github.com/BloopAI/vibe-kanban)
 - **Heim – 轻量级FaaS平台**: 一个支持多语言、多云的轻量级无服务器平台。 [heim.dev](https://heim.dev/)
+
 ## 🔬 科学与健康
+
 - **姜黄中的铅颜料导致全球中毒**: 2024年的报告揭示，姜黄中的铅颜料是全球铅中毒的元凶之一。([NPR](https://www.npr.org/sections/goats-and-soda/2024/09/23/nx-s1-5011028/detectives-mystery-lead-poisoning-new-york-bangladesh)、[Ars Technica](https://arstechnica.com/health/2025/07/woman-takes-10x-dose-of-turmeric-gets-hospitalized-for-liver-damage/))
 - **Lumina 益生菌或导致失明**: 警告称Lumina益生菌可能以类似于甲醇的方式导致失明。 [substack.com](https://substack.com/home/post/p-168042147)
 - **加巴喷丁与痴呆风险**: 研究显示，神经疼痛药物加巴喷丁与痴呆和认知障碍风险增加有关。([MedicalXpress](https://medicalxpress.com/news/2025/07/nerve-pain-drug-gabapentin-linked.html)、[BMJ](https://rapm.bmj.com/content/early/2025/07/02/rapm-2025-106577))
@@ -78,7 +89,9 @@ toc:
 - **高收入国家生育率为何如此低？**: NBER论文探讨了高收入国家生育率持续低下的原因。 [nber.org](https://www.nber.org/papers/w33989)
 - **肠道微生物或能抵御“永久化学品”**: 研究发现肠道微生物可能有助于保护我们免受有毒“永久化学品”的侵害。 [cam.ac.uk](https://www.cam.ac.uk/research/news/gut-microbes-could-protect-us-from-toxic-forever-chemicals)
 - **非脑震荡性头部撞击对大脑影响**: 研究深入探讨了非脑震荡性头部撞击对大脑微观结构、化学和功能的影响。 [springeropen.com](https://sportsmedicine-open.springeropen.com/articles/10.1186/s40798-025-00867-0)
+
 ## 🎯 快速浏览
+
 - **Slack 57MB 的 404 页面**: 发现Slack有一个惊人的57MB大小的404错误页面。 [slack.com](https://a.slack.com/archives/b/c)
 - **有人创造了1840亿比特币**: 回顾2020年比特币历史上的一个异常事件。 [decrypt.co](https://decrypt.co/39750/184-billion-bitcoin-anonymous-creator)
 - **Air India 坠机初步报告**: Air India Flight 171 空难的初步调查报告发布。([BBC News](https://www.bbc.co.uk/news/live/cx20p2x9093t)、[AAIB (PDF)](https://aaib.gov.in/What%27s%20New%20Assets/Preliminary%20Report%20VT-ANB.pdf))
@@ -90,7 +103,9 @@ toc:
 - **《彩虹勇士号》沉没事件**: 维基百科条目介绍绿色和平组织船只《彩虹勇士号》的沉没事件。 [wikipedia.org](https://en.wikipedia.org/wiki/Sinking_of_the_Rainbow_Warrior)
 - **Tandy Corporation：成为IBM兼容电脑**: Tandy公司的历史系列文章第三部分，讲述其如何转向IBM兼容机。 [abortretry.fail](https://www.abortretry.fail/p/tandy-corporation-part-3)
 - **仿生机械臂让植物演奏乐器**: 一个新奇项目，让植物通过仿生机械臂演奏乐器。 [djmag.com](https://djmag.com/news/bionic-robot-arm-lets-plants-play-musical-instruments)
+
 ## 🧰 Dev Tricks
+
 - **Mac Mini M4 Pro 存储升级**: 以一半价格升级M4 Pro Mac Mini存储的指南。 [jeffgeerling.com](https://www.jeffgeerling.com/blog/2025/upgrading-m4-pro-mac-minis-storage-half-price)
 - **重涂你的MacBook**: 关于为MacBook重新涂抹散热膏的指南。 [christianselig.com](https://christianselig.com/2025/07/repaste-macbook/)
 - **Quad9 DNS 每日热门域名**: Quad9递归解析器阵列上每天看到的最热门DNS域名列表。 [GitHub](https://github.com/Quad9DNS/quad9-domains-top500)
