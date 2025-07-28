@@ -6,6 +6,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "How We Used Go 1.22 To Cut Our Search Indexing Build Time By 50%"
+    url: "https://www.datadoghq.com/blog/engineering/go-swiss-tables/"
+    reason: "Datadog通过实际生产应用的收益讲解了Swiss Tables，在追求性能或大规模场景下，很值得阅读和学习"
+    added_at: "2025-07-28"
+    tag: "article"
   - title: "Thoughts on thinking"
     url: "https://dcurt.is/thinking"
     reason: "在AI时代，某些场景下脑子似乎在生锈，深远影响？留给时间吧"
