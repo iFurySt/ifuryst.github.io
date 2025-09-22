@@ -2027,8 +2027,7 @@ def build_graph(service: LLMService) -> StateGraph:
 > 李广密：Long Context跟Long-Term Memory是什么样的关系？
 > **姚顺雨：**Long Context是实现Long-Term Memory的一种方式。
 > 如果你能实现1亿或1千亿或无限长的Context，它是实现Long-Term Memory的一种方式。它是一种和人区别很大的方式，但这是有可能的。当然会有很多不同方式，不好说哪种是最好，或者最合适。
-> **李广密：现在业界实现Long Context有Linear（线性）方式、Sparse（稀疏）方式，或者 Hybrid（混合）方式，你有倾向吗？**
-> **姚顺雨：**我不想对方法进行评论，但我想对evaluation（评估）和task（任务）进行评论。
+> **李广密：现在业界实现Long Context有Linear（线性）方式、Sparse（稀疏）方式，或者 Hybrid（混合）方式，你有倾向吗？** > **姚顺雨：**我不想对方法进行评论，但我想对evaluation（评估）和task（任务）进行评论。
 > 起码到去年为止，大家主要还在做所谓Long Range Arena（长距离评估基准），比如hay in the stack——我有一个很长的输入，我在中间插入一句话，比如 “姚顺雨现在在OpenAI”，然后我问你相关问题。
 > 这是一个必要但不充分的任务。你能完成这个任务，是Not Memory Work（非长期记忆任务）中的前置条件，但远不是充分条件。它是必要条件，但现在大家有点陷在这个必要条件，没有创造更难或更有价值的任务，这是个问题。
 > 当没有一个很好的评估方式，很难真正讨论各种方法的好坏。
