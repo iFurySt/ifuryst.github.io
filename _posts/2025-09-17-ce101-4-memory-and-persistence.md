@@ -6,7 +6,7 @@ tags:
   - AI
   - Book
   - CE101
-categories: AI
+categories: CE101
 giscus_comments: true
 tabs: true
 pretty_table: true

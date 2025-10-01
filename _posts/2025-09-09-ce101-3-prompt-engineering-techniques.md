@@ -3,10 +3,10 @@ layout: post
 title: "大模型上下文工程实践指南-第3章：提示词技术"
 date: 2025-09-09T08:00:00+08:00
 tags:
-  - CE101
-  - Book
   - AI
-categories: CE101
+  - Book
+  - CE101
+categories: AI
 giscus_comments: true
 tabs: true
 pretty_table: true

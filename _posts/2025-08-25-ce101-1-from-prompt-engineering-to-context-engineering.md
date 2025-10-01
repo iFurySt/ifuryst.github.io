@@ -3,10 +3,10 @@ layout: post
 title: "大模型上下文工程实践指南-第1章：从提示词到上下文"
 date: 2025-08-25T08:00:00+08:00
 tags:
-  - Blog
-  - 微信公众号
-  - Substack
-categories: Blog
+  - AI
+  - Book
+  - CE101
+categories: AI
 giscus_comments: true
 tabs: true
 pretty_table: true
