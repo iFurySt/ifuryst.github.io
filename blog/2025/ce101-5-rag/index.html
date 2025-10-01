@@ -88,490 +88,34 @@
 问题: 什么是CatLang？
 回答: CatLang是一种由Leo发明的新编程语言，其语法非常简单，所有函数都以“喵”开头。
 <span class="o">=====================</span>
-</code></pre></div></div> <p>这边我做了一个Top K搜索的模拟，实际上是不会打印的，这个简单的Demo让我们对RAG有一个初步的概念。总体而言，RAG是为了提高效果的技术，其结合文档检索，提供了合适模型的上下文，成为上下文工程中的核心技术之一。接下去我们来看一下RAG的基础架构和流程</p> <h2 id="512-架构与工作流程">5.1.2 架构与工作流程</h2> <p>接下去我们来看看RAG相关的架构和流程，这边我画了一张RAG架构图：</p> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-10-01-ce101-5-rag/1759293252_3-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293252_3-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293252_3-1400.webp 1400w," sizes="95vw" type="image/webp"></source> <img src="/assets/img/2025-10-01-ce101-5-rag/1759293252_3.png" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"> </picture> </figure> </div> </div> </div> </div> <p>这是一个比较完整的RAG架构图，包含了流程中的一些关键节点，我们不需要马上理解每个环节，后面我们会陆续提到每个环节里的内容。</p> <p>RAG的基础架构相对简单，主要分为三个阶段：</p> <ol> <li> <strong>查询（Query）</strong>：输入，通常为用户的查询或者问题等</li> <li> <strong>检索（Retriever）</strong>：从相关知识库中获得与用户问题相关性最高的文档（Top K）</li> <li> <strong>生成（Generation）</strong>：根据Query和检索得到的文档，生成高质量的回答</li> </ol> <p>下面是一个RAG实施的全过程：</p> <ol> <li>数据通过合理的分块（chunking），每块分别做向量化（embedding）后存到向量数据库</li> <li>查询进来后，将查询问题也通过同样的方式向量化后，去到向量数据库内做相似性搜索</li> <li>将搜索得到的top-k文档块的原始数据拼接后放在上下文中一起发送给大语言模型</li> <li>大语言模型基于响应的数据做最后的结果生成</li> </ol> <p>这样有了原始数据的参考，大模型就有了参照物，最终给出的答案也会更加稳定，避免自由发挥情况下容易产生幻觉或产生过时数据的情况发生。在开始深入RAG之前，我们可以先来了解一下检索方式，这有助于我们理解RAG里一个很核心的概念，检索。</p> <h2 id="513-检索方式">5.1.3 检索方式</h2> <p>在自然语言处理中有文本检索技术，分为：</p> <ol> <li>稀疏文本检索（Sparse Retrieval）</li> <li>稠密文本检索（Dense Retrieval）</li> </ol> <p>在现行的RAG语境下，更多是使用了向量化搜索，也就是稠密文本检索的方式。但是随着RAG应用的推广和普及，目前越来越多应用中会将两个检索方式结合起来使用，这个在下一节中也会了解到。现在我们先来了解一下这两种检索方式的原理和差异。</p> <h3 id="稀疏文本检索sparse-retrieval">稀疏文本检索（Sparse Retrieval）</h3> <p>原理是<strong>基于词频（Term Frequency）等显式词项统计信息，使用稀疏向量（Sparse Vector）表示文本，使用向量相似度进行匹配，返回最相关的文档</strong>。那么什么是稀疏向量呢？简单说就是大部分维度为0的向量。简单举个例子来理解，假设有个词表（vocabulary）：</p> <p>```plain text [“apple”, “banana”, “car”, “dog”, “elephant”]</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-这个词表有5个词，对应一个5维的向量空间。现在有个文档：
-
-```plain text
-I like banana
-</code></pre></div></div> <p>我们用稀疏向量来表示这个文档时，会得到：</p> <p>```plain text [0, 1, 0, 0, 0]</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-很直观的可以看到，这是一个5维的向量，但是其中大部分的维度都是0（没出现），只有极少数是非0（有出现的词）。理论上我们会在这里持续增加词出现的频次，比如
-
-```plain text
-banana banana banana!
-</code></pre></div></div> <p>可以得到</p> <p>```plain text [0, 3, 0, 0, 0]</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-看着没什么问题，但是这种极致简单的词频统计，会在某些情况下有问题，比如像“the”、“is”、“you”这些词在所有文本中都很多，但它们没啥实际意义。所以出现次数多的词，并不一定重要。为了解决这个问题，我们就需要引入一些方法。常见的方法有：
-
-- **TF-IDF（Term Frequency - Inverse Document Frequency）**：在词频的基础上加入“逆文档频率”因素，降低常见词的权重，提高稀有词的权重。
-- **BM25**：一种改进的 TF-IDF 加权方案，同时考虑了词频饱和、文档长度归一化等因素，广泛应用于现代搜索引擎。
-
-这些方法都基于**倒排索引（Inverted Index）**结构实现高效检索。它们不再简单依赖“词频越高越重要”的假设，而是引入更多统计规律，使得检索系统能更准确地评估“哪些词更关键”。这个也是传统的搜索引擎的基础，像Google这类搜索引擎在早期就应用了这类技术去做搜索。另外全文检索里可以经常看到这两个技术，比如ES的全文检索就是利用了BM25来做的。
-
-可以看出**稀疏文本检索的优点就是高效快速，消耗资源少，因此被广泛使用**。其**缺点就是无法理解一些语义相近但是词不重叠的文本**，比如car和automobile这种，因此也就有了稠密文本检索来解决这个问题
-
-### 稠密文本检索（Dense Retrieval）
-
-原理是**通过神经网络（如Word2Vec、BERT）将查询和文档分别编码成低维稠密向量（Dense Vector），使用向量相似度（如内积或余弦相似度）进行匹配，返回最相关的文档**。那么什么是稠密向量呢？和稀疏向量刚好反过来了：稠密向量是所有维度基本都有值的向量。每一维都用浮点数表示，通常没有“0”或者很少有“0”。
-
-这边的低维是相对于前面稀疏文本里的稀疏向量通常是极高维度的，因为那边的向量维度=词表大小，通常可以词表可以达到**几十万甚至百万维**，但是在稠密向量里，通常**几十维到几千维**的程度，所以是低维稠密向量。
-
-举个例子，还是前面这句话：
-
-```plain text
-I love bananas
-
-</code></pre></div></div> <p>我们将其送进一个神经网络模型（如BERT、DPR编码器），可以输出得到一个向量，如：</p> <p>```plain text [0.12, -0.08, 0.91, 0.33, …, 0.04] // 共768维</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-像现在流行的Embedding本质上就是这个原理，通过预训练语言模型后，可以通过模型将内容编码为向量，每个向量都是一个**语义表示（Semantic Representation）**，这些向量不是手动构造的，而是模型通过大量文本学习出来的。
-
-我们可以找到很多这种向量可视化的网站或者开源项目，比如[tensorflow](https://projector.tensorflow.org/)这个展示了word2vec的向量在三维空间的表示，可以看两个词的可视化距离（相似度计算其实算的就是在对应维度空间下的两点之间的距离，只不过维度高到人类大脑无法轻易想象，也就是超越人类的认知，没办法像在二维和三维空间下可以轻松计算距离）
-
-&lt;div class="row mt-3"&gt;
-    &lt;div class="col-sm mt-0 mb-0"&gt;
-        &lt;div class="row mt-3"&gt;
-    &lt;div class="col-sm mt-0 mb-0"&gt;
-        
-
-&lt;figure
-  
-&gt;
-  &lt;picture&gt;
-    &lt;!-- Auto scaling with imagemagick --&gt;
-    &lt;!--
-      See https://www.debugbear.com/blog/responsive-images#w-descriptors-and-the-sizes-attribute and
-      https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images for info on defining 'sizes' for responsive images
-    --&gt;
-    
-      &lt;source
-        class="responsive-img-srcset"
-        srcset="/assets/img/2025-10-01-ce101-5-rag/1759293254_4-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293254_4-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293254_4-1400.webp 1400w,"
-        
-          sizes="95vw"
-        
-        type="image/webp"
-      &gt;
-    
-    &lt;img
-      src="/assets/img/2025-10-01-ce101-5-rag/1759293254_4.png"
-      
-        class="img-fluid rounded z-depth-1"
-      
-      
-        width="100%"
-      
-      
-        height="auto"
-      
-      
-      
-      
-      
-        data-zoomable
-      
-      
-        loading="eager"
-      
-      onerror="this.onerror=null; $('.responsive-img-srcset').remove();"
-    &gt;
-  &lt;/picture&gt;
-
-  
-&lt;/figure&gt;
-
-    &lt;/div&gt;
-&lt;/div&gt;
-    &lt;/div&gt;
-&lt;/div&gt;
-另外vectosphere这个，也可以同样可视化展示：
-&lt;div class="row mt-3"&gt;
-    &lt;div class="col-sm mt-0 mb-0"&gt;
-        &lt;div class="row mt-3"&gt;
-    &lt;div class="col-sm mt-0 mb-0"&gt;
-        
-
-&lt;figure
-  
-&gt;
-  &lt;picture&gt;
-    &lt;!-- Auto scaling with imagemagick --&gt;
-    &lt;!--
-      See https://www.debugbear.com/blog/responsive-images#w-descriptors-and-the-sizes-attribute and
-      https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images for info on defining 'sizes' for responsive images
-    --&gt;
-    
-      &lt;source
-        class="responsive-img-srcset"
-        srcset="/assets/img/2025-10-01-ce101-5-rag/1759293254_5-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293254_5-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293254_5-1400.webp 1400w,"
-        
-          sizes="95vw"
-        
-        type="image/webp"
-      &gt;
-    
-    &lt;img
-      src="/assets/img/2025-10-01-ce101-5-rag/1759293254_5.png"
-      
-        class="img-fluid rounded z-depth-1"
-      
-      
-        width="100%"
-      
-      
-        height="auto"
-      
-      
-      
-      
-      
-        data-zoomable
-      
-      
-        loading="eager"
-      
-      onerror="this.onerror=null; $('.responsive-img-srcset').remove();"
-    &gt;
-  &lt;/picture&gt;
-
-  
-&lt;/figure&gt;
-
-    &lt;/div&gt;
-&lt;/div&gt;
-    &lt;/div&gt;
-&lt;/div&gt;
-回过头来，常见的稠密文本检索方法有下面这些，有兴趣的可以自己去了解一下：
-
-我们平时最常见的RAG应用就是使用了Bi-Encoder，因为足够快，而ReRank时数量较少，可以利用Cross-Encoder来打分。
-
-到这里我们已经知道了稠密文本检索到底是做什么了，在提前向量化资料后，在后续问题来了之后可以将问题也进行向量化，然后通过向量相似度进行搜索，得到最相关的资料，这就是稠密文本检索的过程，**能够检索语义相近但词不匹配的文档**，并且**适合复杂查询、开放域问答、RAG 等应用**。
-
-其缺点也相对明显：**需要大规模训练，消耗资源大，部署成本高，另外召回的结果可解释性低**
-
-### 融合方法（Hybrid Retrieval）
-
-两者各有优缺点，因此很多系统或者应用场景会将两者进行结合，比如用稀疏检索（如BM25）结合稠密检索先召回 Top K文档，再用重排模型（Dense Reranker，如Cross-Encoder）对结果进行重新排序，重新排序
-
-引用一张我之前发的关于Bi-Encoder和Cross-Encoder：
-
-&lt;div class="row mt-3"&gt;
-    &lt;div class="col-sm mt-0 mb-0"&gt;
-        &lt;div class="row mt-3"&gt;
-    &lt;div class="col-sm mt-0 mb-0"&gt;
-        
-
-&lt;figure
-  
-&gt;
-  &lt;picture&gt;
-    &lt;!-- Auto scaling with imagemagick --&gt;
-    &lt;!--
-      See https://www.debugbear.com/blog/responsive-images#w-descriptors-and-the-sizes-attribute and
-      https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images for info on defining 'sizes' for responsive images
-    --&gt;
-    
-      &lt;source
-        class="responsive-img-srcset"
-        srcset="/assets/img/2025-10-01-ce101-5-rag/1759293254_6-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293254_6-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293254_6-1400.webp 1400w,"
-        
-          sizes="95vw"
-        
-        type="image/webp"
-      &gt;
-    
-    &lt;img
-      src="/assets/img/2025-10-01-ce101-5-rag/1759293254_6.png"
-      
-        class="img-fluid rounded z-depth-1"
-      
-      
-        width="100%"
-      
-      
-        height="auto"
-      
-      
-      
-      
-      
-        data-zoomable
-      
-      
-        loading="eager"
-      
-      onerror="this.onerror=null; $('.responsive-img-srcset').remove();"
-    &gt;
-  &lt;/picture&gt;
-
-  
-&lt;/figure&gt;
-
-    &lt;/div&gt;
-&lt;/div&gt;
-    &lt;/div&gt;
-&lt;/div&gt;
-我们在实际应用中**不会因为技术而技术**，一定要记住这句话！否则很容易陷入拿着锤子找钉子的尴尬境地（现在其实有不少人就是拿着AI找钉子敲）。就比如前面提到的这些，有可能在实际的应用中只是简单的应用向量化去做检索就足够了，也可能复杂到需要结合关系型数据库做常规的数据检索+ES做全文检索+向量化检索+重排技术得到最匹配的结果去做方案。所以应用AI（Applied AI）的背后就是我们需要去了解每个技术背后的原理，是基于什么背景之下提出来的，以及这个技术目前发展到什么程度了，可以解决什么问题，在某个应用场景下是否合适，这样我们才可以真正做到将AI应用在有价值的地方，赋能业务产生真正的商业价值，而不是陷入技术自嗨中。
-
-了解完这个我们对于RAG的底层依托的技术已经有了比较清晰的认知了，接下去我们会进一步深入去了解RAG相关的技术以及衍生的一些应用方式。
-
-# 5.2 RAG进阶
-
-常规的RAG相对简单，在实际应用中，我们会在原本的架构之上，去运用一些技术和方法来提高，比如：
-
-- **标量+向量**：通常RAG是将文档分块（Chunk）后向量化（Embedding）入库，然后查询也向量化后到向量数据库进行相似性搜索。如前面提到，实际上还可以结合传统的数据库或者ES进行标量数据的匹配检索，最后可以得到标量+向量数据。
-- **重排（Reranking）**：不管是单向量还是结合了标量，在送到模型前可以用一些手段对文档进行重新排序，通常我们会使用重排模型对文档再进行评分排序，这样可以选择实际送到模型的文档
-- **多跳RAG**：当单跳查询无法满足复杂的查询时，结合多跳是可以达到更好的效果的。
-- **图增强RAG（Graph-RAG）**：结合图的能力来扩展RAG的能力，尤其是在文档处理阶段，可以利用图+大模型来细化一些实体和关系，甚至进一步形成社区或领域的形态。
-
-上面只是一部分技术或方法。在技术普及过程，开始会陆续出现体系化的知识，也是为了方便应用以及后来者学习，现在业界也有很多划分方式，比如[Daily Dose of Data Science](https://www.dailydoseofds.com/tag/rag-crash-course/)这张图：
-
-&lt;div class="row mt-3"&gt;
-    &lt;div class="col-sm mt-0 mb-0"&gt;
-        &lt;div class="row mt-3"&gt;
-    &lt;div class="col-sm mt-0 mb-0"&gt;
-        
-
-&lt;figure
-  
-&gt;
-  &lt;picture&gt;
-    &lt;!-- Auto scaling with imagemagick --&gt;
-    &lt;!--
-      See https://www.debugbear.com/blog/responsive-images#w-descriptors-and-the-sizes-attribute and
-      https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images for info on defining 'sizes' for responsive images
-    --&gt;
-    
-      &lt;source
-        class="responsive-img-srcset"
-        srcset="/assets/img/2025-10-01-ce101-5-rag/1759293255_7-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293255_7-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293255_7-1400.webp 1400w,"
-        
-          sizes="95vw"
-        
-        type="image/webp"
-      &gt;
-    
-    &lt;img
-      src="/assets/img/2025-10-01-ce101-5-rag/1759293255_7.jpg"
-      
-        class="img-fluid rounded z-depth-1"
-      
-      
-        width="100%"
-      
-      
-        height="auto"
-      
-      
-      
-      
-      
-        data-zoomable
-      
-      
-        loading="eager"
-      
-      onerror="this.onerror=null; $('.responsive-img-srcset').remove();"
-    &gt;
-  &lt;/picture&gt;
-
-  
-&lt;/figure&gt;
-
-    &lt;/div&gt;
-&lt;/div&gt;
-    &lt;/div&gt;
-&lt;/div&gt;
-另外[这篇论文](https://arxiv.org/pdf/2501.09136)里也提供了相应的划分方式：
-
-我们引用[这篇论文](https://arxiv.org/pdf/2312.10997)里的一张示意图：
-
-&lt;div class="row mt-3"&gt;
-    &lt;div class="col-sm mt-0 mb-0"&gt;
-        &lt;div class="row mt-3"&gt;
-    &lt;div class="col-sm mt-0 mb-0"&gt;
-        
-
-&lt;figure
-  
-&gt;
-  &lt;picture&gt;
-    &lt;!-- Auto scaling with imagemagick --&gt;
-    &lt;!--
-      See https://www.debugbear.com/blog/responsive-images#w-descriptors-and-the-sizes-attribute and
-      https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images for info on defining 'sizes' for responsive images
-    --&gt;
-    
-      &lt;source
-        class="responsive-img-srcset"
-        srcset="/assets/img/2025-10-01-ce101-5-rag/1759293255_8-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293255_8-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293255_8-1400.webp 1400w,"
-        
-          sizes="95vw"
-        
-        type="image/webp"
-      &gt;
-    
-    &lt;img
-      src="/assets/img/2025-10-01-ce101-5-rag/1759293255_8.png"
-      
-        class="img-fluid rounded z-depth-1"
-      
-      
-        width="100%"
-      
-      
-        height="auto"
-      
-      
-      
-      
-      
-        data-zoomable
-      
-      
-        loading="eager"
-      
-      onerror="this.onerror=null; $('.responsive-img-srcset').remove();"
-    &gt;
-  &lt;/picture&gt;
-
-  
-&lt;/figure&gt;
-
-    &lt;/div&gt;
-&lt;/div&gt;
-    &lt;/div&gt;
-&lt;/div&gt;
-可以较为清楚的看出差别，分类是人为划分的，本质上就是针对基础的RAG在各个环节进行优化提升，目的都是为了提高最后输出的效果。
-
-**进阶RAG（Advanced RAG）**就是加入了**前处理阶段（Pre-Retrieval）**来优化查询，比如查询重写或运用一些策略进行处理。并且加入了**后处理阶段（Post-Retrieval）**来优化检索后的文档块，比如重排、压缩或融合等手段，这样在最终给到大模型可以得到更好的结果提升。
-
-**模块化RAG（Modular RAG）**则是将各种阶段或者功能单独成模块，每个模块是最小单元，可以自由的组合，形成一个类似workflow的流程，有点像是玩乐高积木，可以针对不同的业务场景自由组合。本质上里面的技术和方法没有变化，只不过是在工程化上进行了优化，方便不断复用和自由编排。
-
-**图RAG（Graph RAG）**就是利用了图来辅助处理，万物皆可图，图的能力应用在RAG里，使得RAG得到了极大的提升，后面我们会在图RAG章节里会详细分析加入图能力，RAG得到的好处和提升。
-
-**智能体RAG（Agentic RAG）**则是将RAG从简单的检索生成扩展成自主的Agent，可以基于一定的策略动态决策并进行多轮次检索，这个其实是对多跳RAG的一种提升，将AI Agent的思想融入RAG。
-
-到这里我们再回过头来看看我们前面的那张架构图：
-
-&lt;div class="row mt-3"&gt;
-    &lt;div class="col-sm mt-0 mb-0"&gt;
-        &lt;div class="row mt-3"&gt;
-    &lt;div class="col-sm mt-0 mb-0"&gt;
-        
-
-&lt;figure
-  
-&gt;
-  &lt;picture&gt;
-    &lt;!-- Auto scaling with imagemagick --&gt;
-    &lt;!--
-      See https://www.debugbear.com/blog/responsive-images#w-descriptors-and-the-sizes-attribute and
-      https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images for info on defining 'sizes' for responsive images
-    --&gt;
-    
-      &lt;source
-        class="responsive-img-srcset"
-        srcset="/assets/img/2025-10-01-ce101-5-rag/1759293256_9-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293256_9-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293256_9-1400.webp 1400w,"
-        
-          sizes="95vw"
-        
-        type="image/webp"
-      &gt;
-    
-    &lt;img
-      src="/assets/img/2025-10-01-ce101-5-rag/1759293256_9.png"
-      
-        class="img-fluid rounded z-depth-1"
-      
-      
-        width="100%"
-      
-      
-        height="auto"
-      
-      
-      
-      
-      
-        data-zoomable
-      
-      
-        loading="eager"
-      
-      onerror="this.onerror=null; $('.responsive-img-srcset').remove();"
-    &gt;
-  &lt;/picture&gt;
-
-  
-&lt;/figure&gt;
-
-    &lt;/div&gt;
-&lt;/div&gt;
-    &lt;/div&gt;
-&lt;/div&gt;
-这里面其实已经体现了很多的东西，我们可以把RAG分为：
-1. 输入：可能有不同的输入方式，主流常见的是从Chat进来的问题
-2. 前处理：检索前作一些前置处理动作，目的是增加召回效果
-3. 检索：执行检索
-4. 后处理：对检索的结果进行特定的处理，目的也是增加召回效果
-5. 生成：给大模型输出最后的结果
-6. 输出：将结果返回
-
-这个其实就是一个进阶RAG的流程了，至于模块化RAG，其实是将里面的功能模块都单独抽出来形成独立的单元，这样可以重复自由组织编排，而图RAG和智能体RAG则会在里面多个环节参与。下面我们会针对一些关键的节点和方式展开。
-
-## 5.2.1 查询重写
-
-在传统的RAG里，通常就是将查询通过向量化的手段转成嵌入（embedding），做相似性搜索后给到大模型。这种情况下有明显可见的问题：**输入查询无法顺利匹配到文档块**。
-
-在实际场景下，用户输入的问题有可能因为过于简化或者表述不当而无法通过相似度搜索匹配到合适的文档块，使得最终的效果不符合预期。面对这个问题，可以应用查询重写来进一步缓解并提升效果。
-
-正如前面提到的，重写策略其实有挺多的，目前主流的有这么几种（更多还是一些类别的划分，实际上在不同的业务场景下还会有不同的策略浮现的，比如一些行业词汇重写、黑白词等等，这边就不过度展开）：
-
-1. **规范化重写（Canonicalization）**：将随意、模糊、口语化表达转成标准清晰的问题
-2. **同义改写（Paraphrasing）**：增强表达覆盖、抗embedding漏召
-3. **泛化重写（Step-Back Query）**：提升复杂问题检索效果
-4. **多查询生成（Multi-query Generation）**：多视角覆盖、提升召回率
-5. **问题分解策略（Question Decomposition）**：将复杂查询拆分为多个子问题，分步检索和推理
-
-### **规范化重写（Canonicalization）**
-
-规范化重写其实就是针对查询问题让大语言模型帮忙进行重写，使得问题更加规范化，这其中有一些不同的手法。我们先来看一个基础的示例：
-
-```plain text
-周杰伦第一张专辑是什么？
-</code></pre></div></div> <p>可以改写成</p> <p>```plain text 周杰伦第一张音乐专辑名称是什么？</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-类似这样的规范化重写，可以将一个较为随意的问题转变成更加正式的问题。以便在向量化检索的过程中，可以更好的召回预期的文档块用于最终的结果生成。
-
-### **同义改写（Paraphrasing）**
-
-同义改写的原理也是差不多的，对于不合适的表述，可以进行同义替换改写，使得输入的内容可以更容易匹配到合适的文档块。比如：
-
-```plain text
-# 历史聊天记录
+</code></pre></div></div> <p>这边我做了一个Top K搜索的模拟，实际上是不会打印的，这个简单的Demo让我们对RAG有一个初步的概念。总体而言，RAG是为了提高效果的技术，其结合文档检索，提供了合适模型的上下文，成为上下文工程中的核心技术之一。接下去我们来看一下RAG的基础架构和流程</p> <h2 id="512-架构与工作流程">5.1.2 架构与工作流程</h2> <p>接下去我们来看看RAG相关的架构和流程，这边我画了一张RAG架构图：</p> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-10-01-ce101-5-rag/1759293252_3-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293252_3-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293252_3-1400.webp 1400w," sizes="95vw" type="image/webp"></source> <img src="/assets/img/2025-10-01-ce101-5-rag/1759293252_3.png" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"> </picture> </figure> </div> </div> </div> </div> <p>这是一个比较完整的RAG架构图，包含了流程中的一些关键节点，我们不需要马上理解每个环节，后面我们会陆续提到每个环节里的内容。</p> <p>RAG的基础架构相对简单，主要分为三个阶段：</p> <ol> <li> <strong>查询（Query）</strong>：输入，通常为用户的查询或者问题等</li> <li> <strong>检索（Retriever）</strong>：从相关知识库中获得与用户问题相关性最高的文档（Top K）</li> <li> <strong>生成（Generation）</strong>：根据Query和检索得到的文档，生成高质量的回答</li> </ol> <p>下面是一个RAG实施的全过程：</p> <ol> <li>数据通过合理的分块（chunking），每块分别做向量化（embedding）后存到向量数据库</li> <li>查询进来后，将查询问题也通过同样的方式向量化后，去到向量数据库内做相似性搜索</li> <li>将搜索得到的top-k文档块的原始数据拼接后放在上下文中一起发送给大语言模型</li> <li>大语言模型基于响应的数据做最后的结果生成</li> </ol> <p>这样有了原始数据的参考，大模型就有了参照物，最终给出的答案也会更加稳定，避免自由发挥情况下容易产生幻觉或产生过时数据的情况发生。在开始深入RAG之前，我们可以先来了解一下检索方式，这有助于我们理解RAG里一个很核心的概念，检索。</p> <h2 id="513-检索方式">5.1.3 检索方式</h2> <p>在自然语言处理中有文本检索技术，分为：</p> <ol> <li>稀疏文本检索（Sparse Retrieval）</li> <li>稠密文本检索（Dense Retrieval）</li> </ol> <p>在现行的RAG语境下，更多是使用了向量化搜索，也就是稠密文本检索的方式。但是随着RAG应用的推广和普及，目前越来越多应用中会将两个检索方式结合起来使用，这个在下一节中也会了解到。现在我们先来了解一下这两种检索方式的原理和差异。</p> <h3 id="稀疏文本检索sparse-retrieval">稀疏文本检索（Sparse Retrieval）</h3> <p>原理是<strong>基于词频（Term Frequency）等显式词项统计信息，使用稀疏向量（Sparse Vector）表示文本，使用向量相似度进行匹配，返回最相关的文档</strong>。那么什么是稀疏向量呢？简单说就是大部分维度为0的向量。简单举个例子来理解，假设有个词表（vocabulary）：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>["apple", "banana", "car", "dog", "elephant"]
+</code></pre></div></div> <p>这个词表有5个词，对应一个5维的向量空间。现在有个文档：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>I like banana
+</code></pre></div></div> <p>我们用稀疏向量来表示这个文档时，会得到：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0, 1, 0, 0, 0]
+</code></pre></div></div> <p>很直观的可以看到，这是一个5维的向量，但是其中大部分的维度都是0（没出现），只有极少数是非0（有出现的词）。理论上我们会在这里持续增加词出现的频次，比如</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>banana banana banana!
+</code></pre></div></div> <p>可以得到</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0, 3, 0, 0, 0]
+</code></pre></div></div> <p>看着没什么问题，但是这种极致简单的词频统计，会在某些情况下有问题，比如像“the”、“is”、“you”这些词在所有文本中都很多，但它们没啥实际意义。所以出现次数多的词，并不一定重要。为了解决这个问题，我们就需要引入一些方法。常见的方法有：</p> <ul> <li> <strong>TF-IDF（Term Frequency - Inverse Document Frequency）</strong>：在词频的基础上加入“逆文档频率”因素，降低常见词的权重，提高稀有词的权重。</li> <li> <strong>BM25</strong>：一种改进的 TF-IDF 加权方案，同时考虑了词频饱和、文档长度归一化等因素，广泛应用于现代搜索引擎。</li> </ul> <p>这些方法都基于<strong>倒排索引（Inverted Index）</strong>结构实现高效检索。它们不再简单依赖“词频越高越重要”的假设，而是引入更多统计规律，使得检索系统能更准确地评估“哪些词更关键”。这个也是传统的搜索引擎的基础，像Google这类搜索引擎在早期就应用了这类技术去做搜索。另外全文检索里可以经常看到这两个技术，比如ES的全文检索就是利用了BM25来做的。</p> <p>可以看出<strong>稀疏文本检索的优点就是高效快速，消耗资源少，因此被广泛使用</strong>。其<strong>缺点就是无法理解一些语义相近但是词不重叠的文本</strong>，比如car和automobile这种，因此也就有了稠密文本检索来解决这个问题</p> <h3 id="稠密文本检索dense-retrieval">稠密文本检索（Dense Retrieval）</h3> <p>原理是<strong>通过神经网络（如Word2Vec、BERT）将查询和文档分别编码成低维稠密向量（Dense Vector），使用向量相似度（如内积或余弦相似度）进行匹配，返回最相关的文档</strong>。那么什么是稠密向量呢？和稀疏向量刚好反过来了：稠密向量是所有维度基本都有值的向量。每一维都用浮点数表示，通常没有“0”或者很少有“0”。</p> <p>这边的低维是相对于前面稀疏文本里的稀疏向量通常是极高维度的，因为那边的向量维度=词表大小，通常可以词表可以达到<strong>几十万甚至百万维</strong>，但是在稠密向量里，通常<strong>几十维到几千维</strong>的程度，所以是低维稠密向量。</p> <p>举个例子，还是前面这句话：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>I love bananas
+
+</code></pre></div></div> <p>我们将其送进一个神经网络模型（如BERT、DPR编码器），可以输出得到一个向量，如：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0.12, -0.08, 0.91, 0.33, ..., 0.04]   // 共768维
+
+</code></pre></div></div> <p>像现在流行的Embedding本质上就是这个原理，通过预训练语言模型后，可以通过模型将内容编码为向量，每个向量都是一个<strong>语义表示（Semantic Representation）</strong>，这些向量不是手动构造的，而是模型通过大量文本学习出来的。</p> <p>我们可以找到很多这种向量可视化的网站或者开源项目，比如<a href="https://projector.tensorflow.org/" rel="external nofollow noopener" target="_blank">tensorflow</a>这个展示了word2vec的向量在三维空间的表示，可以看两个词的可视化距离（相似度计算其实算的就是在对应维度空间下的两点之间的距离，只不过维度高到人类大脑无法轻易想象，也就是超越人类的认知，没办法像在二维和三维空间下可以轻松计算距离）</p> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-10-01-ce101-5-rag/1759293254_4-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293254_4-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293254_4-1400.webp 1400w," sizes="95vw" type="image/webp"></source> <img src="/assets/img/2025-10-01-ce101-5-rag/1759293254_4.png" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"> </picture> </figure> </div> </div> </div> </div> <p>另外vectosphere这个，也可以同样可视化展示：</p> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-10-01-ce101-5-rag/1759293254_5-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293254_5-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293254_5-1400.webp 1400w," sizes="95vw" type="image/webp"></source> <img src="/assets/img/2025-10-01-ce101-5-rag/1759293254_5.png" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"> </picture> </figure> </div> </div> </div> </div> <p>回过头来，常见的稠密文本检索方法有下面这些，有兴趣的可以自己去了解一下：</p> <p>我们平时最常见的RAG应用就是使用了Bi-Encoder，因为足够快，而ReRank时数量较少，可以利用Cross-Encoder来打分。</p> <p>到这里我们已经知道了稠密文本检索到底是做什么了，在提前向量化资料后，在后续问题来了之后可以将问题也进行向量化，然后通过向量相似度进行搜索，得到最相关的资料，这就是稠密文本检索的过程，<strong>能够检索语义相近但词不匹配的文档</strong>，并且<strong>适合复杂查询、开放域问答、RAG 等应用</strong>。</p> <p>其缺点也相对明显：<strong>需要大规模训练，消耗资源大，部署成本高，另外召回的结果可解释性低</strong></p> <h3 id="融合方法hybrid-retrieval">融合方法（Hybrid Retrieval）</h3> <p>两者各有优缺点，因此很多系统或者应用场景会将两者进行结合，比如用稀疏检索（如BM25）结合稠密检索先召回 Top K文档，再用重排模型（Dense Reranker，如Cross-Encoder）对结果进行重新排序，重新排序</p> <p>引用一张我之前发的关于Bi-Encoder和Cross-Encoder：</p> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-10-01-ce101-5-rag/1759293254_6-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293254_6-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293254_6-1400.webp 1400w," sizes="95vw" type="image/webp"></source> <img src="/assets/img/2025-10-01-ce101-5-rag/1759293254_6.png" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"> </picture> </figure> </div> </div> </div> </div> <p>我们在实际应用中<strong>不会因为技术而技术</strong>，一定要记住这句话！否则很容易陷入拿着锤子找钉子的尴尬境地（现在其实有不少人就是拿着AI找钉子敲）。就比如前面提到的这些，有可能在实际的应用中只是简单的应用向量化去做检索就足够了，也可能复杂到需要结合关系型数据库做常规的数据检索+ES做全文检索+向量化检索+重排技术得到最匹配的结果去做方案。所以应用AI（Applied AI）的背后就是我们需要去了解每个技术背后的原理，是基于什么背景之下提出来的，以及这个技术目前发展到什么程度了，可以解决什么问题，在某个应用场景下是否合适，这样我们才可以真正做到将AI应用在有价值的地方，赋能业务产生真正的商业价值，而不是陷入技术自嗨中。</p> <p>了解完这个我们对于RAG的底层依托的技术已经有了比较清晰的认知了，接下去我们会进一步深入去了解RAG相关的技术以及衍生的一些应用方式。</p> <h1 id="52-rag进阶">5.2 RAG进阶</h1> <p>常规的RAG相对简单，在实际应用中，我们会在原本的架构之上，去运用一些技术和方法来提高，比如：</p> <ul> <li> <strong>标量+向量</strong>：通常RAG是将文档分块（Chunk）后向量化（Embedding）入库，然后查询也向量化后到向量数据库进行相似性搜索。如前面提到，实际上还可以结合传统的数据库或者ES进行标量数据的匹配检索，最后可以得到标量+向量数据。</li> <li> <strong>重排（Reranking）</strong>：不管是单向量还是结合了标量，在送到模型前可以用一些手段对文档进行重新排序，通常我们会使用重排模型对文档再进行评分排序，这样可以选择实际送到模型的文档</li> <li> <strong>多跳RAG</strong>：当单跳查询无法满足复杂的查询时，结合多跳是可以达到更好的效果的。</li> <li> <strong>图增强RAG（Graph-RAG）</strong>：结合图的能力来扩展RAG的能力，尤其是在文档处理阶段，可以利用图+大模型来细化一些实体和关系，甚至进一步形成社区或领域的形态。</li> </ul> <p>上面只是一部分技术或方法。在技术普及过程，开始会陆续出现体系化的知识，也是为了方便应用以及后来者学习，现在业界也有很多划分方式，比如<a href="https://www.dailydoseofds.com/tag/rag-crash-course/" rel="external nofollow noopener" target="_blank">Daily Dose of Data Science</a>这张图：</p> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-10-01-ce101-5-rag/1759293255_7-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293255_7-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293255_7-1400.webp 1400w," sizes="95vw" type="image/webp"></source> <img src="/assets/img/2025-10-01-ce101-5-rag/1759293255_7.jpg" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"> </picture> </figure> </div> </div> </div> </div> <p>另外<a href="https://arxiv.org/pdf/2501.09136" rel="external nofollow noopener" target="_blank">这篇论文</a>里也提供了相应的划分方式：</p> <p>我们引用<a href="https://arxiv.org/pdf/2312.10997" rel="external nofollow noopener" target="_blank">这篇论文</a>里的一张示意图：</p> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-10-01-ce101-5-rag/1759293255_8-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293255_8-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293255_8-1400.webp 1400w," sizes="95vw" type="image/webp"></source> <img src="/assets/img/2025-10-01-ce101-5-rag/1759293255_8.png" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"> </picture> </figure> </div> </div> </div> </div> <p>可以较为清楚的看出差别，分类是人为划分的，本质上就是针对基础的RAG在各个环节进行优化提升，目的都是为了提高最后输出的效果。</p> <p><strong>进阶RAG（Advanced RAG）</strong>就是加入了<strong>前处理阶段（Pre-Retrieval）</strong>来优化查询，比如查询重写或运用一些策略进行处理。并且加入了<strong>后处理阶段（Post-Retrieval）</strong>来优化检索后的文档块，比如重排、压缩或融合等手段，这样在最终给到大模型可以得到更好的结果提升。</p> <p><strong>模块化RAG（Modular RAG）</strong>则是将各种阶段或者功能单独成模块，每个模块是最小单元，可以自由的组合，形成一个类似workflow的流程，有点像是玩乐高积木，可以针对不同的业务场景自由组合。本质上里面的技术和方法没有变化，只不过是在工程化上进行了优化，方便不断复用和自由编排。</p> <p><strong>图RAG（Graph RAG）</strong>就是利用了图来辅助处理，万物皆可图，图的能力应用在RAG里，使得RAG得到了极大的提升，后面我们会在图RAG章节里会详细分析加入图能力，RAG得到的好处和提升。</p> <p><strong>智能体RAG（Agentic RAG）</strong>则是将RAG从简单的检索生成扩展成自主的Agent，可以基于一定的策略动态决策并进行多轮次检索，这个其实是对多跳RAG的一种提升，将AI Agent的思想融入RAG。</p> <p>到这里我们再回过头来看看我们前面的那张架构图：</p> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-10-01-ce101-5-rag/1759293256_9-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293256_9-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293256_9-1400.webp 1400w," sizes="95vw" type="image/webp"></source> <img src="/assets/img/2025-10-01-ce101-5-rag/1759293256_9.png" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"> </picture> </figure> </div> </div> </div> </div> <p>这里面其实已经体现了很多的东西，我们可以把RAG分为：</p> <ol> <li>输入：可能有不同的输入方式，主流常见的是从Chat进来的问题</li> <li>前处理：检索前作一些前置处理动作，目的是增加召回效果</li> <li>检索：执行检索</li> <li>后处理：对检索的结果进行特定的处理，目的也是增加召回效果</li> <li>生成：给大模型输出最后的结果</li> <li>输出：将结果返回</li> </ol> <p>这个其实就是一个进阶RAG的流程了，至于模块化RAG，其实是将里面的功能模块都单独抽出来形成独立的单元，这样可以重复自由组织编排，而图RAG和智能体RAG则会在里面多个环节参与。下面我们会针对一些关键的节点和方式展开。</p> <h2 id="521-查询重写">5.2.1 查询重写</h2> <p>在传统的RAG里，通常就是将查询通过向量化的手段转成嵌入（embedding），做相似性搜索后给到大模型。这种情况下有明显可见的问题：<strong>输入查询无法顺利匹配到文档块</strong>。</p> <p>在实际场景下，用户输入的问题有可能因为过于简化或者表述不当而无法通过相似度搜索匹配到合适的文档块，使得最终的效果不符合预期。面对这个问题，可以应用查询重写来进一步缓解并提升效果。</p> <p>正如前面提到的，重写策略其实有挺多的，目前主流的有这么几种（更多还是一些类别的划分，实际上在不同的业务场景下还会有不同的策略浮现的，比如一些行业词汇重写、黑白词等等，这边就不过度展开）：</p> <ol> <li> <strong>规范化重写（Canonicalization）</strong>：将随意、模糊、口语化表达转成标准清晰的问题</li> <li> <strong>同义改写（Paraphrasing）</strong>：增强表达覆盖、抗embedding漏召</li> <li> <strong>泛化重写（Step-Back Query）</strong>：提升复杂问题检索效果</li> <li> <strong>多查询生成（Multi-query Generation）</strong>：多视角覆盖、提升召回率</li> <li> <strong>问题分解策略（Question Decomposition）</strong>：将复杂查询拆分为多个子问题，分步检索和推理</li> </ol> <h3 id="规范化重写canonicalization"><strong>规范化重写（Canonicalization）</strong></h3> <p>规范化重写其实就是针对查询问题让大语言模型帮忙进行重写，使得问题更加规范化，这其中有一些不同的手法。我们先来看一个基础的示例：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>周杰伦第一张专辑是什么？
+</code></pre></div></div> <p>可以改写成</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>周杰伦第一张音乐专辑名称是什么？
+</code></pre></div></div> <p>类似这样的规范化重写，可以将一个较为随意的问题转变成更加正式的问题。以便在向量化检索的过程中，可以更好的召回预期的文档块用于最终的结果生成。</p> <h3 id="同义改写paraphrasing"><strong>同义改写（Paraphrasing）</strong></h3> <p>同义改写的原理也是差不多的，对于不合适的表述，可以进行同义替换改写，使得输入的内容可以更容易匹配到合适的文档块。比如：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 历史聊天记录
 User: 马斯克现在拥有哪些公司
 AI: 截至2025年，马斯克拥有或主导的公司包括特斯拉、SpaceX、xAI（含X）、Neuralink 和 The Boring Company。
 User: 他现在个人财富估值是多少？
-</code></pre></div></div> <p>历史信息已经出现过相应的人物名，但是在最新的Query中却没有重复表述，此时是可以通过重写将用户最新的问题重写成：</p> <p>```plain text 马斯克现在个人财富估值是多少？</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-甚至是可以进一步结合前面规范化重写：
+</code></pre></div></div> <p>历史信息已经出现过相应的人物名，但是在最新的Query中却没有重复表述，此时是可以通过重写将用户最新的问题重写成：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>马斯克现在个人财富估值是多少？
 
-```plain text
-截止2025年7月，马斯克（Elon Musk）的个人净资产估值是多少？
+</code></pre></div></div> <p>甚至是可以进一步结合前面规范化重写：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>截止2025年7月，马斯克（Elon Musk）的个人净资产估值是多少？
 
-</code></pre></div></div> <p>这样等于是把时间具体化，并且名词也更加规范化表述了。</p> <h3 id="泛化重写step-back-query"><strong>泛化重写（Step-Back Query）</strong></h3> <p>泛化重写是把具体的问题抽象，将问题覆盖范围扩大了，这样可以扩大检索范围和获取更完整的上下文信息，比如：</p> <p>```plain text 马斯克的出生地是哪里？</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-可以改写成：
-
-```plain text
- 马斯克的个人背景和早年经历是什么？
-</code></pre></div></div> <p>这种好处不是明显可见的，为什么这么说呢？因为问题被泛化之后，有可能会导致答案也进一步被泛化，当然最终的递送给大语言模型的Prompt是可以保留原始的问题的。泛化重写其实是应该结合多跳RAG这些技术来发挥更大的作用，这个在后续我们也会涉及到，简单说就是通过泛化先在一个方向上探索，再一步步细化定位到实际想要的结果中。</p> <h3 id="多查询生成multi-query-generation"><strong>多查询生成（Multi-query Generation）</strong></h3> <p>这个方式也是应对用户问题表述不清晰或含糊的情况，通过将单一问题生成多个问题的方式，对一个问题提供多个角度，这样可以提高覆盖度，达到更好的检索和结果生成效果。</p> <p>我们来看下例子：</p> <p>```plain text 周杰伦的第一张专辑是什么？</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-多查询重写：
-
-```plain text
-周杰伦最早发行的专辑是哪一张？
+</code></pre></div></div> <p>这样等于是把时间具体化，并且名词也更加规范化表述了。</p> <h3 id="泛化重写step-back-query"><strong>泛化重写（Step-Back Query）</strong></h3> <p>泛化重写是把具体的问题抽象，将问题覆盖范围扩大了，这样可以扩大检索范围和获取更完整的上下文信息，比如：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 马斯克的出生地是哪里？
+</code></pre></div></div> <p>可以改写成：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 马斯克的个人背景和早年经历是什么？
+</code></pre></div></div> <p>这种好处不是明显可见的，为什么这么说呢？因为问题被泛化之后，有可能会导致答案也进一步被泛化，当然最终的递送给大语言模型的Prompt是可以保留原始的问题的。泛化重写其实是应该结合多跳RAG这些技术来发挥更大的作用，这个在后续我们也会涉及到，简单说就是通过泛化先在一个方向上探索，再一步步细化定位到实际想要的结果中。</p> <h3 id="多查询生成multi-query-generation"><strong>多查询生成（Multi-query Generation）</strong></h3> <p>这个方式也是应对用户问题表述不清晰或含糊的情况，通过将单一问题生成多个问题的方式，对一个问题提供多个角度，这样可以提高覆盖度，达到更好的检索和结果生成效果。</p> <p>我们来看下例子：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>周杰伦的第一张专辑是什么？
+</code></pre></div></div> <p>多查询重写：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>周杰伦最早发行的专辑是哪一张？
 周杰伦第一张音乐专辑的名字是什么？
 周杰伦早期的音乐作品有哪些？
 周杰伦的音乐出道作品是哪一张专辑？
-</code></pre></div></div> <p>这样就将一个问题扩展出基于不同角度的多个问题组合，这样可以以较为全面的角度去召回文档块了。</p> <h3 id="问题分解策略question-decomposition"><strong>问题分解策略（Question Decomposition）</strong></h3> <p>将一个复杂问题拆解成多个原子问题，使得可以基于多个问题去分别召回文档块，比如：</p> <p>```plain text 周杰伦从出道到现在有哪些重要的音乐成就？</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-可以拆解成：
-
-```plain text
-周杰伦是哪一年出道的？
+</code></pre></div></div> <p>这样就将一个问题扩展出基于不同角度的多个问题组合，这样可以以较为全面的角度去召回文档块了。</p> <h3 id="问题分解策略question-decomposition"><strong>问题分解策略（Question Decomposition）</strong></h3> <p>将一个复杂问题拆解成多个原子问题，使得可以基于多个问题去分别召回文档块，比如：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>周杰伦从出道到现在有哪些重要的音乐成就？
+</code></pre></div></div> <p>可以拆解成：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>周杰伦是哪一年出道的？
 周杰伦的第一张专辑是什么？
 周杰伦获得过哪些音乐奖项？
 周杰伦的代表作有哪些？
@@ -612,7 +156,7 @@ User: 他现在个人财富估值是多少？
 <span class="p">)</span>
 <span class="nf">print</span><span class="p">([</span><span class="n">doc</span><span class="p">.</span><span class="n">metadata</span><span class="p">[</span><span class="sh">"</span><span class="s">id</span><span class="sh">"</span><span class="p">]</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">compressed_docs</span><span class="p">])</span>
 
-</code></pre></div></div> <p>对比一下前后的效果：</p> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-10-01-ce101-5-rag/1759293257_10-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293257_10-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293257_10-1400.webp 1400w," sizes="95vw" type="image/webp"></source> <img src="/assets/img/2025-10-01-ce101-5-rag/1759293257_10.png" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"> </picture> </figure> </div> </div> </div> </div> <ul> <li>Document 1 -&gt; Document 1</li> <li>Document 4 -&gt; Document 2</li> <li>Document 6 -&gt; Document 3 经过重排后，获取到的Top 3文档不一样了</li> </ul> <h2 id="523-graph-rag">5.2.3 Graph RAG</h2> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-10-01-ce101-5-rag/1759293257_11-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293257_11-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293257_11-1400.webp 1400w," sizes="95vw" type="image/webp"></source> <img src="/assets/img/2025-10-01-ce101-5-rag/1759293257_11.jpg" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"> </picture> </figure> </div> </div> </div> </div> <p><a href="https://microsoft.github.io/graphrag/" rel="external nofollow noopener" target="_blank">Graph RAG</a>是微软在2024年推出的一种结构化、分层的检索增强生成（RAG）方法，相较于仅使用纯文本片段进行语义搜索的朴素方法，它更加系统和智能。GraphRAG 的处理流程包括：从原始文本中提取知识图谱、构建社区层级结构、为这些社区生成摘要，并在执行基于 RAG 的任务时充分利用这些结构化信息。下面我们会做一个比较详细的分析</p> <h3 id="索引阶段">索引阶段</h3> <p>看看架构图可以有个全局的认知</p> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-10-01-ce101-5-rag/1759293258_12-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293258_12-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293258_12-1400.webp 1400w," sizes="95vw" type="image/webp"></source> <img src="/assets/img/2025-10-01-ce101-5-rag/1759293258_12.png" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"> </picture> </figure> </div> </div> </div> </div> <p>我们来看看标准处理流程：</p> <ol> <li>文本处理 （Text Processing）</li> <li>文档处理（Document Processing）</li> <li>图提取（Graph Extraction）</li> <li>图增强（Graph Augmentation）</li> <li>声明提取（Claims Extraction）</li> <li>社区创建（Community Creation）</li> <li>文本单元最终化（(Final Text Units）</li> <li>社区报告生成（Community Reports）</li> <li>文本嵌入（Text Embeddings）</li> </ol> <h3 id="文本处理-text-processing">文本处理 （Text Processing）</h3> <p>主要接收多种数据输入，然后对输入的数据进行<strong>切分</strong>（支持按句子或者token进行切分），分块得到<strong>文本单元TextUnits</strong>。</p> <p>这步主要是为了<strong>方便后续的数据处理</strong>，因为后续的处理涉及多轮次的模型调用，以一个合理块大小的处理单元来处理，会更加方便且上下文不容超过，<strong>也适合并发调度处理</strong>。</p> <h3 id="文档处理document-processing">文档处理（Document Processing）</h3> <p>将文本处理阶段处理出来的TextUnits与原始文档建立引用关系，形成一个<strong>结构化的数据表</strong>，用于后续一些操作：</p> <ul> <li>跟踪每个文档包含哪些chunk</li> <li>后续社区摘要、图构建等流程中使用</li> <li>统一文档展示和可视化索引</li> </ul> <h3 id="图提取graph-extraction">图提取（Graph Extraction）</h3> <p>会包含几个阶段：</p> <ol> <li> <strong>实体（Entity）</strong>和<strong>关系（Relationship）</strong>提取</li> <li>图数据进行摘要简化（Graph Summrization）</li> </ol> <p>首先会让大语言模型提取文本里的<strong>实体（Entity）</strong>，以及不同实体间的<strong>关系（Relationship）</strong>，还会附带<strong>关系强弱的评分</strong>用于<strong>计算实体间的关系权重</strong>。</p> <p>这期间会在内存中做一定的合并和更新。比如实体和关系的描述，持续的更新会导致描述膨胀，这种情况下需要再进行一步图摘要，也就是让模型再次帮忙将实体和关系里的描述做总结为单一简介描述</p> <h3 id="图增强graph-augmentation">图增强（Graph Augmentation）</h3> <p>图增强里主要是图<strong>最终化</strong>，也就是将初步提取出来的图数据（实体节点和关系边），经过清洗、加工、标准化并准备好用于下游使用的过程。因为这是图构建的最后阶段：</p> <ul> <li>之前：只有基础的实体名称、描述、关系</li> <li>之后：实体具备了向量表示、空间坐标、网络属性等完整特征</li> </ul> <p>简单说就是： <strong>初步提取的基础数据 -&gt; 可用于可视化、推理、检索和分析的结构化图</strong></p> <p>在对实体最终化流程中，会有这么一些操作和步骤：</p> <ul> <li>根据配置决定是否创建向量（embedding）</li> <li>根据配置决定是否对图做UMAP或其他布局（layout）方法，生成2D/3D坐标用于可视化</li> <li>计算每个实体节点的度数（degree），用于后续分析或排序</li> <li>合并、移除重复、预填充缺失字段、生成唯一id等等</li> </ul> <blockquote> <p>UMAP（Uniform Manifold Approximation and Projection）中文名为统一流形近似与投影算法，是一种非线性降维算法，可以用于把高维数据（比如向量嵌入embedding）映射到二维或三维空间，用于方便可视化或聚类分析。简单说就是： UMAP 是一种可以把高维“云雾向量”压缩成漂亮二维坐标点的方法，保留结构、方便展示和聚类</p> </blockquote> <p>关于实体节点的<strong>度数（degree）</strong>，其实是每个节点连接的边的数量，比如：</p> <ul> <li>Leo –写–&gt; 书</li> <li>Leo –开发–&gt; 应用</li> </ul> <p>那么Leo这个节点就有两条边，它的degree就是2。那为什么要算degree呢？因为在图分析/图机器学习中，degree是一个很有用的特征值，比如：</p> <ul> <li>找到重要节点：高度数可能表示实体在图中很核心</li> <li>控制布局：在图布局中（比如UMAP或Force-directed），高 degree 节点更可能在中心。</li> <li>下游模型特征：在图神经网络中，degree 是常用的节点特征之一</li> <li>图过滤：有时我们只保留degree&gt;=2的节点，忽略孤立点（degree=0）。</li> </ul> <h3 id="声明提取claims-extraction">声明提取（Claims Extraction）</h3> <p>Graph RAG里面是叫做<strong>共变量（Covariates）提取任务</strong>，一个道理，就是从文本单元里提取声明（Claims）的过程，并将其转换为结构化数据，供后续图构建或社区摘要使用。</p> <p>操作主要是让<strong>模型针对文本单元里的内容进行声明提取</strong>，Prompt里会包括实体、想找的主张，需要分析的原始内容，最终模型会输出声明主体、涉及对象、声明类型、声明状态（对/错/存疑）、时间范围、描述说明、原始文本这些信息。</p> <h3 id="社区创建community-creation">社区创建（Community Creation）</h3> <p>这里会借助Leiden算法将节点进行<strong>社区化</strong>，简单说就是<strong>把相似、相关的阶段放到统一个社区</strong>。社区是指内部连接多，外部连接少的一组节点，类比班级，一个班级内部的同学联系较为紧密，而不同的班级之间的联系相对就少一点，这里班级就是一个社区的概念。另外同一个班级之下还可以分兴趣小组，这样就出现了分层级的社区，也就是某个社区有可能归属于某个父社区。Leiden算法整体就是在做这么一件事情，我们不展开算法的细节，有兴趣的可以自行了解。</p> <p>通过构建，最终是可以得到一个这种结构的数据</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">cluster_id</span><span class="p">,</span> <span class="n">parent_cluster_id</span><span class="p">,</span> <span class="p">[</span><span class="n">node_ids</span><span class="p">])</span>
+</code></pre></div></div> <p>对比一下前后的效果：</p> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-10-01-ce101-5-rag/1759293257_10-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293257_10-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293257_10-1400.webp 1400w," sizes="95vw" type="image/webp"></source> <img src="/assets/img/2025-10-01-ce101-5-rag/1759293257_10.png" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"> </picture> </figure> </div> </div> </div> </div> <ul> <li>Document 1 -&gt; Document 1</li> <li>Document 4 -&gt; Document 2</li> <li>Document 6 -&gt; Document 3 经过重排后，获取到的Top 3文档不一样了</li> </ul> <h2 id="523-graph-rag">5.2.3 Graph RAG</h2> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-10-01-ce101-5-rag/1759293257_11-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293257_11-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293257_11-1400.webp 1400w," sizes="95vw" type="image/webp"></source> <img src="/assets/img/2025-10-01-ce101-5-rag/1759293257_11.jpg" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"> </picture> </figure> </div> </div> </div> </div> <p><a href="https://microsoft.github.io/graphrag/" rel="external nofollow noopener" target="_blank">Graph RAG</a>是微软在2024年推出的一种结构化、分层的检索增强生成（RAG）方法，相较于仅使用纯文本片段进行语义搜索的朴素方法，它更加系统和智能。GraphRAG 的处理流程包括：从原始文本中提取知识图谱、构建社区层级结构、为这些社区生成摘要，并在执行基于 RAG 的任务时充分利用这些结构化信息。下面我们会做一个比较详细的分析</p> <h3 id="索引阶段">索引阶段</h3> <p>看看架构图可以有个全局的认知</p> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-10-01-ce101-5-rag/1759293258_12-480.webp 480w,/assets/img/2025-10-01-ce101-5-rag/1759293258_12-800.webp 800w,/assets/img/2025-10-01-ce101-5-rag/1759293258_12-1400.webp 1400w," sizes="95vw" type="image/webp"></source> <img src="/assets/img/2025-10-01-ce101-5-rag/1759293258_12.png" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"> </picture> </figure> </div> </div> </div> </div> <p>我们来看看标准处理流程：</p> <ol> <li>文本处理 （Text Processing）</li> <li>文档处理（Document Processing）</li> <li>图提取（Graph Extraction）</li> <li>图增强（Graph Augmentation）</li> <li>声明提取（Claims Extraction）</li> <li>社区创建（Community Creation）</li> <li>文本单元最终化（(Final Text Units）</li> <li>社区报告生成（Community Reports）</li> <li>文本嵌入（Text Embeddings）</li> </ol> <h4 id="文本处理-text-processing">文本处理 （Text Processing）</h4> <p>主要接收多种数据输入，然后对输入的数据进行<strong>切分</strong>（支持按句子或者token进行切分），分块得到<strong>文本单元TextUnits</strong>。</p> <p>这步主要是为了<strong>方便后续的数据处理</strong>，因为后续的处理涉及多轮次的模型调用，以一个合理块大小的处理单元来处理，会更加方便且上下文不容超过，<strong>也适合并发调度处理</strong>。</p> <h4 id="文档处理document-processing">文档处理（Document Processing）</h4> <p>将文本处理阶段处理出来的TextUnits与原始文档建立引用关系，形成一个<strong>结构化的数据表</strong>，用于后续一些操作：</p> <ul> <li>跟踪每个文档包含哪些chunk</li> <li>后续社区摘要、图构建等流程中使用</li> <li>统一文档展示和可视化索引</li> </ul> <h4 id="图提取graph-extraction">图提取（Graph Extraction）</h4> <p>会包含几个阶段：</p> <ol> <li> <strong>实体（Entity）</strong>和<strong>关系（Relationship）</strong>提取</li> <li>图数据进行摘要简化（Graph Summrization）</li> </ol> <p>首先会让大语言模型提取文本里的<strong>实体（Entity）</strong>，以及不同实体间的<strong>关系（Relationship）</strong>，还会附带<strong>关系强弱的评分</strong>用于<strong>计算实体间的关系权重</strong>。</p> <p>这期间会在内存中做一定的合并和更新。比如实体和关系的描述，持续的更新会导致描述膨胀，这种情况下需要再进行一步图摘要，也就是让模型再次帮忙将实体和关系里的描述做总结为单一简介描述</p> <h4 id="图增强graph-augmentation">图增强（Graph Augmentation）</h4> <p>图增强里主要是图<strong>最终化</strong>，也就是将初步提取出来的图数据（实体节点和关系边），经过清洗、加工、标准化并准备好用于下游使用的过程。因为这是图构建的最后阶段：</p> <ul> <li>之前：只有基础的实体名称、描述、关系</li> <li>之后：实体具备了向量表示、空间坐标、网络属性等完整特征</li> </ul> <p>简单说就是： <strong>初步提取的基础数据 -&gt; 可用于可视化、推理、检索和分析的结构化图</strong></p> <p>在对实体最终化流程中，会有这么一些操作和步骤：</p> <ul> <li>根据配置决定是否创建向量（embedding）</li> <li>根据配置决定是否对图做UMAP或其他布局（layout）方法，生成2D/3D坐标用于可视化</li> <li>计算每个实体节点的度数（degree），用于后续分析或排序</li> <li>合并、移除重复、预填充缺失字段、生成唯一id等等</li> </ul> <blockquote> <p>UMAP（Uniform Manifold Approximation and Projection）中文名为统一流形近似与投影算法，是一种非线性降维算法，可以用于把高维数据（比如向量嵌入embedding）映射到二维或三维空间，用于方便可视化或聚类分析。简单说就是： UMAP 是一种可以把高维“云雾向量”压缩成漂亮二维坐标点的方法，保留结构、方便展示和聚类</p> </blockquote> <p>关于实体节点的<strong>度数（degree）</strong>，其实是每个节点连接的边的数量，比如：</p> <ul> <li>Leo –写–&gt; 书</li> <li>Leo –开发–&gt; 应用</li> </ul> <p>那么Leo这个节点就有两条边，它的degree就是2。那为什么要算degree呢？因为在图分析/图机器学习中，degree是一个很有用的特征值，比如：</p> <ul> <li>找到重要节点：高度数可能表示实体在图中很核心</li> <li>控制布局：在图布局中（比如UMAP或Force-directed），高 degree 节点更可能在中心。</li> <li>下游模型特征：在图神经网络中，degree 是常用的节点特征之一</li> <li>图过滤：有时我们只保留degree&gt;=2的节点，忽略孤立点（degree=0）。</li> </ul> <h4 id="声明提取claims-extraction">声明提取（Claims Extraction）</h4> <p>Graph RAG里面是叫做<strong>共变量（Covariates）提取任务</strong>，一个道理，就是从文本单元里提取声明（Claims）的过程，并将其转换为结构化数据，供后续图构建或社区摘要使用。</p> <p>操作主要是让<strong>模型针对文本单元里的内容进行声明提取</strong>，Prompt里会包括实体、想找的主张，需要分析的原始内容，最终模型会输出声明主体、涉及对象、声明类型、声明状态（对/错/存疑）、时间范围、描述说明、原始文本这些信息。</p> <h4 id="社区创建community-creation">社区创建（Community Creation）</h4> <p>这里会借助Leiden算法将节点进行<strong>社区化</strong>，简单说就是<strong>把相似、相关的阶段放到统一个社区</strong>。社区是指内部连接多，外部连接少的一组节点，类比班级，一个班级内部的同学联系较为紧密，而不同的班级之间的联系相对就少一点，这里班级就是一个社区的概念。另外同一个班级之下还可以分兴趣小组，这样就出现了分层级的社区，也就是某个社区有可能归属于某个父社区。Leiden算法整体就是在做这么一件事情，我们不展开算法的细节，有兴趣的可以自行了解。</p> <p>通过构建，最终是可以得到一个这种结构的数据</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">cluster_id</span><span class="p">,</span> <span class="n">parent_cluster_id</span><span class="p">,</span> <span class="p">[</span><span class="n">node_ids</span><span class="p">])</span>
 </code></pre></div></div> <p>示例数据</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span>
   <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="sh">'</span><span class="s">A</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">B</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">C</span><span class="sh">'</span><span class="p">]),</span>  <span class="c1"># 一级社区，ID=1，父节点=-1（说明是顶层），含有节点A/B/C
 </span>  <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="sh">'</span><span class="s">A</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">B</span><span class="sh">'</span><span class="p">]),</span>        <span class="c1"># 二级社区，ID=2，父节点是1，细分A/B
@@ -620,7 +164,7 @@ User: 他现在个人财富估值是多少？
 </code></pre></div></div> <p>最终再通过一定的操作来<strong>整理聚合社区</strong>，只保留每个社区里实体和社区内实体间关系信息，社区之间的关系被忽略，这样最终就得到一份社区数据了，会存放到数据库里，类似</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">id</span><span class="p">,</span><span class="n">human_readable_id</span><span class="p">,</span><span class="n">community</span><span class="p">,</span><span class="n">parent</span><span class="p">,</span><span class="n">children</span><span class="p">,</span><span class="n">entity_ids</span><span class="p">,</span><span class="n">relationship_ids</span><span class="p">,</span><span class="n">text_unit_ids</span><span class="p">,</span><span class="n">level</span><span class="p">,</span><span class="n">title</span><span class="p">,</span><span class="n">period</span><span class="p">,</span><span class="n">size</span>
 <span class="mf">1e2</span><span class="n">f3a00</span><span class="o">-</span><span class="n">aaaa</span><span class="o">-</span><span class="mi">1111</span><span class="o">-</span><span class="n">bbbb</span><span class="o">-</span><span class="mi">000000000001</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="sh">"</span><span class="s">[]</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">[</span><span class="sh">'</span><span class="s">e1</span><span class="sh">'</span><span class="s">, </span><span class="sh">'</span><span class="s">e2</span><span class="sh">'</span><span class="s">, </span><span class="sh">'</span><span class="s">e3</span><span class="sh">'</span><span class="s">]</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">[</span><span class="sh">'</span><span class="s">r1</span><span class="sh">'</span><span class="s">, </span><span class="sh">'</span><span class="s">r2</span><span class="sh">'</span><span class="s">]</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">[</span><span class="sh">'</span><span class="s">t1</span><span class="sh">'</span><span class="s">, </span><span class="sh">'</span><span class="s">t2</span><span class="sh">'</span><span class="s">, </span><span class="sh">'</span><span class="s">t3</span><span class="sh">'</span><span class="s">]</span><span class="sh">"</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">Community</span> <span class="mi">0</span><span class="p">,</span><span class="mi">2025</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">25</span><span class="p">,</span><span class="mi">3</span>
 <span class="mi">4</span><span class="n">a6b7c00</span><span class="o">-</span><span class="n">bbbb</span><span class="o">-</span><span class="mi">2222</span><span class="o">-</span><span class="n">cccc</span><span class="o">-</span><span class="mi">000000000002</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="sh">"</span><span class="s">[]</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">[</span><span class="sh">'</span><span class="s">e4</span><span class="sh">'</span><span class="s">, </span><span class="sh">'</span><span class="s">e5</span><span class="sh">'</span><span class="s">]</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">[</span><span class="sh">'</span><span class="s">r3</span><span class="sh">'</span><span class="s">]</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">[</span><span class="sh">'</span><span class="s">t4</span><span class="sh">'</span><span class="s">, </span><span class="sh">'</span><span class="s">t5</span><span class="sh">'</span><span class="s">]</span><span class="sh">"</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">Community</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2025</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">25</span><span class="p">,</span><span class="mi">2</span>
-</code></pre></div></div> <h3 id="文本单元最终化final-text-units">文本单元最终化（(Final Text Units）</h3> <p>这一步主要是针对前面的几个步骤产生的<strong>中间数据做最终的聚合关联</strong>，也就是将文本单元（TextUnits）与实体（Entities）、关系（Relationships）和声明共变量（Covariates）。关联之后文本单元就拥有了实体id列表、关系列表、声明列表。</p> <p>大概数据如下：</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="p">{</span>
+</code></pre></div></div> <h4 id="文本单元最终化final-text-units">文本单元最终化（(Final Text Units）</h4> <p>这一步主要是针对前面的几个步骤产生的<strong>中间数据做最终的聚合关联</strong>，也就是将文本单元（TextUnits）与实体（Entities）、关系（Relationships）和声明共变量（Covariates）。关联之后文本单元就拥有了实体id列表、关系列表、声明列表。</p> <p>大概数据如下：</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="p">{</span>
       <span class="sh">"</span><span class="s">id</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">text_unit_001</span><span class="sh">"</span><span class="p">,</span>
       <span class="sh">"</span><span class="s">short_id</span><span class="sh">"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
       <span class="sh">"</span><span class="s">text</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">Apple Inc. is headquartered in Cupertino...</span><span class="sh">"</span><span class="p">,</span>
@@ -630,41 +174,37 @@ User: 他现在个人财富估值是多少？
 </span>      <span class="sh">"</span><span class="s">relationship_ids</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span><span class="sh">"</span><span class="s">rel_001</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">rel_002</span><span class="sh">"</span><span class="p">],</span>              <span class="c1"># ⭐ 图数据关联
 </span>      <span class="sh">"</span><span class="s">covariate_ids</span><span class="sh">"</span><span class="p">:</span> <span class="p">[</span><span class="sh">"</span><span class="s">claim_001</span><span class="sh">"</span><span class="p">]</span>                           <span class="c1"># ⭐ 声明数据关联
 </span>  <span class="p">}</span>
-</code></pre></div></div> <p>这步的目的是为每个文本单元添加结构化语义（实体、关系、属性），为后续图创建和问答系统打下基础。</p> <h3 id="社区报告生成community-reports">社区报告生成（Community Reports）</h3> <p>这步核心目的是基于实体（Entities）、关系（Relationships）、社区（Communities）和声明（Claims），构建每个社区的<strong>摘要性报告</strong>。</p> <p>核心的处理步骤有：</p> <ul> <li>社区展开：将社区结构展开</li> <li>数据准备：预处理实体、关系和声明数据</li> <li>上下文创建：为每个社区构建上下文</li> <li>摘要生成：生成社区报告</li> </ul> <p>首先就是将原本的社区记录（一条记录是一个社区，包含多个实体和关系）展开，然后合并到实体里，这样实体里就包含了所属社区、层级这些信息了。</p> <p>然后就是针对实体、关系和声明做相应的结构化数据准备，补充一些缺失的描述，为后续构建Prompt做准备。</p> <p>接下去是针对每个社区构建一份<strong>本地上下文（Local Context）</strong>。首先会遍历社区的所有层级（从高到低，这边可以理解一层都有不同的社区，上层的社区下会继续划分子社区，所以是一个嵌套关系的），对每个社区聚合实体、边、声明，然后将结构化的社区上下文变成模型可读的Prompt，再发送给模型进行摘要。</p> <p>摘要生成主要是读取前一步产生的社区上下文信息，调用大语言模型去生成文字摘要。期间会有一些车略，比如处理上下超限的情况，会尝试用子社区报告替换本地上下文，如果无法替换则进行修剪本地上下文以适应限制。</p> <p>样例数据：</p> <p>```plain text —–Reports—– community_id,full_content 1,”Community 1 consists of software development entities focused on healthcare applications…”</p> <p>—–Entities—– id,entity,description,degree 5,MICROSOFT,Microsoft is a technology company,15 12,AZURE CLOUD,Azure is Microsoft’s cloud computing platform,8 23,HEALTHCARE APP,A healthcare application developed by Microsoft,3</p> <p>—–Relationships—– id,source,target,description,degree 101,MICROSOFT,AZURE CLOUD,Microsoft owns and operates Azure Cloud platform,12 102,AZURE CLOUD,HEALTHCARE APP,Healthcare app is deployed on Azure Cloud,6</p> <p>—–Claims—– id,subject,type,status,description 201,MICROSOFT,CLAIM,CONFIRMED,Microsoft has strong presence in healthcare technology 202,HEALTHCARE APP,CLAIM,SUSPECTED,The app may have compliance issues</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-### 文本嵌入（Text Embeddings）
+</code></pre></div></div> <p>这步的目的是为每个文本单元添加结构化语义（实体、关系、属性），为后续图创建和问答系统打下基础。</p> <h4 id="社区报告生成community-reports">社区报告生成（Community Reports）</h4> <p>这步核心目的是基于实体（Entities）、关系（Relationships）、社区（Communities）和声明（Claims），构建每个社区的<strong>摘要性报告</strong>。</p> <p>核心的处理步骤有：</p> <ul> <li>社区展开：将社区结构展开</li> <li>数据准备：预处理实体、关系和声明数据</li> <li>上下文创建：为每个社区构建上下文</li> <li>摘要生成：生成社区报告</li> </ul> <p>首先就是将原本的社区记录（一条记录是一个社区，包含多个实体和关系）展开，然后合并到实体里，这样实体里就包含了所属社区、层级这些信息了。</p> <p>然后就是针对实体、关系和声明做相应的结构化数据准备，补充一些缺失的描述，为后续构建Prompt做准备。</p> <p>接下去是针对每个社区构建一份<strong>本地上下文（Local Context）</strong>。首先会遍历社区的所有层级（从高到低，这边可以理解一层都有不同的社区，上层的社区下会继续划分子社区，所以是一个嵌套关系的），对每个社区聚合实体、边、声明，然后将结构化的社区上下文变成模型可读的Prompt，再发送给模型进行摘要。</p> <p>摘要生成主要是读取前一步产生的社区上下文信息，调用大语言模型去生成文字摘要。期间会有一些车略，比如处理上下超限的情况，会尝试用子社区报告替换本地上下文，如果无法替换则进行修剪本地上下文以适应限制。</p> <p>样例数据：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-----Reports-----
+community_id,full_content
+1,"Community 1 consists of software development entities focused on healthcare applications..."
 
-这步是最后的环节了，用于为前面产生的各种文本内容生成对应的**向量表示**，用于后续检索阶段的语义搜索和向量检索。主要包括：
+-----Entities-----
+id,entity,description,degree
+5,MICROSOFT,Microsoft is a technology company,15
+12,AZURE CLOUD,Azure is Microsoft's cloud computing platform,8
+23,HEALTHCARE APP,A healthcare application developed by Microsoft,3
 
-- 完整文档内容
-- 实体标题和描述
-- 关系描述
-- 文本单元
-- 社区标题和摘要
-- 社区完整报告内容
+-----Relationships-----
+id,source,target,description,degree
+101,MICROSOFT,AZURE CLOUD,Microsoft owns and operates Azure Cloud platform,12
+102,AZURE CLOUD,HEALTHCARE APP,Healthcare app is deployed on Azure Cloud,6
 
-### 检索阶段
-
-Graph RAG针对不同的使用场景，提供了4种查询方法：
-
-1. **全局搜索（Global Search）**：面向社区报告级别的全局搜索，适合高层知识查找
-2. **本地搜索（Local Search）**：走了图和文本搜索，同时融合实体、关系、文本等细粒度搜索
-3. **动态推理搜索（DRIFT Search）**：和本地搜索类似，但是引入了embedding对齐
-4. **基础搜索（Basic Search）**：走了文本级别的搜索，是最轻量的文本向量语义检索
-
-### **全局搜索（Global Search）**
-
-主要**基于社区（Community）和其报告（Reports）进行粗粒度搜索**。走的是Map Reduce的方式，也就是将社区报告拆成多个文本块（chunks），每个文本块分别发送给大语言模型做分析，会生成类似下面格式的内容
-
-```plain text
-points,
+-----Claims-----
+id,subject,type,status,description
+201,MICROSOFT,CLAIM,CONFIRMED,Microsoft has strong presence in healthcare technology
+202,HEALTHCARE APP,CLAIM,SUSPECTED,The app may have compliance issues
+</code></pre></div></div> <h4 id="文本嵌入text-embeddings">文本嵌入（Text Embeddings）</h4> <p>这步是最后的环节了，用于为前面产生的各种文本内容生成对应的<strong>向量表示</strong>，用于后续检索阶段的语义搜索和向量检索。主要包括：</p> <ul> <li>完整文档内容</li> <li>实体标题和描述</li> <li>关系描述</li> <li>文本单元</li> <li>社区标题和摘要</li> <li>社区完整报告内容</li> </ul> <h3 id="检索阶段">检索阶段</h3> <p>Graph RAG针对不同的使用场景，提供了4种查询方法：</p> <ol> <li> <strong>全局搜索（Global Search）</strong>：面向社区报告级别的全局搜索，适合高层知识查找</li> <li> <strong>本地搜索（Local Search）</strong>：走了图和文本搜索，同时融合实体、关系、文本等细粒度搜索</li> <li> <strong>动态推理搜索（DRIFT Search）</strong>：和本地搜索类似，但是引入了embedding对齐</li> <li> <strong>基础搜索（Basic Search）</strong>：走了文本级别的搜索，是最轻量的文本向量语义检索</li> </ol> <h4 id="全局搜索global-search"><strong>全局搜索（Global Search）</strong></h4> <p>主要<strong>基于社区（Community）和其报告（Reports）进行粗粒度搜索</strong>。走的是Map Reduce的方式，也就是将社区报告拆成多个文本块（chunks），每个文本块分别发送给大语言模型做分析，会生成类似下面格式的内容</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>points,
         description
     ]
 }}
-</code></pre></div></div> <p>这里包括的是对应社区报告的摘要，精炼的内容描述和对应的重要性得分，评分会决定该观点是否值得被纳入最终的Reduce阶段。Reduce阶段只会过滤出score大于0的结果，并且对结果进行排序，使得较为重要的观点排在前面，最终会展现出类似这样的形式：</p> <p>```plain text —-Analyst 1—- Importance Score: 90 某个摘要句子…</p> <p>—-Analyst 2—- Importance Score: 88 另一个摘要句子…</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-表现出不同的“分析员”（Analyst）的分析情况，然后把这份汇总的结果再次发送到大语言模型，将多个“分析员”的观点汇总成一个连贯、有逻辑且可读性较强的最终答案。输入的prompt片段类似：
+</code></pre></div></div> <p>这里包括的是对应社区报告的摘要，精炼的内容描述和对应的重要性得分，评分会决定该观点是否值得被纳入最终的Reduce阶段。Reduce阶段只会过滤出score大于0的结果，并且对结果进行排序，使得较为重要的观点排在前面，最终会展现出类似这样的形式：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>----Analyst 1----
+Importance Score: 90
+某个摘要句子...
 
-```plain text
----Target response length and format---
+----Analyst 2----
+Importance Score: 88
+另一个摘要句子...
+</code></pre></div></div> <p>表现出不同的“分析员”（Analyst）的分析情况，然后把这份汇总的结果再次发送到大语言模型，将多个“分析员”的观点汇总成一个连贯、有逻辑且可读性较强的最终答案。输入的prompt片段类似：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---Target response length and format---
 
 Multi-paragraph explanation with markdown headings
 
@@ -677,23 +217,12 @@ Company A violated environmental regulations in 2021 and was fined [Data: Report
 ----Analyst 2----
 Importance Score: 82
 Whistleblowers from 2020 also claimed unsafe disposal methods by Company A [Data: Reports (12, 15, 19, 22, 26, +more)].
-</code></pre></div></div> <p>最终输出的类似：</p> <p>```plain text</p> <h2 id="environmental-violations-of-company-a">Environmental Violations of Company A</h2> <p>Company A was found guilty of violating environmental regulations in 2021, resulting in multiple fines [Data: Reports (3, 6, 7)].</p> <p>In addition, whistleblower reports from 2020 suggested unsafe disposal practices, further highlighting the company’s failure in compliance [Data: Reports (12, 15, 19, 22, 26, +more)].</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-### **本地搜索（Local Search）**
+</code></pre></div></div> <p>最终输出的类似：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## Environmental Violations of Company A
 
-本地搜索会利用**向量搜索**去检索出**合适的实体（Entities）**，然后给予这个实体去构建对应的上下文，其中涉及到了以下的数据：
+Company A was found guilty of violating environmental regulations in 2021, resulting in multiple fines [Data: Reports (3, 6, 7)].
 
-- 实体
-- 关系
-- 文本单元
-- 社区摘要
-- 声明
-
-其中实体是通过向量化搜索得到的，社区则是通过排序后选出topK个社区摘要，其他的则是通过对应实体去检索。最终会将上面的这些数据构建成单个上下文（不像全局搜索用chunk的形式）。然后将这个上下文结合预设的Prompt一起发送到大语言模型生成结果。
-
-示例输入片段：
-
-```plain text
----Role---
+In addition, whistleblower reports from 2020 suggested unsafe disposal practices, further highlighting the company's failure in compliance [Data: Reports (12, 15, 19, 22, 26, +more)].
+</code></pre></div></div> <h4 id="本地搜索local-search"><strong>本地搜索（Local Search）</strong></h4> <p>本地搜索会利用<strong>向量搜索</strong>去检索出<strong>合适的实体（Entities）</strong>，然后给予这个实体去构建对应的上下文，其中涉及到了以下的数据：</p> <ul> <li>实体</li> <li>关系</li> <li>文本单元</li> <li>社区摘要</li> <li>声明</li> </ul> <p>其中实体是通过向量化搜索得到的，社区则是通过排序后选出topK个社区摘要，其他的则是通过对应实体去检索。最终会将上面的这些数据构建成单个上下文（不像全局搜索用chunk的形式）。然后将这个上下文结合预设的Prompt一起发送到大语言模型生成结果。</p> <p>示例输入片段：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---Role---
 
 You are a helpful assistant responding to questions about data in the tables provided.
 
@@ -708,28 +237,49 @@ multi-paragraph summary
 Entities Table:
 1. John Smith - CEO
 2. ...
-</code></pre></div></div> <p>输出示例：</p> <p>```plain text</p> <h2 id="key-individuals">Key Individuals</h2> <p>John Smith is listed as CEO of Company A [Data: Entities (1)].</p> <p>…</p> <h2 id="summary">Summary</h2> <p>These findings suggest …</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-### **动态推理搜索（DRIFT Search）**
+</code></pre></div></div> <p>输出示例：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## Key Individuals
 
-动态推理搜索（DRIFT Search，Dynamic Reasoning and Inference with Flexible Traversal）是最复杂也最智能的一种检索方式，它结合了推理驱动的层次搜索、查询拆分（Primer）、多步骤搜索和最终答案的合并（Reduce）。
+John Smith is listed as CEO of Company A [Data: Entities (1)].
 
-首先DRIFT会随机从社区报告里取一个**全量文本**出来，然后将输入的内容与随机取出的社区报告（作为模板）给到大语言模型去做相应的**虚拟答案（Hypothetical Answer）**生成，相应的Prompt是这样的：
+...
 
-```plain text
-Create a hypothetical answer to the following query: {query}
+## Summary
+
+These findings suggest ...
+</code></pre></div></div> <h4 id="动态推理搜索drift-search"><strong>动态推理搜索（DRIFT Search）</strong></h4> <p>动态推理搜索（DRIFT Search，Dynamic Reasoning and Inference with Flexible Traversal）是最复杂也最智能的一种检索方式，它结合了推理驱动的层次搜索、查询拆分（Primer）、多步骤搜索和最终答案的合并（Reduce）。</p> <p>首先DRIFT会随机从社区报告里取一个<strong>全量文本</strong>出来，然后将输入的内容与随机取出的社区报告（作为模板）给到大语言模型去做相应的<strong>虚拟答案（Hypothetical Answer）</strong>生成，相应的Prompt是这样的：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Create a hypothetical answer to the following query: {query}
 
 Format it to follow the structure of the template below:
 
 {template}
 
 Ensure that the hypothetical answer does not reference new named entities that are not present in the original query.
-</code></pre></div></div> <p>然后将虚拟的答案转成向量，通过计算余弦相似度（Sosine Similarity），可以得到虚拟答案和所有文档的相似度，取出topK社区报告。</p> <p>然后基于Primer做将topK社区报告进行分片，并发调用LLM对每一份报告进行子问题生成（Query Decomposition）。我们来看看其Prompt模板：</p> <p>```plain text You are a helpful agent designed to reason over a knowledge graph in response to a user query. This is a unique knowledge graph where edges are freeform text rather than verb operators. You will begin your reasoning looking at a summary of the content of the most relevant communites and will provide:</p> <ol> <li> <p>score: How well the intermediate answer addresses the query. A score of 0 indicates a poor, unfocused answer, while a score of 100 indicates a highly focused, relevant answer that addresses the query in its entirety.</p> </li> <li> <p>intermediate_answer: This answer should match the level of detail and length found in the community summaries. The intermediate answer should be exactly 2000 characters long. This must be formatted in markdown and must begin with a header that explains how the following text is related to the query.</p> </li> <li> <p>follow_up_queries: A list of follow-up queries that could be asked to further explore the topic. These should be formatted as a list of strings. Generate at least five good follow-up queries.</p> </li> </ol> <p>Use this information to help you decide whether or not you need more information about the entities mentioned in the report. You may also use your general knowledge to think of entities which may help enrich your answer.</p> <p>You will also provide a full answer from the content you have available. Use the data provided to generate follow-up queries to help refine your search. Do not ask compound questions, for example: “What is the market cap of Apple and Microsoft?”. Use your knowledge of the entity distribution to focus on entity types that will be useful for searching a broad area of the knowledge graph.</p> <p>For the query:</p> <p>{query}</p> <p>The top-ranked community summaries:</p> <p>{community_reports}</p> <p>Provide the intermediate answer, and all scores in JSON format following:</p> <p>intermediate_answer</p> <p>Begin:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-这里的Prompt要求LLM以类人类推理者而不是抽象逻辑机器来推理，其作用是结合用户query与社区总结（community reports），引导LLM推理出一个中间答案（intermediate answer）和一组后续子查询（follow-up queries）
+</code></pre></div></div> <p>然后将虚拟的答案转成向量，通过计算余弦相似度（Sosine Similarity），可以得到虚拟答案和所有文档的相似度，取出topK社区报告。</p> <p>然后基于Primer做将topK社区报告进行分片，并发调用LLM对每一份报告进行子问题生成（Query Decomposition）。我们来看看其Prompt模板：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>You are a helpful agent designed to reason over a knowledge graph in response to a user query.
+This is a unique knowledge graph where edges are freeform text rather than verb operators. You will begin your reasoning looking at a summary of the content of the most relevant communites and will provide:
 
-输出示例：
+1. score: How well the intermediate answer addresses the query. A score of 0 indicates a poor, unfocused answer, while a score of 100 indicates a highly focused, relevant answer that addresses the query in its entirety.
 
-```plain text
-{
+2. intermediate_answer: This answer should match the level of detail and length found in the community summaries. The intermediate answer should be exactly 2000 characters long. This must be formatted in markdown and must begin with a header that explains how the following text is related to the query.
+
+3. follow_up_queries: A list of follow-up queries that could be asked to further explore the topic. These should be formatted as a list of strings. Generate at least five good follow-up queries.
+
+Use this information to help you decide whether or not you need more information about the entities mentioned in the report. You may also use your general knowledge to think of entities which may help enrich your answer.
+
+You will also provide a full answer from the content you have available. Use the data provided to generate follow-up queries to help refine your search. Do not ask compound questions, for example: "What is the market cap of Apple and Microsoft?". Use your knowledge of the entity distribution to focus on entity types that will be useful for searching a broad area of the knowledge graph.
+
+For the query:
+
+{query}
+
+The top-ranked community summaries:
+
+{community_reports}
+
+Provide the intermediate answer, and all scores in JSON format following:
+
+intermediate_answer
+
+Begin:
+</code></pre></div></div> <p>这里的Prompt要求LLM以类人类推理者而不是抽象逻辑机器来推理，其作用是结合用户query与社区总结（community reports），引导LLM推理出一个中间答案（intermediate answer）和一组后续子查询（follow-up queries）</p> <p>输出示例：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
   "intermediate_answer": "## Challenges Faced by EV Companies in 2024\n\nElectric vehicle companies encountered several critical challenges in...",
   "score": 91,
   "follow_up_queries": [
@@ -740,11 +290,13 @@ Ensure that the hypothetical answer does not reference new named entities that a
     "What impact do rising raw material costs have on EV pricing in 2024?"
   ]
 }
-</code></pre></div></div> <p>最终这个环节得到的是以虚拟答案检索出来的topK社区报告为语境种子，去生成对应的中间答案和子查询列表以及对应的评分。最后就是将所有的中间答案拼接起来，评分取平均数，子查询问题合并。</p> <p>接下去进入到循环执行动作（Action）的步骤了，会持续从当前状态中挑出尚未处理的动作（只保留top-k最重要的动作），每个动作进行搜索，这里的检索走的是本地搜索（Local Search），也就是针对query走图和文本搜索。这边还会控制最大深度，避免深度爆炸。</p> <p>最后将所有的结果进行聚合（Reduce），会将前面所有Action最终的回答拼接让模型帮忙汇总出最终答案</p> <h3 id="基础搜索basic-search"><strong>基础搜索（Basic Search）</strong></h3> <p>基础搜索的话只会将问题基于文本单元做<strong>向量检索</strong>，得到topK结果，然后到大语言模型进行生成。相对简单的一个检索。</p> <p>示例输入：</p> <p>```plain text source_id|text 12|John Smith is the CEO of QuantumTech and has faced several allegations of insider trading. 34|QuantumTech has been under investigation by the SEC since 2022. 46|Multiple anonymous reports accuse John Smith of misusing company resources. 51|John Smith was previously CEO at FutureCorp, where a similar scandal occurred. 55|Internal emails obtained by regulators suggest conflicts of interest involving John Smith.</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-示例输出：
-
-```plain text
----Target response length and format---
+</code></pre></div></div> <p>最终这个环节得到的是以虚拟答案检索出来的topK社区报告为语境种子，去生成对应的中间答案和子查询列表以及对应的评分。最后就是将所有的中间答案拼接起来，评分取平均数，子查询问题合并。</p> <p>接下去进入到循环执行动作（Action）的步骤了，会持续从当前状态中挑出尚未处理的动作（只保留top-k最重要的动作），每个动作进行搜索，这里的检索走的是本地搜索（Local Search），也就是针对query走图和文本搜索。这边还会控制最大深度，避免深度爆炸。</p> <p>最后将所有的结果进行聚合（Reduce），会将前面所有Action最终的回答拼接让模型帮忙汇总出最终答案</p> <h4 id="基础搜索basic-search"><strong>基础搜索（Basic Search）</strong></h4> <p>基础搜索的话只会将问题基于文本单元做<strong>向量检索</strong>，得到topK结果，然后到大语言模型进行生成。相对简单的一个检索。</p> <p>示例输入：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>source_id|text
+12|John Smith is the CEO of QuantumTech and has faced several allegations of insider trading.
+34|QuantumTech has been under investigation by the SEC since 2022.
+46|Multiple anonymous reports accuse John Smith of misusing company resources.
+51|John Smith was previously CEO at FutureCorp, where a similar scandal occurred.
+55|Internal emails obtained by regulators suggest conflicts of interest involving John Smith.
+</code></pre></div></div> <p>示例输出：</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---Target response length and format---
 
 multiple paragraphs
 
