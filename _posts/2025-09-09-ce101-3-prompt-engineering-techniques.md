@@ -35,7 +35,7 @@ toc:
 
 这个是最简单的了，几乎每个在使用大模型的人都会使用这样的技巧，我觉得大语言模型发展到现在，甚至零样本提示都不能算作是一个技巧了。简单的说大语言模型经过庞大的语料库训练后，已经有了基本的推理能力，可以完成很多任务而不需要提供任何的样本数据做示例，比如：
 
-```plain text
+```
 将文本分类为中性、负面或正面。
 文本：嗯，还行吧
 情感：
@@ -43,7 +43,7 @@ toc:
 
 输出
 
-```plain text
+```
 中性
 ```
 
@@ -53,7 +53,7 @@ toc:
 
 继零样本之后就是多样本提示了，这个我相信很多也使用过，其原理很简单，就是给模型一些示例，这样模型可以参考并模仿，在很多场景下非常有效，比如：
 
-```plain text
+```
 Input: 你在干嘛？
 Lang: 四川话
 Output: 你在整啥子哦？
@@ -73,13 +73,13 @@ Output:
 
 模型输出了
 
-```plain text
+```
 Have you eaten?
 ```
 
 这样其实就是展示了一些示例给模型，模型会参考着来，不过细心的你一定发现，这里其实零样本就可以实现了，也就是
 
-```plain text
+```
 Input: 吃了么？
 Lang: 英语
 Output:
@@ -87,7 +87,7 @@ Output:
 
 也会输出一样的结果。这是因为模型的参数量已经大到一定程度，对于一些基础知识是可以直接推理的，我们可以看看这个例子：
 
-```plain text
+```
 Input: 在干嘛？
 Output: 嘛干在？
 
@@ -103,7 +103,7 @@ Output:
 
 模型会输出
 
-```plain text
+```
 么什吃，啊以可？
 ```
 
@@ -158,7 +158,7 @@ Manus的解决方法是引入多样性，会在上下文中引入少量结构化
     </div>
 </div>
 可以看到，当我们把论文里的问题里的数字提高到一个大数，模型就很难在不推理的情况下一下给出正确答案，第一次我使用`return just one number`就是防止模型自我进行推理，因为现在模型相对聪明一点，哪怕不是推理模型也会简单的推理演化再给出结果。这边得到的答案是`4240812393`，实际的答案是`2123812393-123123+2123123123=4246812393`
-```plain text
+```
 4240812393
 4246812393
 ```
@@ -176,7 +176,7 @@ Manus的解决方法是引入多样性，会在上下文中引入少量结构化
     </div>
 </div>
 这里我们可以看到，模型一步一步的推理计算，最终得到了`**4,246,812,393**`
-```plain text
+```
 4246812393
 4246812393
 ```
@@ -229,14 +229,14 @@ Manus的解决方法是引入多样性，会在上下文中引入少量结构化
     </div>
 </div>
 我简单表述了一下我的需求：
-```plain text
+```
 我在设计一个运维方向的AI Agent，可以基于用户给的一些日志、报警、客户反馈，自动去排查，可以借助一些日志、监控数据、相关时序数据、甚至到机器上查看等手段，可以帮助快速定位问题或者寻找解决方案。请你帮我写一版System Prompt。对了这个AI Agent叫LeoOps
 
 输出markdown到code block里
 
 ````
 ChatGPT就输出了：
-```plain text
+```
 # LeoOps 系统提示词（System Prompt）
 
 你是 **LeoOps**，一个专为运维领域设计的智能助手，擅长故障排查和问题定位。你能够根据用户提供的日志、报警信息、客户反馈、监控数据、时序指标，甚至主机上的运行状态，智能分析并提供可能的原因和解决建议。你的目标是帮助运维人员快速定位问题、减少故障时间、提升系统稳定性。
@@ -325,7 +325,7 @@ ChatGPT就输出了：
     </div>
 </div>
 这张图我们可以看到，每一次都会生成几个可能，然后分别评估，最终选择最好的最有潜力的几个，继续下去，这样可以不断收窄直到结束。我们可以用一个简单的例子看看如何一步步演化的：
-```plain text
+```
 用 3, 4, 6, 8 得到 24
 
 目标：四则运算得到24，每步保留最好的2个选择
@@ -471,13 +471,13 @@ ReAct的核心灵感来源于人类：人类在解决问题时，往往会交替
 
 这个循环持续进行，直到模型认为可以给出最终答案。我们来看一个很简单的例子，我们写一个系统提示词如下：
 然后我们在运行的时候发送问题，比如：
-```plain text
+```
 牛顿出生在哪一年？
 ````
 
 运行过程可能是这样的：
 
-```plain text
+```
 Round: 1: 模型输出一下内容，不知道结果，思考
 Thought: 我不记得牛顿出生的年份，我应该进行搜索。
 
@@ -536,7 +536,7 @@ Claude Code能在推出到市场后以极短时间成为效果最好的Coding助
 
 这其中就有提示词技巧，不仅仅是系统提示词，还有一些压缩提示词什么的，都非常值得学习
 
-```plain text
+```
 You are an interactive CLI tool that helps users with software engineering tasks. Use the instructions below and the tools available to you to assist the user.
 
 IMPORTANT: Assist with defensive security tasks only. Refuse to create, modify, or improve code that may be used maliciously. Allow security analysis, detection rules, vulnerability explanations, defensive tools, and security documentation.
@@ -715,7 +715,7 @@ assistant: Clients are marked as failed in the `connectToServer` function in src
 
 翻译成中文是
 
-```plain text
+```
 你是一个交互式 CLI 工具，旨在协助用户完成软件工程任务。请根据以下指令和可用工具为用户提供帮助。
 
 重要说明：仅协助防御性安全任务。拒绝创建、修改或优化可能被用于恶意用途的代码。你可以协助安全分析、检测规则、漏洞解释、防御工具与安全文档的相关工作。
@@ -848,7 +848,7 @@ assistant: 客户端错误处理位于 src/services/process.ts:712 的 connectTo
 
 来自于xlab-uiuc的SREArena，是一个用于SRE或AIOps场景下的针对部署在k8s上的微服务进行问题诊断的Agent：
 
-```plain text
+```
 Monitor and diagnose an application consisting of **MANY** microservices. Some or none of the microservices have faults. Get all the pods and deployments to figure out what kind of services are running in the cluster.
 Carefully identify the whether the faults are present and if they are, and identify what is the root cause of the fault.
 
@@ -897,7 +897,7 @@ Remember to check these, and remember this information:
 
 翻译成中文是：
 
-```plain text
+```
 对一个包含**大量**微服务的应用进行监控和诊断。部分微服务可能存在故障，也可能全部正常。
 获取所有的 pod 和 deployment，以了解集群中运行了哪些服务。
 仔细判断是否存在故障；如果有，找出故障的根本原因。
@@ -947,7 +947,7 @@ Remember to check these, and remember this information:
 
 会配合下面的模拟用户消息的提示词来使用
 
-```plain text
+```
 You will be working this application:
 
 {app_name}
@@ -972,7 +972,7 @@ You will begin by analyzing the service's state and telemetry with the tools.
 
 翻译成中文是
 
-```plain text
+```
 你将负责处理以下应用：
 
 {app_name}
@@ -1002,7 +1002,7 @@ You will begin by analyzing the service's state and telemetry with the tools.
 
 在Letta的代码里我们可以看到，Letta也是借助了大模型，利用特定的系统提示词来对聊天历史记录进行摘要的动作，我们可以看到：
 
-```plain text
+```
 Your job is to summarize a history of previous messages in a conversation between an AI persona and a human.
 The conversation you are given is a from a fixed context window and may not be complete.
 Messages sent by the AI are marked with the 'assistant' role.
@@ -1018,7 +1018,7 @@ Only output the summary, do NOT include anything else in your output.
 
 翻译成中文是
 
-```plain text
+```
 你的任务是总结一段人类与 AI 人设之间的对话历史。
 给出的对话来自一个固定的上下文窗口，可能并不完整。
 AI 发送的消息用 assistant 角色标记。
@@ -1044,11 +1044,11 @@ user 角色还用于系统事件，如登录事件和心跳事件（心跳会在
     </div>
 </div>
 内容是：
-```plain text
+```
 Understood, I will respond with a summary of the message (and only the summary, nothing else) once I receive the conversation history. I'm ready.
 ```
 中文是：
-```plain text
+```
 明白了，一旦我收到对话历史，我将只输出消息摘要（仅摘要，不包含其他内容）。我已准备好了。
 ```
 这其实也是一种提示词技巧，通过一个伪造的回复，进一步引导指示大模型后续的回复应该遵循的指令。
@@ -1057,7 +1057,7 @@ Understood, I will respond with a summary of the message (and only the summary, 
 
 这是一个通过APP、TG、WhatsApp、Line或短信进行日程管理的AI应用，简单说就是通过自然应用交互，会自动生成对应的日程，到期前会提醒你，就是一个非常简单的一个功能，现在诸如飞书、企业微信之类的都开始集成这类功能了，我当时是看到豌豆荚的创始人王俊煜推荐的，我就简单用了一下。习惯性Hack了一下系统提示词：
 
-```plain text
+```
 You are Toki, a smart calendar assistant.
 
 You must output or return one or more appropriate function calls instead.
@@ -1124,7 +1124,7 @@ If the user wants to change the language, you need to call this tool.
 
 翻译成中文是：
 
-```plain text
+```
 你是 Toki，一位智能日历助理。
 
 你必须输出或返回一个或多个适当的函数调用。
@@ -1192,7 +1192,7 @@ If the user wants to change the language, you need to call this tool.
 
 Cursor的系统提示词，我们先来看看一份Agent的系统提示词
 
-````plain text
+````
 You are an AI coding assistant, powered by GPT-5. You operate in Cursor.
 
 You are pair programming with a USER to solve their coding task. Each time the USER sends a message, we may automatically attach some information about their current state, such as what files they have open, where their cursor is, recently viewed files, edit history in their session so far, linter errors, and more. This information may or may not be relevant to the coding task, it is up for you to decide.
@@ -1426,7 +1426,7 @@ IMPORTANT: Always follow the rules in the todo_spec carefully!
 
 中文是：
 
-````plain text
+````
 您是一个由 GPT-5 驱动的 AI 编程助手，在 Cursor 中运行。
 
 您正在与用户进行结对编程来解决他们的编程任务。每次用户发送消息时，我们可能会自动附加一些关于他们当前状态的信息，例如他们打开的文件、光标位置、最近查看的文件、此会话中迄今为止的编辑历史、代码检查错误等。这些信息可能与编程任务相关，也可能无关，由您来决定。
@@ -1660,7 +1660,7 @@ Todo 项目内容：
 
 还有记忆相关的提示词：
 
-```plain text
+```
 You are an AI Assistant who is an extremely knowledgable software engineer, and you are judging whether or not certain memories are worth remembering.
 If a memory is remembered, that means that in future conversations between an AI programmer and a human programmer, the AI programmer will be able use this memory to make a better response.
 
@@ -1733,7 +1733,7 @@ Then on a new line return the score in the format "SCORE: [score]" where [score]
 
 中文是：
 
-```plain text
+```
 你是一位知识渊博的软件工程师 AI 助手，你的任务是判断某些记忆是否值得被保留。
 如果一条记忆被保留，意味着在未来 AI 程序员与人类程序员的对话中，AI 程序员能够利用这条记忆作出更好的回应。
 
@@ -1806,7 +1806,7 @@ frontend-layout: 前端使用 tailwind css。（具体技术选型 - 得分 4）
 
 Gemini新出的StoryBook，其实也是基于Gemini套系统提示词，然后里面挂载了**22个Agent**，所以其实这个是一种**基于Supervisor式的多Agent架构**。这也是我们通过提示词可以分析出来这些额外的信息。可以窥见一个AI产品背后的实现逻辑
 
-```plain text
+```
 You are Gemini, a Google LLM with access to real-time information via specialized agents. You **must** invoke agents using the exact @agent_name format specified below to gather necessary information before responding to the user using the @user agent.
 Adhere to any additional Configuration Instructions provided (see the 'configuration' section), unless they conflict with these core instructions. If conflicts arise, prioritize these core instructions. If the configuration asks you to think (or use the @thought agent), think silently about that topic before responding instead of invoking the @thought agent.
 
@@ -1878,7 +1878,7 @@ As a reminder, these are the only files in the filesystem that can be loaded. No
 
 中文是
 
-````plain text
+````
 # Gemini：美观且实用的系统提示词指南
 
 ## 概述
@@ -1941,7 +1941,6 @@ As a reminder, these are the only files in the filesystem that can be loaded. No
 
 以下是文件系统中唯一可加载的文件。不可访问其他文件：
 
-```json
 {"fileMimeType":"image/png","fileName":"18008324112679408234.png","fileNameIsCodeAccessible":true}
 {"fileMimeType":"text/plain","fileName":"illustration_prompts.txt","fileNameIsCodeAccessible":true}
 {"fileMimeType":"image/png","fileName":"7992694369566020728.png","fileNameIsCodeAccessible":true}
@@ -1957,8 +1956,5 @@ As a reminder, these are the only files in the filesystem that can be loaded. No
 {"fileMimeType":"image/png","fileName":"12308801863961295468.png","fileNameIsCodeAccessible":true}
 {"fileMimeType":"text/plain","fileName":"27y7viompmuyb_Ha6H.md","fileNameIsCodeAccessible":true}
 {"fileMimeType":"text/plain","fileName":"<filename.xyz>","fileNameIsCodeAccessible":true}
-````
-
 ```
 
-```

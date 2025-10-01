@@ -256,7 +256,7 @@ MemGPT也就是我们前面提到的，现在改名叫[Letta](https://www.letta.
     </div>
 </div>
 下面我们来进一看看Letta的记忆原理和实现细节。在开始前我会先展示一下全量的系统提示词：
-```plain text
+```
 You are Letta, the latest version of Limnal Corporation's digital companion, developed in 2023.
 Your task is to converse with a user from the perspective of your persona.
 
@@ -320,7 +320,7 @@ From now on, you are going to act as your persona.
 
 ````
 翻译成中文是：
-```plain text
+```
 你是 Letta，由 Limnal 公司在 2023 年开发的最新版本数字伙伴。
 你的任务是以你的人设身份与用户进行对话。
 
@@ -386,7 +386,7 @@ Human 子区块：存储你与之交谈对象的关键信息，支持更加个�
 
 可以看到提示词里有告诉大模型如何管理记忆，可以通过函数调用直接读写和更新记忆，最后我们也可以看到预留了填充目前的核心记忆的占位符，也就是**核心记忆和归档记忆的总体情况会一直驻留在上下文空间里**，这样大模型是可以实时感知到目前的记忆情况。我们来看看最后的`{CORE_MEMORY}`的例子：
 
-```plain text
+```
 ### Memory [last modified: 2024-01-11 12:43:23 PM]
 9 previous messages between you and the user are stored in recall memory (use functions to access them)
 0 total memories you created are stored in archival memory (use functions to access them)
@@ -418,7 +418,7 @@ Chad loves dogs.
 
 中文是：
 
-```plain text
+```
 ### 记忆 [最后修改时间: 2024-01-11 12:43:23 PM]
 你和用户之间的 9 条先前消息存储在回忆记忆中（需通过函数访问）。
 你创建的 0 条记忆存储在归档记忆中（需通过函数访问）。
@@ -504,7 +504,7 @@ Letta使用了三层内存架构，分别是：
     </div>
 </div>
 我们可以看到，Letta是在Tool列表里定义了这些操作内容的工具
-```plain text
+```
 function_map = {
     "send_message": self.send_message,
     "conversation_search": self.conversation_search,
@@ -556,7 +556,7 @@ Zep其实就是一个类似[GraphRAG](https://arxiv.org/abs/2404.16130)的系统
     </div>
 </div>
 接下来我们来看看Zep里记忆相关的是怎么实现。首先是关于提取实体的系统提示词如下（Zep其实支持从`message`,`json`和`text`中提取，我们这边只展示`message`方式，其他两种都是一样的，只不过提示词和里面拼装的数据有些许差别而已）：
-```plain text
+```
 You are an AI assistant that extracts entity nodes from conversational messages.
 Your primary task is to extract and classify the speaker and other significant entities mentioned in the conversation.
 
@@ -564,7 +564,7 @@ Your primary task is to extract and classify the speaker and other significant e
 
 翻译成中文是：
 
-```plain text
+```
 你是一个从对话消息中提取实体节点的 AI 助理。
 你的主要任务是提取并分类说话者以及对话中提到的其他重要实体。
 
@@ -572,7 +572,7 @@ Your primary task is to extract and classify the speaker and other significant e
 
 还会拼接预定义的用户提示词：
 
-```plain text
+```
 <ENTITY TYPES>
 {context['entity_types']}
 </ENTITY TYPES>
@@ -615,7 +615,7 @@ reference entities. Only extract distinct entities from the CURRENT MESSAGE. Don
 
 翻译成中文是：
 
-```plain text
+```
 <实体类型>
 {context['entity_types']}
 </实体类型>
@@ -658,7 +658,7 @@ reference entities. Only extract distinct entities from the CURRENT MESSAGE. Don
 
 下面是一个 填充后的示例：
 
-```plain text
+```
 
 <ENTITY TYPES>
 [
@@ -724,7 +724,7 @@ reference entities. Only extract distinct entities from the CURRENT MESSAGE. Don
 
 响应结果示例：
 
-```plain text
+```
 {
   "extracted_entities": [
     {
@@ -752,7 +752,7 @@ reference entities. Only extract distinct entities from the CURRENT MESSAGE. Don
 
 这里面还会有一些补充机制，比如里面有反思（Reflexion）环节，也就是在提取完实体后，会触发反思，目的是确保没有遗漏重要的实体，相关的系统提示词和用户提示词我拼在一起放在下面了
 
-```plain text
+```
 System Prompt:
 You are an AI assistant that determines which entities have not been extracted from the given context
 
@@ -783,7 +783,7 @@ Given the above previous messages, current message, and list of extracted entiti
 
 反思后的输出结果：
 
-```plain text
+```
 {
   "missed_entities": [
     "San Francisco",
@@ -796,7 +796,7 @@ Given the above previous messages, current message, and list of extracted entiti
 
 看完了实体提取，我们再来看看关系提取，相关的提示词我放在下面：
 
-```plain text
+```
 System Prompt:
 
 You are an expert fact extractor that extracts fact triples from text.
@@ -882,7 +882,7 @@ You may use information from the PREVIOUS MESSAGES only to disambiguate referenc
 
 翻译成中文是：
 
-```plain text
+```
 系统提示词：
 
 你是一个专业的事实抽取器，能够从文本中提取事实三元组（fact triples）。
@@ -964,7 +964,7 @@ user: 我打算去旧金山，并在那里见我的同事 John Smith，他在 Go
 
 响应为：
 
-```plain text
+```
 {
   "edges": [
     {
@@ -1006,7 +1006,7 @@ user: 我打算去旧金山，并在那里见我的同事 John Smith，他在 Go
 
 通过上面两阶段，就已经可以取到实体和关系了，之后就还会有一些辅助操作，比如去重合并等，最后就是存到图数据库里了，同时节点和关系也会向量化生成embedding后存到向量数据库。通过实体和关系就可以组成一个事实（Fact），类似下面：
 
-```plain text
+```
 fact = "John Smith works at Google"
 fact = "Apple was founded by Steve Jobs in 1976"
 fact = "Tim Cook became CEO of Apple in August 2011"
@@ -1066,7 +1066,7 @@ mem0的处理由两阶段组成：提取和更新。这样可以确保记忆的�
     </div>
 </div>
 我们会看一下里面涉及的一些关键的提示词，提取关键事实：
-```plain text
+```
 You are a Personal Information Organizer, specialized in accurately storing facts, user
 memories, and preferences. Your primary role is to extract relevant pieces of information
 from conversations and organize them into distinct, manageable facts. This allows for easy
@@ -1173,7 +1173,7 @@ You should detect the language of the user input and record the facts in the sam
 
 ````
 翻译成中文是
-```plain text
+```
 你是一个个人信息整理助手，专门负责准确地存储事实、用户记忆和偏好。你的主要职责是从对话中提取相关信息，并将其整理为清晰且可管理的事实。这使得未来的交互中可以轻松检索和个性化处理。以下是你需要重点关注的信息类型以及处理输入数据的详细说明。
 
 需记住的信息类型：
@@ -1274,7 +1274,7 @@ JSON 格式返回。
 
 再来看一个记忆操作类型判断的提示词：
 
-```plain text
+```
 You are a smart memory manager which controls the memory of a system.
 You can perform four operations: (1) add into the memory, (2) update the memory, (3) delete from the memory, and (4) no change.
 
@@ -1427,7 +1427,7 @@ Please note to return the IDs in the output from the input IDs only and do not g
 
 翻译成中文是
 
-```plain text
+```
 你是一个智能内存管理器，负责控制系统的内存。
 你可以执行四种操作：（1）添加到内存，（2）更新内存，（3）从内存中删除，（4）不作更改。
 
@@ -1595,7 +1595,7 @@ Please note to return the IDs in the output from the input IDs only and do not g
 
 首先看`app/app.py`，入口在这里：
 
-```plain text
+```
 from langgraph.checkpoint.postgres import PostgresSaver
 
 from .config import load_config
@@ -1634,7 +1634,7 @@ def run():
 
 调用`app/config.py`进行配置加载：
 
-```plain text
+```
 import os
 import re
 from dataclasses import dataclass
@@ -1729,7 +1729,7 @@ def load_config() -> AppConfig:
 
 然后会连接数据库，这边我们使用pgvector用作向量数据库
 
-```plain text
+```
 from typing import List
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
@@ -1813,7 +1813,7 @@ class FactStore:
 
 里面涉及Embedding模型的使用：
 
-```plain text
+```
 from typing import Optional, Sequence
 from langchain_openai import OpenAIEmbeddings
 from .config import AppConfig
@@ -1851,7 +1851,7 @@ class Embedder:
 
 另外调用大模型的服务，我们直接基于litellm来实现，所有主流的大模型都可以轻松调用
 
-```plain text
+```
 from typing import Dict, Any, List, Tuple
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, MessagesState, START, END
@@ -1914,7 +1914,7 @@ def build_graph(service: LLMService) -> StateGraph:
 
 最后是两份提示词，一份是系统提示词`prompts/system.prompt`：
 
-```plain text
+```
 你叫ce101，是由 Leo 开发的一个拥有记忆能力的小助手。
 
 对话风格与行为规范：
@@ -1939,7 +1939,7 @@ def build_graph(service: LLMService) -> StateGraph:
 
 另一份是事实提取的提示词`prompts/fact_extraction.prompt`：
 
-```plain text
+```
 你是一个中文信息抽取器（Information Extractor）。
 
 目标：从用户本轮输入中，提取适合长期记忆、对后续对话有帮助的“事实”。

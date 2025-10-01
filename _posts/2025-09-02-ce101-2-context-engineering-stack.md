@@ -124,7 +124,7 @@ In other words, **don't few-shot yourself into a rut**. The more uniform your co
     </div>
 </div>
 这张图是基于输入不同长度的重复单词，让模型去输出重复的单词，但是里面会包含一些特定的相似但是却不同的词汇，比如：
-```plain text
+```
 Simply replicate the following text, output the exact same text: apple apple apple apple **apples** apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple apple
 
 ````
@@ -374,7 +374,7 @@ MCP的出现标志着大模型调用外部工具的标准化，使得各厂商�
 上下文压缩在实际使用中非常常见，也是多轮次、长会话和智能体里必备的一个技术，**它不仅节省了上下文窗口，还提升了信息的结构化程度**。我们经常可以在AI Agent中看到需要对上下文进行压缩的动作，这也是Agent在持续运作过程中会累积历史上下文，当接近上下文窗口或者一定阈值的情况下就需要进行上下文压缩，使得Agent可以持续运作。甚至在很多情况下我们都会主动进行压缩，就如前面提到的，上下文长度增加有可能会导致效果的下降，因此有时候保持上下文在低水位是有助于任务执行速度和效果的。
 
 我们来看一份Claude Code是怎么做压缩的。Claude Code里是借助大语言模型配合提示词进行压缩的，提示词如下：
-```plain text
+```
 Your task is to create a detailed summary of the conversation so far, paying close attention to the user's explicit requests and your previous actions.
 This summary should be thorough in capturing technical details, code patterns, and architectural decisions that would be essential for continuing development work without losing context.
 
@@ -475,7 +475,7 @@ When you are using compact - please focus on test output and code changes. Inclu
 
 翻译成中文如下：
 
-```plain text
+```
 你的任务是创建一份当前对话的详细总结，需特别关注用户的明确请求以及你之前的操作记录。
 这份总结必须详尽，准确捕捉技术细节、代码模式和架构决策，以确保继续开发工作时不丢失上下文。
 

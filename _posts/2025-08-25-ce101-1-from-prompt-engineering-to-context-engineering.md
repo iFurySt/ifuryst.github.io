@@ -49,7 +49,7 @@ Transformer架构引入了**注意力机制（Self-Attention）**，使得模型
 
 了解完背景之后，现在我们来进一步看看什么是提示词。首先我们用一简单的例子来展示：
 
-```plain text
+```
 Leo: 我是
 
 ChatGPT: 你好呀！你可以继续补充“我是……”后面的内容，也可以直接告诉我你想聊什么、做什么～😊
@@ -83,7 +83,7 @@ ChatGPT: 我是一个热爱探索世界的旅行者。
 
 给一段简单的提示词构成：
 
-```plain text
+```
 You are ChatGPT, a large language model trained by OpenAI, based on the GPT-4.5 architecture.
 Knowledge cutoff: 2023-10
 Current date: 2025-06-29
@@ -202,7 +202,7 @@ The `web` tool has the following commands:
 
 这是一份GPT4.5的系统提示词（System Prompt），下面我翻译成一版中文的
 
-```plain text
+```
 你是ChatGPT，基于GPT-4.5架构的大型语言模型，由OpenAI训练。
 知识截止日期：2023年10月
 当前日期：2025年6月29日
@@ -324,7 +324,7 @@ The `web` tool has the following commands:
 
 还提供了一些相关的背景信息，比如：
 
-```plain text
+```
 你是ChatGPT，基于GPT-4.5架构的大型语言模型，由OpenAI训练。
 知识截止日期：2023年10月
 当前日期：2025年6月29日
@@ -333,7 +333,7 @@ The `web` tool has the following commands:
 
 还有对于输出的一些限制和格式要求：
 
-```plain text
+```
 期望一个符合此模式的JSON字符串：
 {
   comments: {
