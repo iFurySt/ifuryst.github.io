@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "LeoTalk AI周知 13: "
+title: "LeoTalk AI周知 13: AI这一年"
 date: 2025-12-15T08:00:00+08:00
 tags:
   - AI
