@@ -59,9 +59,7 @@ layout: default
               <i class="fa-solid fa-tag fa-sm"></i> {{ category -}}
             </a>
           {% elsif current_lang == 'en' %}
-            <a href="{{ blog_root | relative_url }}">
-              <i class="fa-solid fa-tag fa-sm"></i> {{ category -}}
-            </a>
+            <a href="{{ blog_root | relative_url }}"> <i class="fa-solid fa-tag fa-sm"></i> {{ category -}}</a>
           {% else %}
             <i class="fa-solid fa-tag fa-sm"></i> {{ category }}
           {% endif %}

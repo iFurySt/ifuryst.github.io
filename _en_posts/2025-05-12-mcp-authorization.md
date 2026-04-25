@@ -30,76 +30,76 @@ Content-Type: application/x-www-form-urlencoded
 <span class="nv">client_id</span><span class="o">=</span>abc123&amp;
 <span class="nv">client_secret</span><span class="o">=</span>secret456
 </code></pre></div> </div> </li> <li> <p>Using the token, you can request the corresponding resources (resource scope determined by the scope)</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">{</span>
-  <span class="s2">"access_token"</span>: <span class="s2">"2YotnFZFEjr1zCsicMWpAA"</span>,
-  <span class="s2">"token_type"</span>: <span class="s2">"Bearer"</span>,
-  <span class="s2">"expires_in"</span>: 3600,
-  <span class="s2">"refresh_token"</span>: <span class="s2">"tGzv3JOkF0XG5Qx2TlKWIA"</span>
+<span class="s2">"access_token"</span>: <span class="s2">"2YotnFZFEjr1zCsicMWpAA"</span>,
+<span class="s2">"token_type"</span>: <span class="s2">"Bearer"</span>,
+<span class="s2">"expires_in"</span>: 3600,
+<span class="s2">"refresh_token"</span>: <span class="s2">"tGzv3JOkF0XG5Qx2TlKWIA"</span>
 <span class="o">}</span>
 </code></pre></div> </div> </li> </ol> <p>RFC 6750 basically supplements OAuth 2.0, mainly specifying that AccessToken is represented as a Bearer Token (Authorization: Bearer <token>). Note that it is not necessarily a JWT. Many places use JWT, but Bearer Token is not equivalent to JWT; it can be a JWT or a random string.</token></p> <h3 id="oauth-20-authorization-server-metadata---rfc-8414">OAuth 2.0 Authorization Server Metadata - RFC 8414</h3> <p>The /authorize and /token endpoints mentioned earlier are fixed or pre-agreed configurations, which may not be convenient in some scenarios. Therefore, this RFC provides an automatic discovery mechanism, somewhat similar to openid-configuration in OIDC.</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GET https://auth.example.com/.well-known/oauth-authorization-server
 
 <span class="c"># Multi-tenant</span>
 GET https://auth.example.com/.well-known/oauth-authorization-server?issuer<span class="o">=</span>https://issuer.example.com
 </code></pre></div></div> <p>This adds an endpoint (the Discovery Endpoint, .well-known/oauth-authorization-server) for discovering related configurations. The configuration (Metadata Document, authorization server metadata in JSON format) might look like:</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">{</span>
-  <span class="s2">"issuer"</span>: <span class="s2">"https://mcp-github-oauth.ifuryst.workers.dev"</span>,
-  <span class="s2">"authorization_endpoint"</span>: <span class="s2">"https://mcp-github-oauth.ifuryst.workers.dev/authorize"</span>,
-  <span class="s2">"token_endpoint"</span>: <span class="s2">"https://mcp-github-oauth.ifuryst.workers.dev/token"</span>,
-  <span class="s2">"registration_endpoint"</span>: <span class="s2">"https://mcp-github-oauth.ifuryst.workers.dev/register"</span>,
-  <span class="s2">"response_types_supported"</span>: <span class="o">[</span>
-    <span class="s2">"code"</span>
-  <span class="o">]</span>,
-  <span class="s2">"response_modes_supported"</span>: <span class="o">[</span>
-    <span class="s2">"query"</span>
-  <span class="o">]</span>,
-  <span class="s2">"grant_types_supported"</span>: <span class="o">[</span>
-    <span class="s2">"authorization_code"</span>,
-    <span class="s2">"refresh_token"</span>
-  <span class="o">]</span>,
-  <span class="s2">"token_endpoint_auth_methods_supported"</span>: <span class="o">[</span>
-    <span class="s2">"client_secret_basic"</span>,
-    <span class="s2">"client_secret_post"</span>,
-    <span class="s2">"none"</span>
-  <span class="o">]</span>,
-  <span class="s2">"revocation_endpoint"</span>: <span class="s2">"https://mcp-github-oauth.ifuryst.workers.dev/token"</span>,
-  <span class="s2">"code_challenge_methods_supported"</span>: <span class="o">[</span>
-    <span class="s2">"plain"</span>,
-    <span class="s2">"S256"</span>
-  <span class="o">]</span>
+<span class="s2">"issuer"</span>: <span class="s2">"https://mcp-github-oauth.ifuryst.workers.dev"</span>,
+<span class="s2">"authorization_endpoint"</span>: <span class="s2">"https://mcp-github-oauth.ifuryst.workers.dev/authorize"</span>,
+<span class="s2">"token_endpoint"</span>: <span class="s2">"https://mcp-github-oauth.ifuryst.workers.dev/token"</span>,
+<span class="s2">"registration_endpoint"</span>: <span class="s2">"https://mcp-github-oauth.ifuryst.workers.dev/register"</span>,
+<span class="s2">"response_types_supported"</span>: <span class="o">[</span>
+<span class="s2">"code"</span>
+<span class="o">]</span>,
+<span class="s2">"response_modes_supported"</span>: <span class="o">[</span>
+<span class="s2">"query"</span>
+<span class="o">]</span>,
+<span class="s2">"grant_types_supported"</span>: <span class="o">[</span>
+<span class="s2">"authorization_code"</span>,
+<span class="s2">"refresh_token"</span>
+<span class="o">]</span>,
+<span class="s2">"token_endpoint_auth_methods_supported"</span>: <span class="o">[</span>
+<span class="s2">"client_secret_basic"</span>,
+<span class="s2">"client_secret_post"</span>,
+<span class="s2">"none"</span>
+<span class="o">]</span>,
+<span class="s2">"revocation_endpoint"</span>: <span class="s2">"https://mcp-github-oauth.ifuryst.workers.dev/token"</span>,
+<span class="s2">"code_challenge_methods_supported"</span>: <span class="o">[</span>
+<span class="s2">"plain"</span>,
+<span class="s2">"S256"</span>
+<span class="o">]</span>
 <span class="o">}</span>
 </code></pre></div></div> <table> <thead> <tr> <th>Field Name</th> <th>Required</th> <th>Type</th> <th>Description</th> </tr> </thead> <tbody> <tr> <td>issuer</td> <td>✅ Yes</td> <td>string</td> <td>Unique identifier of the authorization server (URL), must be https, no parameters or fragments</td> </tr> <tr> <td>authorization_endpoint</td> <td>✅ Yes (unless not supporting auth code flow)</td> <td>string</td> <td>OAuth authorization endpoint address for obtaining user authorization</td> </tr> <tr> <td>token_endpoint</td> <td>✅ Yes (unless only supporting implicit)</td> <td>string</td> <td>Token endpoint where clients obtain access tokens</td> </tr> <tr> <td>jwks_uri</td> <td>⛔ Optional</td> <td>string</td> <td>JWK Set address containing public keys for clients to verify JWT signatures</td> </tr> <tr> <td>registration_endpoint</td> <td>⛔ Optional</td> <td>string</td> <td>Endpoint for registering clients when dynamic client registration is supported</td> </tr> <tr> <td>scopes_supported</td> <td>⛔ Recommended</td> <td>array</td> <td>List of supported scopes</td> </tr> <tr> <td>response_types_supported</td> <td>✅ Yes</td> <td>array</td> <td>Supported response types, such as code, token</td> </tr> <tr> <td>response_modes_supported</td> <td>⛔ Optional</td> <td>array</td> <td>Supported response modes, such as query, fragment, form_post</td> </tr> <tr> <td>grant_types_supported</td> <td>⛔ Optional</td> <td>array</td> <td>Supported grant types, such as authorization_code, client_credentials</td> </tr> <tr> <td>token_endpoint_auth_methods_supported</td> <td>⛔ Optional</td> <td>array</td> <td>Client authentication methods supported by the token endpoint, such as client_secret_basic</td> </tr> <tr> <td>token_endpoint_auth_signing_alg_values_supported</td> <td>⛔ Optional</td> <td>array</td> <td>Signature algorithms supported when using JWT authentication at token endpoint, such as RS256</td> </tr> <tr> <td>service_documentation</td> <td>⛔ Optional</td> <td>string</td> <td>Developer documentation address</td> </tr> <tr> <td>ui_locales_supported</td> <td>⛔ Optional</td> <td>array</td> <td>List of languages supported by UI (e.g., zh-CN)</td> </tr> <tr> <td>op_policy_uri</td> <td>⛔ Optional</td> <td>string</td> <td>URL for the authorization server’s policy on client data usage</td> </tr> <tr> <td>op_tos_uri</td> <td>⛔ Optional</td> <td>string</td> <td>Terms of service URL</td> </tr> <tr> <td>revocation_endpoint</td> <td>⛔ Optional</td> <td>string</td> <td>Token revocation endpoint (see RFC 7009)</td> </tr> <tr> <td>revocation_endpoint_auth_methods_supported</td> <td>⛔ Optional</td> <td>array</td> <td>Authentication methods supported by the revocation endpoint</td> </tr> <tr> <td>revocation_endpoint_auth_signing_alg_values_supported</td> <td>⛔ Optional</td> <td>array</td> <td>JWT signature algorithms supported by the revocation endpoint</td> </tr> <tr> <td>introspection_endpoint</td> <td>⛔ Optional</td> <td>string</td> <td>Token status check endpoint (see RFC 7662)</td> </tr> <tr> <td>introspection_endpoint_auth_methods_supported</td> <td>⛔ Optional</td> <td>array</td> <td>Authentication methods supported by the introspection endpoint</td> </tr> <tr> <td>introspection_endpoint_auth_signing_alg_values_supported</td> <td>⛔ Optional</td> <td>array</td> <td>JWT signature algorithms supported by the introspection endpoint</td> </tr> <tr> <td>code_challenge_methods_supported</td> <td>⛔ Optional</td> <td>array</td> <td>Supported PKCE code_challenge_method (e.g., S256)</td> </tr> </tbody> </table> <p>Additionally, service providers can add custom fields.</p> <h3 id="oauth-20-dynamic-client-registration-protocol---rfc-7591">OAuth 2.0 Dynamic Client Registration Protocol - RFC 7591</h3> <p>The previous steps for registering to obtain ClientID were manual. This RFC essentially allows clients to automatically register themselves to get a ClientID and ClientSecret without requiring pre-registration by humans.</p> <p>Registration example:</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>POST /register HTTP/1.1
 Host: server.example.com
 Content-Type: application/json
 
 <span class="o">{</span>
-  <span class="s2">"client_name"</span>: <span class="s2">"AwesomeApp"</span>,
-  <span class="s2">"redirect_uris"</span>: <span class="o">[</span>
-    <span class="s2">"https://awesome.example.com/oauth/callback"</span>
-  <span class="o">]</span>,
-  <span class="s2">"grant_types"</span>: <span class="o">[</span><span class="s2">"authorization_code"</span>, <span class="s2">"refresh_token"</span><span class="o">]</span>,
-  <span class="s2">"response_types"</span>: <span class="o">[</span><span class="s2">"code"</span><span class="o">]</span>,
-  <span class="s2">"scope"</span>: <span class="s2">"read write"</span>,
-  <span class="s2">"token_endpoint_auth_method"</span>: <span class="s2">"client_secret_basic"</span>
+<span class="s2">"client_name"</span>: <span class="s2">"AwesomeApp"</span>,
+<span class="s2">"redirect_uris"</span>: <span class="o">[</span>
+<span class="s2">"https://awesome.example.com/oauth/callback"</span>
+<span class="o">]</span>,
+<span class="s2">"grant_types"</span>: <span class="o">[</span><span class="s2">"authorization_code"</span>, <span class="s2">"refresh_token"</span><span class="o">]</span>,
+<span class="s2">"response_types"</span>: <span class="o">[</span><span class="s2">"code"</span><span class="o">]</span>,
+<span class="s2">"scope"</span>: <span class="s2">"read write"</span>,
+<span class="s2">"token_endpoint_auth_method"</span>: <span class="s2">"client_secret_basic"</span>
 <span class="o">}</span>
 </code></pre></div></div> <p>Possible response:</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">{</span>
-  <span class="s2">"client_id"</span>: <span class="s2">"s6BhdRkqt3"</span>,
-  <span class="s2">"client_secret"</span>: <span class="s2">"7Fjfp0ZBr1KtDRbnfVdmIw"</span>,
-  <span class="s2">"registration_access_token"</span>: <span class="s2">"access-token-123"</span>,
-  <span class="s2">"registration_client_uri"</span>: <span class="s2">"https://server.example.com/register/s6BhdRkqt3"</span>,
-  <span class="s2">"client_id_issued_at"</span>: 1599389946,
-  <span class="s2">"client_secret_expires_at"</span>: 0
+<span class="s2">"client_id"</span>: <span class="s2">"s6BhdRkqt3"</span>,
+<span class="s2">"client_secret"</span>: <span class="s2">"7Fjfp0ZBr1KtDRbnfVdmIw"</span>,
+<span class="s2">"registration_access_token"</span>: <span class="s2">"access-token-123"</span>,
+<span class="s2">"registration_client_uri"</span>: <span class="s2">"https://server.example.com/register/s6BhdRkqt3"</span>,
+<span class="s2">"client_id_issued_at"</span>: 1599389946,
+<span class="s2">"client_secret_expires_at"</span>: 0
 <span class="o">}</span>
 </code></pre></div></div> <h3 id="oauth-21">OAuth 2.1</h3> <p>This revises OAuth 2.0 rather than completely rewriting it. The main differences are:</p> <ul> <li>Implicit and Resource Owner Password Credentials methods were removed due to security concerns</li> <li>All clients are required to use PKCE</li> <li>Refresh token rotation is recommended (the old one is discarded when refreshed)</li> </ul> <p>I think the most important obvious difference is the mandatory use of PKCE (Proof Key for Code Exchange), a mechanism designed to prevent authorization code interception and replay, which basically works as follows:</p> <ol> <li>The client randomly generates a string, which is the code_verifier</li> <li>After SHA256 hashing and Base64 encoding the code_verifier, another random string is obtained, which is the code_challenge</li> <li>The client can send the code_challenge and the corresponding hash algorithm code_challenge_method=S256 when making a request</li> <li>After the user agrees to authorize, the server records the code_challenge</li> <li>When the client exchanges the authorization_code for a token, it must include the original code_verifier</li> <li>The authorization service will hash the code_verifier and compare it to confirm whether to accept the request</li> </ol> <p>Let’s look at the code:</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">secrets</span>
 <span class="kn">import</span> <span class="n">hashlib</span>
 <span class="kn">import</span> <span class="n">base64</span>
 
 <span class="k">def</span> <span class="nf">generate_code_verifier</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">64</span><span class="p">):</span>
-    <span class="c1"># PKCE specification recommends length between 43-128 characters
-</span>    <span class="k">return</span> <span class="n">base64</span><span class="p">.</span><span class="nf">urlsafe_b64encode</span><span class="p">(</span><span class="n">secrets</span><span class="p">.</span><span class="nf">token_bytes</span><span class="p">(</span><span class="n">length</span><span class="p">)).</span><span class="nf">rstrip</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">=</span><span class="sh">'</span><span class="p">).</span><span class="nf">decode</span><span class="p">(</span><span class="sh">'</span><span class="s">utf-8</span><span class="sh">'</span><span class="p">)</span>
+<span class="c1"># PKCE specification recommends length between 43-128 characters
+</span> <span class="k">return</span> <span class="n">base64</span><span class="p">.</span><span class="nf">urlsafe_b64encode</span><span class="p">(</span><span class="n">secrets</span><span class="p">.</span><span class="nf">token_bytes</span><span class="p">(</span><span class="n">length</span><span class="p">)).</span><span class="nf">rstrip</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">=</span><span class="sh">'</span><span class="p">).</span><span class="nf">decode</span><span class="p">(</span><span class="sh">'</span><span class="s">utf-8</span><span class="sh">'</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">generate_code_challenge</span><span class="p">(</span><span class="n">code_verifier</span><span class="p">):</span>
-    <span class="n">code_verifier_bytes</span> <span class="o">=</span> <span class="n">code_verifier</span><span class="p">.</span><span class="nf">encode</span><span class="p">(</span><span class="sh">'</span><span class="s">utf-8</span><span class="sh">'</span><span class="p">)</span>
-    <span class="n">sha256_digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="p">.</span><span class="nf">sha256</span><span class="p">(</span><span class="n">code_verifier_bytes</span><span class="p">).</span><span class="nf">digest</span><span class="p">()</span>
-    <span class="n">code_challenge</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="nf">urlsafe_b64encode</span><span class="p">(</span><span class="n">sha256_digest</span><span class="p">).</span><span class="nf">rstrip</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">=</span><span class="sh">'</span><span class="p">).</span><span class="nf">decode</span><span class="p">(</span><span class="sh">'</span><span class="s">utf-8</span><span class="sh">'</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">code_challenge</span>
+<span class="n">code_verifier_bytes</span> <span class="o">=</span> <span class="n">code_verifier</span><span class="p">.</span><span class="nf">encode</span><span class="p">(</span><span class="sh">'</span><span class="s">utf-8</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">sha256_digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="p">.</span><span class="nf">sha256</span><span class="p">(</span><span class="n">code_verifier_bytes</span><span class="p">).</span><span class="nf">digest</span><span class="p">()</span>
+<span class="n">code_challenge</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="nf">urlsafe_b64encode</span><span class="p">(</span><span class="n">sha256_digest</span><span class="p">).</span><span class="nf">rstrip</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">=</span><span class="sh">'</span><span class="p">).</span><span class="nf">decode</span><span class="p">(</span><span class="sh">'</span><span class="s">utf-8</span><span class="sh">'</span><span class="p">)</span>
+<span class="k">return</span> <span class="n">code_challenge</span>
 
 <span class="c1"># Example
 </span><span class="n">code_verifier</span> <span class="o">=</span> <span class="nf">generate_code_verifier</span><span class="p">()</span>
@@ -108,15 +108,17 @@ Content-Type: application/json
 <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">code_verifier:</span><span class="sh">"</span><span class="p">,</span> <span class="n">code_verifier</span><span class="p">)</span>
 <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">code_challenge:</span><span class="sh">"</span><span class="p">,</span> <span class="n">code_challenge</span><span class="p">)</span>
 <span class="c1"># code_verifier: 92Foogx4d9Q5cbDbmLrz7eCHfAxX06q-6FHhmyKQ0OMcGpRbu6CWzknxCUSuvJ6b5-D_dIaJB5mHfAIfk_Qu1A
+
 # code_challenge: GFc8vy-W93jTehp7I3Fvzma2DH5JNjnRAoktZuHtywA
+
 </span></code></pre></div></div> <p>So the similar request is:</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Initiate authorization request</span>
 GET /authorize?
-  <span class="nv">response_type</span><span class="o">=</span>code&amp;
-  <span class="nv">client_id</span><span class="o">=</span>abc123&amp;
-  <span class="nv">redirect_uri</span><span class="o">=</span>https://client.example.com/cb&amp;
-  <span class="nv">code_challenge</span><span class="o">=</span>E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&amp;
-  <span class="nv">code_challenge_method</span><span class="o">=</span>S256&amp;
-  <span class="nv">state</span><span class="o">=</span>xyz
+<span class="nv">response_type</span><span class="o">=</span>code&amp;
+<span class="nv">client_id</span><span class="o">=</span>abc123&amp;
+<span class="nv">redirect_uri</span><span class="o">=</span>https://client.example.com/cb&amp;
+<span class="nv">code_challenge</span><span class="o">=</span>E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&amp;
+<span class="nv">code_challenge_method</span><span class="o">=</span>S256&amp;
+<span class="nv">state</span><span class="o">=</span>xyz
 
 <span class="c"># Exchange for token</span>
 POST /token
@@ -142,12 +144,12 @@ wrangler secret put COOKIE_ENCRYPTION_KEY
 <span class="c"># 4. Set up KV namespace</span>
 wrangler kv:namespace create <span class="s2">"OAUTH_KV"</span>
 <span class="c"># This will generate a corresponding id, copy and write to the wrangler.jsonrc file</span>
-	<span class="s2">"kv_namespaces"</span>: <span class="o">[</span>
-		<span class="o">{</span>
-			<span class="s2">"binding"</span>: <span class="s2">"OAUTH_KV"</span>,
-			<span class="s2">"id"</span>: <span class="s2">"abc123"</span>
-		<span class="o">}</span>
-	<span class="o">]</span>,
+<span class="s2">"kv_namespaces"</span>: <span class="o">[</span>
+<span class="o">{</span>
+<span class="s2">"binding"</span>: <span class="s2">"OAUTH_KV"</span>,
+<span class="s2">"id"</span>: <span class="s2">"abc123"</span>
+<span class="o">}</span>
+<span class="o">]</span>,
 <span class="c"># 5. Deploy to Worker, this will jump to browser login and similar operations, finally select the user to upload</span>
 npm run deploy
 </code></pre></div></div> <p>Screenshots of the related operations are as follows:</p> <div class="row mt-3"> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-05-12-mcp-authorization/MCPGitHubOAuth1-480.webp 480w,/assets/img/2025-05-12-mcp-authorization/MCPGitHubOAuth1-800.webp 800w,/assets/img/2025-05-12-mcp-authorization/MCPGitHubOAuth1-1400.webp 1400w," sizes="95vw" type="image/webp"/> <img src="/assets/img/2025-05-12-mcp-authorization/MCPGitHubOAuth1.png" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-05-12-mcp-authorization/MCPGitHubOAuth2-480.webp 480w,/assets/img/2025-05-12-mcp-authorization/MCPGitHubOAuth2-800.webp 800w,/assets/img/2025-05-12-mcp-authorization/MCPGitHubOAuth2-1400.webp 1400w," sizes="95vw" type="image/webp"/> <img src="/assets/img/2025-05-12-mcp-authorization/MCPGitHubOAuth2.png" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> <div class="row mt-3"> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-05-12-mcp-authorization/MCPGitHubOAuth3-480.webp 480w,/assets/img/2025-05-12-mcp-authorization/MCPGitHubOAuth3-800.webp 800w,/assets/img/2025-05-12-mcp-authorization/MCPGitHubOAuth3-1400.webp 1400w," sizes="95vw" type="image/webp"/> <img src="/assets/img/2025-05-12-mcp-authorization/MCPGitHubOAuth3.png" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> <div class="col-sm mt-0 mb-0"> <figure> <picture> <source class="responsive-img-srcset" srcset="/assets/img/2025-05-12-mcp-authorization/MCPGitHubOAuth4-480.webp 480w,/assets/img/2025-05-12-mcp-authorization/MCPGitHubOAuth4-800.webp 800w,/assets/img/2025-05-12-mcp-authorization/MCPGitHubOAuth4-1400.webp 1400w," sizes="95vw" type="image/webp"/> <img src="/assets/img/2025-05-12-mcp-authorization/MCPGitHubOAuth4.png" class="img-fluid rounded z-depth-1" width="100%" height="auto" data-zoomable="" loading="eager" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"/> </picture> </figure> </div> </div> </div> <h3 id="testing">Testing</h3> <p>Currently, there are few clients that support MCP authentication, and cursor has no plans to support it at the moment. We’ll use the official inspector for testing:</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npx @modelcontextprotocol/inspector@latest

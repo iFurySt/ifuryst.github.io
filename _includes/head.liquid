@@ -74,7 +74,7 @@
   {% assign alternate_lang = 'en' %}
 {% endif %}
 {% if page.translation_key %}
-  {% assign alternate_url = nil %}
+  {% assign alternate_url = null %}
   {% for site_page in site.pages %}
     {% assign site_page_lang = site_page.lang | default: 'zh' %}
     {% if site_page.translation_key == page.translation_key and site_page_lang == alternate_lang %}
@@ -99,8 +99,16 @@
     {% endfor %}
   {% endif %}
   {% if alternate_url %}
-    <link rel="alternate" hreflang="{% if current_lang == 'en' %}en{% else %}zh-CN{% endif %}" href="{{ page.url | replace:'index.html','' | absolute_url }}">
-    <link rel="alternate" hreflang="{% if alternate_lang == 'en' %}en{% else %}zh-CN{% endif %}" href="{{ alternate_url | replace:'index.html','' | absolute_url }}">
+    <link
+      rel="alternate"
+      hreflang="{% if current_lang == 'en' %}en{% else %}zh-CN{% endif %}"
+      href="{{ page.url | replace:'index.html','' | absolute_url }}"
+    >
+    <link
+      rel="alternate"
+      hreflang="{% if alternate_lang == 'en' %}en{% else %}zh-CN{% endif %}"
+      href="{{ alternate_url | replace:'index.html','' | absolute_url }}"
+    >
   {% endif %}
 {% endif %}
 
