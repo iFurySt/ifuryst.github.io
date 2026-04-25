@@ -6,6 +6,7 @@
 // Dimensions
 $max-content-width: {{ site.max_width }};
 
+// ci-optimization-test: no-op css change for purgecss cache validation.
 @import
   "variables",
   "themes",
