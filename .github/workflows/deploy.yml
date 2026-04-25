@@ -94,6 +94,27 @@ jobs:
             fi
           fi
           echo "run_purgecss=$PURGECSS" >> "$GITHUB_OUTPUT"
+      - name: Check build mode
+        id: build-mode
+        run: |
+          BUILD_MODE=incremental
+          if git rev-parse --verify HEAD^1 >/dev/null 2>&1; then
+            CHANGED_FILES=$(git diff --name-only HEAD^1 HEAD)
+            if echo "$CHANGED_FILES" | grep -Eq "^_config\\.yml$|^_config\\.no-imagemagick\\.yml$|^Gemfile$|^Gemfile\\.lock$|^_layouts/|^_includes/|^_data/|^_pages/|^_news/|^_projects/|^_bibliography/|^assets/js/|^assets/img/"; then
+              BUILD_MODE=full
+            fi
+          else
+            BUILD_MODE=full
+          fi
+          echo "incremental=$BUILD_MODE" >> "$GITHUB_OUTPUT"
+      - name: Restore Jekyll cache
+        if: steps.build-mode.outputs.incremental == 'incremental'
+        uses: actions/cache@v4
+        with:
+          path: .jekyll-cache
+          key: ${{ runner.os }}-jekyll-cache-${{ hashFiles('Gemfile.lock', '_config.yml', '_config.no-imagemagick.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-jekyll-cache-
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -123,12 +144,16 @@ jobs:
       - name: Install and Build 🔧
         run: |
           export JEKYLL_ENV=production
+          JEKYLL_INCREMENTAL_FLAG=""
+          if [[ "${{ steps.build-mode.outputs.incremental }}" == "incremental" ]]; then
+            JEKYLL_INCREMENTAL_FLAG="--incremental"
+          fi
           if [[ "${{ steps.image-changes.outputs.enable_imagemagick }}" == "true" ]]; then
             sudo apt-get update
             sudo apt-get install -y --no-install-recommends imagemagick
-            bundle exec jekyll build
+            bundle exec jekyll build $JEKYLL_INCREMENTAL_FLAG
           else
-            bundle exec jekyll build --config _config.yml,_config.no-imagemagick.yml
+            bundle exec jekyll build --config _config.yml,_config.no-imagemagick.yml $JEKYLL_INCREMENTAL_FLAG
           fi
       - name: Purge unused CSS 🧹
         if: steps.purgecss-needed.outputs.run_purgecss == 'true'
