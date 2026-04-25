@@ -3,6 +3,8 @@ layout: post
 date: 2024-07-20 12:13:00+0800
 inline: true
 related_posts: false
+lang: zh
+translation_key: blog-is-back
 ---
 
 重新把我的Blog带回来了！距离上次已经过去了15年了，15年前的兄弟们，早已消失在互联网的各个角落里了😭
