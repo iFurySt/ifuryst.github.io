@@ -111,7 +111,9 @@ jobs:
         if: steps.build-mode.outputs.incremental == 'incremental'
         uses: actions/cache@v4
         with:
-          path: .jekyll-cache
+          path: |
+            .jekyll-cache
+            .jekyll-metadata
           key: ${{ runner.os }}-jekyll-cache-${{ hashFiles('Gemfile.lock', '_config.yml', '_config.no-imagemagick.yml', '_config.fast.yml') }}
           restore-keys: |
             ${{ runner.os }}-jekyll-cache-
