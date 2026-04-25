@@ -112,7 +112,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .jekyll-cache
-          key: ${{ runner.os }}-jekyll-cache-${{ hashFiles('Gemfile.lock', '_config.yml', '_config.no-imagemagick.yml') }}
+          key: ${{ runner.os }}-jekyll-cache-${{ hashFiles('Gemfile.lock', '_config.yml', '_config.no-imagemagick.yml', '_config.fast.yml') }}
           restore-keys: |
             ${{ runner.os }}-jekyll-cache-
       - name: Setup Ruby
@@ -141,6 +141,19 @@ jobs:
           valueFile: "_config.yml"
           propertyPath: "giscus.repo"
           value: ${{ github.repository }}
+      - name: Resolve Jekyll config chain
+        id: jekyll-config
+        run: |
+          JEKYLL_CONFIGS="_config.yml"
+          if [[ "${{ steps.image-changes.outputs.enable_imagemagick }}" == "false" ]]; then
+            JEKYLL_CONFIGS="$JEKYLL_CONFIGS,_config.no-imagemagick.yml"
+          fi
+
+          if [[ "${{ steps.build-mode.outputs.incremental }}" == "incremental" ]]; then
+            JEKYLL_CONFIGS="$JEKYLL_CONFIGS,_config.ci-fast.yml"
+          fi
+
+          echo "configs=$JEKYLL_CONFIGS" >> "$GITHUB_OUTPUT"
       - name: Install and Build 🔧
         run: |
           export JEKYLL_ENV=production
@@ -148,12 +161,13 @@ jobs:
           if [[ "${{ steps.build-mode.outputs.incremental }}" == "incremental" ]]; then
             JEKYLL_INCREMENTAL_FLAG="--incremental"
           fi
+
           if [[ "${{ steps.image-changes.outputs.enable_imagemagick }}" == "true" ]]; then
             sudo apt-get update
             sudo apt-get install -y --no-install-recommends imagemagick
-            bundle exec jekyll build $JEKYLL_INCREMENTAL_FLAG
+            bundle exec jekyll build --config "${{ steps.jekyll-config.outputs.configs }}" $JEKYLL_INCREMENTAL_FLAG
           else
-            bundle exec jekyll build --config _config.yml,_config.no-imagemagick.yml $JEKYLL_INCREMENTAL_FLAG
+            bundle exec jekyll build --config "${{ steps.jekyll-config.outputs.configs }}" $JEKYLL_INCREMENTAL_FLAG
           fi
       - name: Purge unused CSS 🧹
         if: steps.purgecss-needed.outputs.run_purgecss == 'true'
