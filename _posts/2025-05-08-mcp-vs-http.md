@@ -2,6 +2,8 @@
 layout: post
 title: "MCP之于HTTP"
 date: 2025-05-08T13:30:00+08:00
+lang: zh
+translation_key: mcp-vs-http
 tags: AI
 categories: AI
 giscus_comments: true

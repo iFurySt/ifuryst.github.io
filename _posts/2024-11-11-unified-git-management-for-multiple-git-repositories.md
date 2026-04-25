@@ -2,6 +2,8 @@
 layout: post
 title: "Git多项目配置管理"
 date: 2024-11-11T23:08:27+08:00
+lang: zh
+translation_key: unified-git-management-for-multiple-git-repositories
 tags: Git
 categories: DevOps
 giscus_comments: true

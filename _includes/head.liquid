@@ -67,6 +67,42 @@
 {% endif %}
 <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url | bust_css_cache }}">
 <link rel="canonical" href="{{ page.url | replace:'index.html','' | absolute_url }}">
+{% assign current_lang = page.lang | default: 'zh' %}
+{% if current_lang == 'en' %}
+  {% assign alternate_lang = 'zh' %}
+{% else %}
+  {% assign alternate_lang = 'en' %}
+{% endif %}
+{% if page.translation_key %}
+  {% assign alternate_url = nil %}
+  {% for site_page in site.pages %}
+    {% assign site_page_lang = site_page.lang | default: 'zh' %}
+    {% if site_page.translation_key == page.translation_key and site_page_lang == alternate_lang %}
+      {% assign alternate_url = site_page.permalink | default: site_page.url %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+  {% if current_lang == 'en' %}
+    {% for translated_post in site.posts %}
+      {% assign translated_post_lang = translated_post.lang | default: 'zh' %}
+      {% if translated_post.translation_key == page.translation_key and translated_post_lang == alternate_lang %}
+        {% assign alternate_url = translated_post.url %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    {% for translated_post in site.en_posts %}
+      {% if translated_post.translation_key == page.translation_key %}
+        {% assign alternate_url = translated_post.url %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+  {% if alternate_url %}
+    <link rel="alternate" hreflang="{% if current_lang == 'en' %}en{% else %}zh-CN{% endif %}" href="{{ page.url | replace:'index.html','' | absolute_url }}">
+    <link rel="alternate" hreflang="{% if alternate_lang == 'en' %}en{% else %}zh-CN{% endif %}" href="{{ alternate_url | replace:'index.html','' | absolute_url }}">
+  {% endif %}
+{% endif %}
 
 <!-- Dark Mode -->
 <script src="{{ '/assets/js/theme.js' | relative_url | bust_file_cache }}"></script>

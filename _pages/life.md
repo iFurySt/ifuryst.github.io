@@ -2,6 +2,8 @@
 layout: life
 permalink: /life/
 title: 生活
+lang: zh
+translation_key: life
 description: life outside work
 nav: true
 nav_order: 5

@@ -1,6 +1,8 @@
 ---
 layout: about
 title: 关于
+lang: zh
+translation_key: about
 permalink: /
 subtitle: Also known as Leo 😎
 

@@ -23,29 +23,43 @@
   <script>
     // get the ninja-keys element
     const ninja = document.querySelector('ninja-keys');
+    {% assign current_lang = page.lang | default: 'zh' %}
+    {% if current_lang == 'en' %}
+      {% assign current_home = '/en/' %}
+      {% assign searchable_posts = site.en_posts | sort: 'date' | reverse %}
+    {% else %}
+      {% assign current_home = '/' %}
+      {% assign searchable_posts = site.posts %}
+    {% endif %}
 
     // add the home and posts menu items
     ninja.data = [
-      {%- for page in site.pages -%}
-        {%- if page.permalink == '/' -%}{%- assign about_title = page.title | strip -%}{%- endif -%}
+      {%- for site_page in site.pages -%}
+        {%- assign site_page_lang = site_page.lang | default: 'zh' -%}
+        {%- if site_page.permalink == current_home and site_page_lang == current_lang -%}{%- assign about_title = site_page.title | strip -%}{%- endif -%}
       {%- endfor -%}
       {
         id: "nav-{{ about_title | slugify }}",
         title: "{{ about_title | truncatewords: 13 }}",
         section: "Navigation",
         handler: () => {
-          window.location.href = "{{ '/' | relative_url }}";
+          window.location.href = "{{ current_home | relative_url }}";
         },
       },
       {%- assign sorted_pages = site.pages | sort: "nav_order" -%}
       {%- for p in sorted_pages -%}
-        {%- if p.nav and p.autogen == null -%}
+        {%- assign p_lang = p.lang | default: 'zh' -%}
+        {%- if p.nav and p.autogen == null and p_lang == current_lang -%}
           {%- if p.dropdown -%}
             {%- for child in p.children -%}
               {%- unless child.title == 'divider' -%}
                 {
                   {%- assign title = child.title | escape | strip -%}
-                  {%- if child.permalink contains "/blog/" -%}{%- assign url = "/blog/" -%} {%- else -%}{%- assign url = child.url -%}{%- endif -%}
+                  {%- if child.permalink contains "/blog/" -%}
+                    {%- if current_lang == "en" -%}{%- assign url = "/en/blog/" -%}{%- else -%}{%- assign url = "/blog/" -%}{%- endif -%}
+                  {%- else -%}
+                    {%- assign url = child.url -%}
+                  {%- endif -%}
                   id: "dropdown-{{ title | slugify }}",
                   title: "{{ title | truncatewords: 13 }}",
                   description: "{{ child.description | strip_html | strip_newlines | escape | strip }}",
@@ -60,7 +74,11 @@
           {%- else -%}
             {
               {%- assign title = p.title | escape | strip -%}
-              {%- if p.permalink contains "/blog/" -%}{%- assign url = "/blog/" -%} {%- else -%}{%- assign url = p.url -%}{%- endif -%}
+              {%- if p.permalink contains "/blog/" -%}
+                {%- if current_lang == "en" -%}{%- assign url = "/en/blog/" -%}{%- else -%}{%- assign url = "/blog/" -%}{%- endif -%}
+              {%- else -%}
+                {%- assign url = p.url -%}
+              {%- endif -%}
               id: "nav-{{ title | slugify }}",
               title: "{{ title | truncatewords: 13 }}",
               description: "{{ p.description | strip_html | strip_newlines | escape | strip }}",
@@ -72,7 +90,7 @@
           {%- endif -%}
         {%- endif -%}
       {%- endfor -%}
-      {%- for post in site.posts -%}
+      {%- for post in searchable_posts -%}
         {
           {%- assign title = post.title | escape | strip -%}
           id: "post-{{ title | slugify }}",
@@ -97,8 +115,10 @@
         },
       {%- endfor -%}
       {%- for collection in site.collections -%}
-        {%- if collection.label != 'posts' -%}
+        {%- if collection.label != 'posts' and collection.label != 'en_posts' -%}
           {%- for item in collection.docs -%}
+            {%- assign item_lang = item.lang | default: 'zh' -%}
+            {%- unless item_lang == current_lang -%}{%- continue -%}{%- endunless -%}
             {
               {%- if item.inline -%}
                 {%- assign title = item.content | newline_to_br | replace: "<br />", " " | replace: "<br/>", " " | strip_html | strip_newlines | escape | strip -%}

@@ -2,6 +2,8 @@
 layout: default
 permalink: /blog/
 title: 文章
+lang: zh
+translation_key: blog
 nav: true
 nav_order: 1
 pagination:

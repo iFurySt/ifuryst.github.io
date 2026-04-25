@@ -1,5 +1,14 @@
 {% assign have_related_posts = false %}
-{% for post in site.related_posts | limit: site.related_blog_posts.max_related %}
+{% assign current_lang = page.lang | default: 'zh' %}
+{% if current_lang == 'en' %}
+  {% assign related_candidates = site.en_posts | sort: 'date' | reverse %}
+{% else %}
+  {% assign related_candidates = site.related_posts %}
+{% endif %}
+{% for post in related_candidates limit: site.related_blog_posts.max_related %}
+  {% if post.url == page.url %}
+    {% continue %}
+  {% endif %}
   {% unless have_related_posts %}
     {% assign have_related_posts = true %}
     <br>

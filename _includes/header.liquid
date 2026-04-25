@@ -1,9 +1,46 @@
 <header>
+  {% assign current_lang = page.lang | default: 'zh' %}
+  {% if current_lang == 'en' %}
+    {% assign current_home = '/en/' %}
+    {% assign target_lang = 'zh' %}
+    {% assign language_label = '中文' %}
+    {% assign language_url = '/' %}
+  {% else %}
+    {% assign current_home = '/' %}
+    {% assign target_lang = 'en' %}
+    {% assign language_label = 'EN' %}
+    {% assign language_url = '/en/' %}
+  {% endif %}
+  {% if page.translation_key %}
+    {% for site_page in site.pages %}
+      {% assign site_page_lang = site_page.lang | default: 'zh' %}
+      {% if site_page.translation_key == page.translation_key and site_page_lang == target_lang %}
+        {% assign language_url = site_page.permalink | default: site_page.url %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+    {% if current_lang == 'en' %}
+      {% for translated_post in site.posts %}
+        {% assign translated_post_lang = translated_post.lang | default: 'zh' %}
+        {% if translated_post.translation_key == page.translation_key and translated_post_lang == target_lang %}
+          {% assign language_url = translated_post.url %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      {% for translated_post in site.en_posts %}
+        {% if translated_post.translation_key == page.translation_key %}
+          {% assign language_url = translated_post.url %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endif %}
   <!-- Nav Bar -->
   <nav id="navbar" class="navbar navbar-light navbar-expand-sm {% if site.navbar_fixed %}fixed-top{% else %}sticky-top{% endif %}" role="navigation">
     <div class="container">
-      {% if page.permalink != '/' %}
-        <a class="navbar-brand title font-weight-lighter" href="{{ site.baseurl }}/">
+      {% if page.permalink != current_home %}
+        <a class="navbar-brand title font-weight-lighter" href="{{ current_home | relative_url }}">
           {% if site.title == 'blank' %}
             {% if site.first_name %}
               <span class="font-weight-bold">
@@ -42,15 +79,16 @@
 
       <div class="collapse navbar-collapse text-right" id="navbarNav">
         <ul class="navbar-nav ml-auto flex-nowrap">
-          {% for page in site.pages %}
-            {% if page.permalink == '/' %} {% assign about_title = page.title %} {% endif %}
+          {% for site_page in site.pages %}
+            {% assign site_page_lang = site_page.lang | default: 'zh' %}
+            {% if site_page.permalink == current_home and site_page_lang == current_lang %} {% assign about_title = site_page.title %} {% endif %}
           {% endfor %}
 
           <!-- About -->
-          <li class="nav-item {% if page.permalink == '/' %}active{% endif %}">
-            <a class="nav-link" href="{{ '/' | relative_url }}">
+          <li class="nav-item {% if page.permalink == current_home %}active{% endif %}">
+            <a class="nav-link" href="{{ current_home | relative_url }}">
               {{- about_title }}
-              {% if page.permalink == '/' %}
+              {% if page.permalink == current_home %}
                 <span class="sr-only">(current)</span>
               {% endif %}
             </a>
@@ -59,7 +97,8 @@
           <!-- Other pages -->
           {% assign sorted_pages = site.pages | sort: 'nav_order' %}
           {% for p in sorted_pages %}
-            {% if p.nav and p.autogen == null %}
+            {% assign p_lang = p.lang | default: 'zh' %}
+            {% if p.nav and p.autogen == null and p_lang == current_lang %}
               {% if p.dropdown %}
                 {% assign has_active_child = false %}
                 {% for child in p.children %}
@@ -97,7 +136,11 @@
               {% else %}
                 {% assign parent_link = p.permalink | remove: 'index.html' %}
                 <li class="nav-item {% if page.url contains parent_link %}active{% endif %}">
-                  {% if p.permalink contains '/blog/' %}{% assign url = '/blog/' %} {% else %}{% assign url = p.url %}{% endif %}
+                  {% if p.permalink contains '/blog/' %}
+                    {% if current_lang == 'en' %}{% assign url = '/en/blog/' %}{% else %}{% assign url = '/blog/' %}{% endif %}
+                  {% else %}
+                    {% assign url = p.url %}
+                  {% endif %}
                   <a class="nav-link" href="{{ url | relative_url }}">
                     {{- p.title }}
                     {% if page.url contains p.url %}
@@ -127,7 +170,7 @@
             </li>
           {% endif %}
           <li class="nav-item">
-            <a class="nav-link" href="https://en.ifuryst.com/">EN</a>
+            <a class="nav-link" href="{{ language_url | remove: 'index.html' | relative_url }}">{{ language_label }}</a>
           </li>
         </ul>
       </div>

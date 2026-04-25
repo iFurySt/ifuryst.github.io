@@ -2,6 +2,8 @@
 layout: post
 title: "关于中国酒场文化的思考"
 date: 2024-10-30T23:47:27+08:00
+lang: zh
+translation_key: reflections-on-chinas-drinking-culture
 tags: thoughts
 categories: opinions
 giscus_comments: true

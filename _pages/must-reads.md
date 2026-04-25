@@ -2,6 +2,8 @@
 layout: links
 permalink: /must-reads/
 title: 值得一读
+lang: zh
+translation_key: must-reads
 description: "A collection of must-read articles, papers, and resources that have shaped my thinking and inspired me to learn more."
 nav: true
 nav_order: 4
@@ -58,7 +60,7 @@ links:
     tag: "article"
   - title: "Why GitHub Actually Won"
     url: "https://blog.gitbutler.com/why-github-actually-won/"
-    reason: '一点关于如何创业的后发思考：<br />"...Big hosts didn't care and smaller players weren't serious...So, to sum up, we won because we started at the right time and we had taste...".'
+    reason: "一点关于如何创业的后发思考：<br />\"...Big hosts didn't care and smaller players weren't serious...So, to sum up, we won because we started at the right time and we had taste...\"."
     added_at: "2024-09-29"
     tag: "article"
   - title: "Creating a Git commit: The Hard Way"

@@ -1,5 +1,11 @@
 <!doctype html>
-<html lang="{{ site.lang }}">
+{% assign current_lang = page.lang | default: site.lang | default: 'zh-CN' %}
+{% if current_lang == 'zh' %}
+  {% assign html_lang = 'zh-CN' %}
+{% else %}
+  {% assign html_lang = current_lang %}
+{% endif %}
+<html lang="{{ html_lang }}">
   <!-- Head -->
   <head>
     {% if page.redirect %}

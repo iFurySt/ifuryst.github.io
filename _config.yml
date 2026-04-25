@@ -14,7 +14,7 @@ footer_text: >
   Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
   Photos from <a href="https://unsplash.com/@ifuryst" target="_blank">Unsplash</a>.
 keywords: 📝 💭 🆒 🏝️ 💻 # add your own keywords or leave empty
-lang: en # the language of your site (for example: en, fr, cn, ru, etc.)
+lang: zh-CN # the language of your site (for example: en, fr, cn, ru, etc.)
 icon: 🕶️ # the emoji used as the favicon (alternatively, provide image name in /assets/img/)
 
 url: https://ifuryst.github.io # the base hostname & protocol for your site
@@ -188,6 +188,9 @@ collections:
       layout: post
     output: true
     permalink: /:collection/:title/
+  en_posts:
+    output: true
+    permalink: /en/blog/:year/:title/
   projects:
     output: true
     permalink: /:collection/:title/

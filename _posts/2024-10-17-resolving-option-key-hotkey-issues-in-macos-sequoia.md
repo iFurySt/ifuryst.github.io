@@ -2,6 +2,8 @@
 layout: post
 title: "MacOS Sequoia 15.0.1 Option热键绑定失效问题"
 date: 2024-10-17T22:00:27+08:00
+lang: zh
+translation_key: resolving-option-key-hotkey-issues-in-macos-sequoia
 tags: MacOS
 categories: tricks
 giscus_comments: true

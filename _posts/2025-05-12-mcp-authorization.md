@@ -2,6 +2,8 @@
 layout: post
 title: "MCP鉴权"
 date: 2025-05-12T13:30:00+08:00
+lang: zh
+translation_key: mcp-authorization
 tags: AI
 categories: AI
 giscus_comments: true

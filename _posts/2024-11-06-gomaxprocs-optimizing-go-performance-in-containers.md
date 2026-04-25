@@ -2,6 +2,8 @@
 layout: post
 title: "GOMAXPROCS：Go的CPU核心数限制与容器化环境中的性能优化"
 date: 2024-11-06T21:08:27+08:00
+lang: zh
+translation_key: gomaxprocs-optimizing-go-performance-in-containers
 tags: Go
 categories: Coding
 giscus_comments: true
