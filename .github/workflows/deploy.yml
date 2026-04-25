@@ -67,6 +67,29 @@ jobs:
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Check image changes
+        id: image-changes
+        run: |
+          IMAGEMAGICK_BUILD=true
+          if git rev-parse --verify HEAD^1 >/dev/null 2>&1; then
+          if git diff --quiet HEAD^1 -- assets/img; then
+            IMAGEMAGICK_BUILD=false
+          fi
+          fi
+          echo "enable_imagemagick=$IMAGEMAGICK_BUILD" >> "$GITHUB_OUTPUT"
+      - name: Check purgecss necessity
+        id: purgecss-needed
+        run: |
+          PURGECSS=true
+          if git rev-parse --verify HEAD^1 >/dev/null 2>&1; then
+            CHANGED_FILES=$(git diff --name-only HEAD^1 HEAD)
+            if ! echo "$CHANGED_FILES" | grep -Eq "\.css$|\.scss$|^_sass/|^_layouts/|^_includes/|^assets/css/"; then
+              PURGECSS=false
+            fi
+          fi
+          echo "run_purgecss=$PURGECSS" >> "$GITHUB_OUTPUT"
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -81,11 +104,16 @@ jobs:
           value: ${{ github.repository }}
       - name: Install and Build 🔧
         run: |
-          sudo apt-get update
-          sudo apt-get install -y imagemagick
           export JEKYLL_ENV=production
-          bundle exec jekyll build
+          if [[ "${{ steps.image-changes.outputs.enable_imagemagick }}" == "true" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends imagemagick
+            bundle exec jekyll build
+          else
+            bundle exec jekyll build --config _config.yml,_config.no-imagemagick.yml
+          fi
       - name: Purge unused CSS 🧹
+        if: steps.purgecss-needed.outputs.run_purgecss == 'true'
         run: |
           npm install -g purgecss
           purgecss -c purgecss.config.js
