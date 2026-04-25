@@ -95,6 +95,20 @@ jobs:
         with:
           ruby-version: "3.2.2"
           bundler-cache: true
+      - name: Setup Node.js for PurgeCSS
+        if: steps.purgecss-needed.outputs.run_purgecss == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Restore node_modules for PurgeCSS
+        id: purgecss-node-cache
+        if: steps.purgecss-needed.outputs.run_purgecss == 'true'
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: Update _config.yml ⚙️
         uses: fjogeleit/yaml-update-action@main
         with:
@@ -115,8 +129,10 @@ jobs:
       - name: Purge unused CSS 🧹
         if: steps.purgecss-needed.outputs.run_purgecss == 'true'
         run: |
-          npm install -g purgecss
-          purgecss -c purgecss.config.js
+          if [[ "${{ steps.purgecss-node-cache.outputs.cache-hit }}" != 'true' ]]; then
+            npm ci --no-audit --no-fund
+          fi
+          ./node_modules/.bin/purgecss -c purgecss.config.js
       - name: Deploy 🚀
         if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@v4
