@@ -2,6 +2,8 @@
 layout: post
 title: "解决问题的原始冲动"
 date: 2026-04-21T08:00:00+08:00
+lang: zh
+translation_key: the-urge-to-solve
 tags:
   - AI
   - Product

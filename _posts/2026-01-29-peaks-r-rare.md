@@ -2,6 +2,8 @@
 layout: post
 title: "高峰不常有"
 date: 2026-01-29T08:00:00+08:00
+lang: zh
+translation_key: peaks-r-rare
 tags:
   - Blog
   - 微信公众号

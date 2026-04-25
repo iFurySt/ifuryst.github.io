@@ -2,6 +2,8 @@
 layout: post
 title: "快节奏慢生活"
 date: 2026-01-24T08:00:00+08:00
+lang: zh
+translation_key: fast-pace-slow-life
 tags: PersonalUpdate
 categories: PersonalUpdate
 giscus_comments: true
