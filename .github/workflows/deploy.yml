@@ -150,7 +150,7 @@ jobs:
           fi
 
           if [[ "${{ steps.build-mode.outputs.incremental }}" == "incremental" ]]; then
-            JEKYLL_CONFIGS="$JEKYLL_CONFIGS,_config.ci-fast.yml"
+            JEKYLL_CONFIGS="$JEKYLL_CONFIGS,_config.fast.yml"
           fi
 
           echo "configs=$JEKYLL_CONFIGS" >> "$GITHUB_OUTPUT"
