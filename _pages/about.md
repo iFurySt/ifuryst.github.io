@@ -11,7 +11,7 @@ profile:
   image: prof_pic.jpg
   image_circular: false # crops the image to make it circular
   more_info: >
-    <p>我第一次看到鸵鸟是在23年在韩国旅行的时候，感觉很像恐龙!</p>
+    <p>被雪覆盖的马特洪峰和采尔马特很哇塞</p>
 
 news: true # includes a list of news items
 selected_papers: true # includes a list of papers marked as "selected={true}"

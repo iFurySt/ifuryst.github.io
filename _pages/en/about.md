@@ -11,7 +11,7 @@ profile:
   image: prof_pic.jpg
   image_circular: false # crops the image to make it circular
   more_info: >
-    <p>The 1st time I saw an ostrich was in South Korea. They kinda look like dinosaurs!</p>
+    <p>The snow-capped Matterhorn and Zermatt were so good they briefly reduced my vocabulary to "wow."</p>
 
 news: true # includes a list of news items
 selected_papers: true # includes a list of papers marked as "selected={true}"
