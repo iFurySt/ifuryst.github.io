@@ -13,3 +13,9 @@ plugins:
   - jekyll-toc
   - jekyll-twitter-plugin
   - jemoji
+
+imagemagick:
+  enabled: false
+
+responsive_images:
+  enabled: true
