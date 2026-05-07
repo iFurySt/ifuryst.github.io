@@ -76,13 +76,13 @@ jobs:
       - name: Check image changes
         id: image-changes
         run: |
-          IMAGEMAGICK_BUILD=true
+          IMAGES_CHANGED=true
           if git rev-parse --verify HEAD^1 >/dev/null 2>&1; then
-          if git diff --quiet HEAD^1 -- assets/img; then
-            IMAGEMAGICK_BUILD=false
+            if git diff --quiet HEAD^1 -- assets/img; then
+              IMAGES_CHANGED=false
+            fi
           fi
-          fi
-          echo "enable_imagemagick=$IMAGEMAGICK_BUILD" >> "$GITHUB_OUTPUT"
+          echo "changed=$IMAGES_CHANGED" >> "$GITHUB_OUTPUT"
       - name: Check purgecss necessity
         id: purgecss-needed
         run: |
@@ -100,7 +100,7 @@ jobs:
           BUILD_MODE=incremental
           if git rev-parse --verify HEAD^1 >/dev/null 2>&1; then
             CHANGED_FILES=$(git diff --name-only HEAD^1 HEAD)
-            if echo "$CHANGED_FILES" | grep -Eq "^_config\\.yml$|^_config\\.no-imagemagick\\.yml$|^Gemfile$|^Gemfile\\.lock$|^_layouts/|^_includes/|^_data/|^_pages/|^_news/|^_projects/|^_bibliography/|^assets/js/|^assets/img/"; then
+            if echo "$CHANGED_FILES" | grep -Eq "^_config(\\..*)?\\.yml$|^Gemfile$|^Gemfile\\.lock$|^_layouts/|^_includes/|^_data/|^_pages/|^_news/|^_projects/|^_bibliography/|^assets/js/"; then
               BUILD_MODE=full
             fi
           else
@@ -114,9 +114,17 @@ jobs:
           path: |
             .jekyll-cache
             .jekyll-metadata
-          key: ${{ runner.os }}-jekyll-cache-${{ hashFiles('Gemfile.lock', '_config.yml', '_config.no-imagemagick.yml', '_config.fast.yml') }}
+          key: ${{ runner.os }}-jekyll-cache-${{ hashFiles('Gemfile.lock', '_config.yml', '_config.no-imagemagick.yml', '_config.fast.yml', '_config.ci-generated-images.yml') }}
           restore-keys: |
             ${{ runner.os }}-jekyll-cache-
+      - name: Restore responsive image cache
+        id: responsive-image-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .responsive-image-cache
+          key: ${{ runner.os }}-responsive-images-${{ hashFiles('_config.yml', '_config.ci-generated-images.yml', '.github/scripts/generate-responsive-images.rb', 'assets/img/**') }}
+          restore-keys: |
+            ${{ runner.os }}-responsive-images-
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -146,10 +154,7 @@ jobs:
       - name: Resolve Jekyll config chain
         id: jekyll-config
         run: |
-          JEKYLL_CONFIGS="_config.yml"
-          if [[ "${{ steps.image-changes.outputs.enable_imagemagick }}" == "false" ]]; then
-            JEKYLL_CONFIGS="$JEKYLL_CONFIGS,_config.no-imagemagick.yml"
-          fi
+          JEKYLL_CONFIGS="_config.yml,_config.ci-generated-images.yml"
 
           if [[ "${{ steps.build-mode.outputs.incremental }}" == "incremental" ]]; then
             JEKYLL_CONFIGS="$JEKYLL_CONFIGS,_config.fast.yml"
@@ -164,13 +169,20 @@ jobs:
             JEKYLL_INCREMENTAL_FLAG="--incremental"
           fi
 
-          if [[ "${{ steps.image-changes.outputs.enable_imagemagick }}" == "true" ]]; then
-            sudo apt-get update
-            sudo apt-get install -y --no-install-recommends imagemagick
-            bundle exec jekyll build --config "${{ steps.jekyll-config.outputs.configs }}" $JEKYLL_INCREMENTAL_FLAG
-          else
-            bundle exec jekyll build --config "${{ steps.jekyll-config.outputs.configs }}" $JEKYLL_INCREMENTAL_FLAG
-          fi
+          bundle exec jekyll build --config "${{ steps.jekyll-config.outputs.configs }}" $JEKYLL_INCREMENTAL_FLAG
+      - name: Install ImageMagick
+        if: steps.responsive-image-cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends imagemagick
+      - name: Restore generated responsive images
+        run: ruby .github/scripts/generate-responsive-images.rb
+      - name: Save responsive image cache
+        if: github.event_name != 'pull_request' && steps.responsive-image-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .responsive-image-cache
+          key: ${{ steps.responsive-image-cache.outputs.cache-primary-key }}
       - name: Purge unused CSS 🧹
         if: steps.purgecss-needed.outputs.run_purgecss == 'true'
         run: |
