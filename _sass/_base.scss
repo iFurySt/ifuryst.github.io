@@ -870,6 +870,67 @@ html.transition *:after {
 
 // Extra Markdown style (post Customization)
 .post {
+  .post-header {
+    .post-title {
+      font-size: 1.8rem;
+      line-height: 1.25;
+      margin-bottom: 0.6rem;
+
+      @media (min-width: 768px) {
+        font-size: 2.1rem;
+      }
+    }
+  }
+
+  .post-content {
+    #markdown-content {
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        line-height: 1.35;
+      }
+
+      h1 {
+        font-size: 1.7rem;
+        margin-top: 2.25rem;
+        margin-bottom: 1rem;
+      }
+
+      h2 {
+        font-size: 1.45rem;
+        margin-top: 2rem;
+        margin-bottom: 0.9rem;
+      }
+
+      h3 {
+        font-size: 1.25rem;
+        margin-top: 1.75rem;
+        margin-bottom: 0.75rem;
+      }
+
+      h4 {
+        font-size: 1.1rem;
+        margin-top: 1.5rem;
+        margin-bottom: 0.6rem;
+      }
+
+      h5 {
+        font-size: 1rem;
+        margin-top: 1.25rem;
+        margin-bottom: 0.5rem;
+      }
+
+      h6 {
+        font-size: 0.95rem;
+        margin-top: 1.25rem;
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+
   .post-meta {
     color: var(--global-text-color-light);
     font-size: 0.875rem;
