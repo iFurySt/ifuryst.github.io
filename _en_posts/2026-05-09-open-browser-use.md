@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Browser Use Explained"
+title: "Browser Use Deep Dive"
 date: 2026-05-09T08:00:00+08:00
 lang: en
 translation_key: open-browser-use
