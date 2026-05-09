@@ -391,3 +391,5 @@ AI带给我们的很多，但是还有很多东西其（暂时）无法带给我
 
 1. [Inside look at modern web browser (part 1)](https://developer.chrome.com/blog/inside-browser-part1)
 2. [Inside look at modern web browser (part 2)](https://developer.chrome.com/blog/inside-browser-part2)
+3. [Inside look at modern web browser (part 3)](https://developer.chrome.com/blog/inside-browser-part3)
+4. [Inside look at modern web browser (part 4)](https://developer.chrome.com/blog/inside-browser-part4)
