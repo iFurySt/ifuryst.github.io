@@ -2,6 +2,8 @@
 layout: post
 title: "Browser Use详解"
 date: 2026-05-09T08:00:00+08:00
+lang: zh
+translation_key: open-browser-use
 tags: AI
 categories: AI
 giscus_comments: true
