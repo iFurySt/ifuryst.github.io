@@ -270,6 +270,8 @@ It is the built-in webpage in the right sidebar.
 
 This approach exists because Codex.app itself is written with Electron, and Electron already has browser capabilities built in. Codex adds its own business-layer abstraction in the middle. A single Codex.app window plus session uniquely corresponds to one browser page, and that page maps to Electron's WebContents. The details are hidden from the upper layer.
 
+This corresponds to the Chrome-related parts we discussed earlier. For products that already have something similar, it is a useful reference point. I will not expand on it here. If you need it, you can dig deeper on your own, and if you have questions you can email me. I can share some of my insights from the deep dive.
+
 One advantage of IAB is that it is relatively simple, and it feels smoother for users. They can preview the browser being operated directly inside the app.
 
 But the downsides are also obvious:
@@ -411,7 +413,9 @@ For specific usage, see the GitHub repository. I will not repeat it here.
 
 # Epilogue
 
-Although OpenAI has lost many people, it still does not stop them from continuing to deliver impressive work. Perhaps the organization is strong enough, or perhaps the people still there are full of talent. Either way, they have been continuously delivering better products recently, which is good to see. Behind this, it also keeps inspiring my thinking about product power.
+I would actually call this article half-finished, because many things I originally imagined and planned were not fully presented. Recently, my time and energy have not been enough to support writing this article to a level I am fully satisfied with. But I also do not want imperfection to become a reason for not finishing, so I decided to publish it anyway. I believe that even if it is imperfect, it can still reach many people. This applies to both life and work: completion should be the first priority. Only on top of that do people who can pursue perfection have a chance to become legendary.
+
+Back to Codex and OAI themselves. Although OpenAI has lost many people, it still does not stop them from continuing to deliver impressive work. Perhaps the organization is strong enough, or perhaps the people still there are full of talent. Either way, they have been continuously delivering better products recently, which is good to see. Behind this, it also keeps inspiring my thinking about product power.
 
 **Coding≠Engineering, Technology≠Product.**
 
