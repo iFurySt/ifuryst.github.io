@@ -193,20 +193,20 @@ prompt_tokens=8 generated_tokens=100 elapsed_seconds=3.932 tokens_per_second=25.
 
 Let me briefly explain what these parameters mean.
 
-| Parameter | Meaning |
-| --- | --- |
-| CUDA_VISIBLE_DEVICES=0 | Only let the program see GPU 0. We are focusing on a single card for now |
-| PYTHONPATH=src | Add the repo's `src/` to Python's import path, making it convenient to run the source directly |
-| /data/anaconda3/bin/python | Use conda's Python |
-| -m nanollmserve.cli.generate | Run the command-line entry point as a module |
-| --model "$MODEL" | Specify the model path or model name on hf. Here we downloaded the offline model files in advance, so we set a local path earlier |
-| --local-files-only | Use only existing local model files, without downloading from the internet |
-| --prompt "xxxx" | The prompt given to the model. It is very bare for now; in practice, it is usually a combination like system prompt + user prompt |
-| --max-new-tokens 100 | Generate at most 100 new tokens. Right now we do not consume EOS or other stop tokens, so inference continues until 100 tokens are generated. You can see that even after it should have ended, it keeps repeating output until 100 tokens |
-| --temperature 0 | Temperature is 0, using greedy decoding. Each step chooses the token with the highest probability. Repeated output is also partly caused by this parameter |
-| --device cuda | Put the model on a CUDA GPU |
-| --dtype bfloat16 | Use bfloat16 precision. dtype means data type, or what numeric format data uses for storage and computation |
-| --show-stats | Output generation statistics, such as token counts, latency, tokens/s, device, and dtype |
+| Parameter                    | Meaning                                                                                                                                                                                                                                    |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| CUDA_VISIBLE_DEVICES=0       | Only let the program see GPU 0. We are focusing on a single card for now                                                                                                                                                                   |
+| PYTHONPATH=src               | Add the repo's `src/` to Python's import path, making it convenient to run the source directly                                                                                                                                             |
+| /data/anaconda3/bin/python   | Use conda's Python                                                                                                                                                                                                                         |
+| -m nanollmserve.cli.generate | Run the command-line entry point as a module                                                                                                                                                                                               |
+| --model "$MODEL"             | Specify the model path or model name on hf. Here we downloaded the offline model files in advance, so we set a local path earlier                                                                                                          |
+| --local-files-only           | Use only existing local model files, without downloading from the internet                                                                                                                                                                 |
+| --prompt "xxxx"              | The prompt given to the model. It is very bare for now; in practice, it is usually a combination like system prompt + user prompt                                                                                                          |
+| --max-new-tokens 100         | Generate at most 100 new tokens. Right now we do not consume EOS or other stop tokens, so inference continues until 100 tokens are generated. You can see that even after it should have ended, it keeps repeating output until 100 tokens |
+| --temperature 0              | Temperature is 0, using greedy decoding. Each step chooses the token with the highest probability. Repeated output is also partly caused by this parameter                                                                                 |
+| --device cuda                | Put the model on a CUDA GPU                                                                                                                                                                                                                |
+| --dtype bfloat16             | Use bfloat16 precision. dtype means data type, or what numeric format data uses for storage and computation                                                                                                                                |
+| --show-stats                 | Output generation statistics, such as token counts, latency, tokens/s, device, and dtype                                                                                                                                                   |
 
 The output result is:
 
@@ -307,7 +307,7 @@ Loading checkpoint shards: 100%|███████| 5/5 [00:00<00:00, 136.32i
 This means it read 5 weight shards.
 
 In addition, here we manually specified `bfloat16`. Like `float16`, it takes 2 bytes. Because the exponent bits and precision bits are smaller, the computation is lighter, while the quality loss is not large. Here we can roughly estimate the VRAM usage as:
-*8B*2Bytes=8*10^9*2Bytes/1024^3=~16G*
+*8B*2Bytes=8*10^9*2Bytes/1024^3=~16G\*
 
 There are also some other memory costs.
 
@@ -320,58 +320,58 @@ model.eval() # switch model to inference mode; there is also model.train() for t
 
 That is, when we call `AutoModelForCausalLM.from_pretrained`, the model has already been loaded from the on-disk weight files into CPU memory and constructed according to the model architecture and config. So machine RAM is usually very large; otherwise loading the model would already be a problem. But because CPU compute parallelism is not enough and is too slow, the model still needs to be moved into GPU memory and computed in parallel by GPU compute cores.
 
-| **Item** | **8x A100 80GB (typical DGX/HGX A100)** | **8x H100 80GB (typical DGX/HGX H100)** |
-| --- | --- | --- |
-| GPU model | NVIDIA A100 80GB SXM4 | NVIDIA H100 80GB SXM5 |
-| GPU count | 8 | 8 |
-| Per-GPU memory | 80GB HBM2e | 80GB HBM3 |
-| Total GPU memory | 640GB | 640GB |
-| Per-GPU memory bandwidth | ~2.0 TB/s | ~3.0 TB/s |
-| GPU peak power (TDP) | ~400W | ~700W |
-| GPU architecture | Ampere | Hopper |
-| Tensor Core | 3rd generation | 4th generation |
-| FP8 support | No | Yes (Transformer Engine) |
-| BF16 support | Yes | Yes |
-| NVLink version | NVLink 3 | NVLink 4 |
-| Per-GPU NVLink bandwidth | 600 GB/s bidirectional | 900 GB/s bidirectional |
-| NVSwitch | 6x NVSwitch | 3rd-generation NVSwitch |
-| GPU topology | all-to-all | all-to-all |
-| GPU-to-GPU communication | NVSwitch Fabric | NVSwitch Fabric |
-| PCIe generation | PCIe Gen4 | PCIe Gen5 |
-| PCIe x16 one-way bandwidth | ~32 GB/s | ~64 GB/s |
-| PCIe x16 bidirectional bandwidth | ~64 GB/s | ~128 GB/s |
-| CPU (official DGX typical) | dual AMD EPYC 7742 | dual Intel Xeon Sapphire Rapids |
-| CPU core count | 64C x2 = 128 cores | ~56-60C x2 |
-| CPU architecture codename | Rome | Sapphire Rapids |
-| System memory | 1TB-2TB DDR4 | 2TB DDR5 |
-| Memory bandwidth | DDR4 | DDR5, higher |
-| Local NVMe | multiple NVMe SSDs | multiple Gen4/Gen5 NVMe |
-| Network | Mellanox ConnectX-6 | ConnectX-7 |
-| InfiniBand | HDR 200Gbps | NDR 400Gbps |
-| RDMA | supported | supported |
-| DPU | usually none | BlueField-3 |
-| Whole-machine power | ~6.5-8 kW | ~10-12 kW |
-| Cooling | high-pressure air cooling | high-pressure air cooling / liquid cooling |
-| Typical use | GPT-3/LLaMA1-era training | GPT-4-era training/inference |
-| Typical bottleneck | NVLink/memory bandwidth | power/cooling/cross-node communication |
-| Training characteristic | more compute-bound | memory/communication-bound is more obvious |
-| MoE support | possible but communication pressure is high | very suitable |
-| Tensor Parallel | strong | extremely strong |
-| Inference KV Cache performance | strong | extremely strong |
-| Typical price (whole machine) | ~$120k-200k | ~$250k-500k+ |
+| **Item**                         | **8x A100 80GB (typical DGX/HGX A100)**     | **8x H100 80GB (typical DGX/HGX H100)**    |
+| -------------------------------- | ------------------------------------------- | ------------------------------------------ |
+| GPU model                        | NVIDIA A100 80GB SXM4                       | NVIDIA H100 80GB SXM5                      |
+| GPU count                        | 8                                           | 8                                          |
+| Per-GPU memory                   | 80GB HBM2e                                  | 80GB HBM3                                  |
+| Total GPU memory                 | 640GB                                       | 640GB                                      |
+| Per-GPU memory bandwidth         | ~2.0 TB/s                                   | ~3.0 TB/s                                  |
+| GPU peak power (TDP)             | ~400W                                       | ~700W                                      |
+| GPU architecture                 | Ampere                                      | Hopper                                     |
+| Tensor Core                      | 3rd generation                              | 4th generation                             |
+| FP8 support                      | No                                          | Yes (Transformer Engine)                   |
+| BF16 support                     | Yes                                         | Yes                                        |
+| NVLink version                   | NVLink 3                                    | NVLink 4                                   |
+| Per-GPU NVLink bandwidth         | 600 GB/s bidirectional                      | 900 GB/s bidirectional                     |
+| NVSwitch                         | 6x NVSwitch                                 | 3rd-generation NVSwitch                    |
+| GPU topology                     | all-to-all                                  | all-to-all                                 |
+| GPU-to-GPU communication         | NVSwitch Fabric                             | NVSwitch Fabric                            |
+| PCIe generation                  | PCIe Gen4                                   | PCIe Gen5                                  |
+| PCIe x16 one-way bandwidth       | ~32 GB/s                                    | ~64 GB/s                                   |
+| PCIe x16 bidirectional bandwidth | ~64 GB/s                                    | ~128 GB/s                                  |
+| CPU (official DGX typical)       | dual AMD EPYC 7742                          | dual Intel Xeon Sapphire Rapids            |
+| CPU core count                   | 64C x2 = 128 cores                          | ~56-60C x2                                 |
+| CPU architecture codename        | Rome                                        | Sapphire Rapids                            |
+| System memory                    | 1TB-2TB DDR4                                | 2TB DDR5                                   |
+| Memory bandwidth                 | DDR4                                        | DDR5, higher                               |
+| Local NVMe                       | multiple NVMe SSDs                          | multiple Gen4/Gen5 NVMe                    |
+| Network                          | Mellanox ConnectX-6                         | ConnectX-7                                 |
+| InfiniBand                       | HDR 200Gbps                                 | NDR 400Gbps                                |
+| RDMA                             | supported                                   | supported                                  |
+| DPU                              | usually none                                | BlueField-3                                |
+| Whole-machine power              | ~6.5-8 kW                                   | ~10-12 kW                                  |
+| Cooling                          | high-pressure air cooling                   | high-pressure air cooling / liquid cooling |
+| Typical use                      | GPT-3/LLaMA1-era training                   | GPT-4-era training/inference               |
+| Typical bottleneck               | NVLink/memory bandwidth                     | power/cooling/cross-node communication     |
+| Training characteristic          | more compute-bound                          | memory/communication-bound is more obvious |
+| MoE support                      | possible but communication pressure is high | very suitable                              |
+| Tensor Parallel                  | strong                                      | extremely strong                           |
+| Inference KV Cache performance   | strong                                      | extremely strong                           |
+| Typical price (whole machine)    | ~$120k-200k                                 | ~$250k-500k+                               |
 
 Looking briefly at this table, we can see that machine RAM is often above 1T, which is no longer in the same dimension as the 32GB/64GB/128GB computers or servers we usually think of. Another thing worth noting here is the speed difference between PCIe, NVLink, and HBM.
 
-| **Item** | **NVIDIA A100 80GB SXM4** | **NVIDIA H100 80GB SXM5** |
-| --- | --- | --- |
-| HBM type | HBM2e | HBM3 |
-| HBM bandwidth | ~2 TB/s | ~3 TB/s |
-| PCIe | Gen4 x16 | Gen5 x16 |
-| PCIe one-way bandwidth | ~32 GB/s | ~64 GB/s |
-| NVLink | NVLink 3 | NVLink 4 |
-| NVLink bandwidth | 600 GB/s | 900 GB/s |
-| GPU topology | NVSwitch all-to-all | NVSwitch all-to-all |
-| Cross-machine network | 200G IB | 400G IB |
+| **Item**               | **NVIDIA A100 80GB SXM4** | **NVIDIA H100 80GB SXM5** |
+| ---------------------- | ------------------------- | ------------------------- |
+| HBM type               | HBM2e                     | HBM3                      |
+| HBM bandwidth          | ~2 TB/s                   | ~3 TB/s                   |
+| PCIe                   | Gen4 x16                  | Gen5 x16                  |
+| PCIe one-way bandwidth | ~32 GB/s                  | ~64 GB/s                  |
+| NVLink                 | NVLink 3                  | NVLink 4                  |
+| NVLink bandwidth       | 600 GB/s                  | 900 GB/s                  |
+| GPU topology           | NVSwitch all-to-all       | NVSwitch all-to-all       |
+| Cross-machine network  | 200G IB                   | 400G IB                   |
 
 ```python
          [ GPU Compute ]
@@ -393,10 +393,10 @@ Looking briefly at this table, we can see that machine RAM is often above 1T, wh
 This is especially important in mature infra, because what infra solves is precisely communication. The most important problem in model inference today is not compute, but transfer speed. Much of the time is spent waiting for transfers, preventing compute utilization from being fully maximized. If efficiency is insufficient, there will be idle capacity. NVIDIA's moat now is also its ability to build machines such as **NVL72**, an entire rack that lets 72 GPUs collaborate as much like one GPU as possible.
 
 | **Platform** | **HBM** | **NVLink** |
-| --- | --- | --- |
-| A100 | 2 TB/s | 600 GB/s |
-| H100 | 3 TB/s | 900 GB/s |
-| GB200 NVL72 | 8 TB/s | 1.8 TB/s |
+| ------------ | ------- | ---------- |
+| A100         | 2 TB/s  | 600 GB/s   |
+| H100         | 3 TB/s  | 900 GB/s   |
+| GB200 NVL72  | 8 TB/s  | 1.8 TB/s   |
 
 That is a side note, just to build a bit of global understanding in advance. Let us continue.
 
