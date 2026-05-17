@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "LLM Infra 101: Model Inference"
+title: "LLM Infra 101 v0.0: Model Inference"
 date: 2026-05-17T08:00:00+08:00
 lang: en
 translation_key: llm-infra-101-model-inference
