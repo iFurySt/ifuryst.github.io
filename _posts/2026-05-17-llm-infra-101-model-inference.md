@@ -2,6 +2,8 @@
 layout: post
 title: "LLM Infra 101: 推理模型"
 date: 2026-05-17T08:00:00+08:00
+lang: zh
+translation_key: llm-infra-101-model-inference
 tags:
   - AI
   - LLMInfra-101
@@ -215,7 +217,7 @@ prompt_tokens=8 generated_tokens=100 elapsed_seconds=3.932 tokens_per_second=25.
 
 然后输出的结果是
 
-```plain text
+```
  KV cache is a technique used in transformer models to store the keys and values of previous attention computations, allowing the model to efficiently process sequential data by reusing these cached values instead of recalculating them for each new input token.
 KV cache is a technique used in transformer models to store the keys and values of previous attention computations, allowing the model to efficiently process sequential data by reusing these cached values instead of recalculating them for each new input token.
 Okay, I need to explain what a
@@ -225,7 +227,7 @@ Okay, I need to explain what a
 
 至于最后的
 
-```plain text
+```
 prompt_tokens=8 generated_tokens=100 elapsed_seconds=3.932 tokens_per_second=25.43 device=cuda dtype=bfloat16
 ```
 
@@ -285,7 +287,7 @@ model.eval() # 模型切换到推理模式，还有model.train()训练模式
 
 我们这边采用了hf的[transformers](https://github.com/huggingface/transformers)库来加载模型和Tokenizer（AutoTokenizer和AutoModelForCausalLM）。其中tokenizer会去读取
 
-```python
+```
 /data2/nanoLLMServe/models/Qwen3-8B/tokenizer_config.json
 /data2/nanoLLMServe/models/Qwen3-8B/tokenizer.json
 ```
@@ -294,7 +296,7 @@ model.eval() # 模型切换到推理模式，还有model.train()训练模式
 
 模型加载则是读取对应的模型结构配置和safetensor文件：
 
-```python
+```
 config.json
 model.safetensors.index.json
 model-00001-of-00005.safetensors
@@ -306,7 +308,7 @@ model-00005-of-00005.safetensors
 
 在STDOUT我们可以看到有输出一行
 
-```python
+```
 Loading checkpoint shards: 100%|███████| 5/5 [00:00<00:00, 136.32it/s]
 ```
 
@@ -378,7 +380,7 @@ model.eval() # 模型切换到推理模式，还有model.train()训练模式
 | GPU 拓扑      | NVSwitch 全互联           | NVSwitch 全互联           |
 | 跨机网络      | 200G IB                   | 400G IB                   |
 
-```python
+```
          [ GPU Compute ]
                 │
                 │ 超高速
@@ -418,7 +420,7 @@ attention_mask = encoded.get("attention_mask")
 
 这里基本上做的就是把输入的提示词去做tokenizer，然后送到GPU里，大概行为类似这样：
 
-```python
+```
 "Explain KV cache in one sentence."
   -> tokenizer
   -> input_ids: shape [1, 8]
@@ -446,7 +448,7 @@ with torch.inference_mode():
 
 大体流程是这样的，第三步最后拿到的是token ids，也就是这里第一次的input_ids
 
-```python
+```
 Explain KV cache in one sentence.
 input_ids = [[849, 735, 6634, 304, 825, 11652, 13, 151645]] # 这边举例，实际的token ids不是这样
 ```
@@ -459,14 +461,14 @@ input_ids = [[849, 735, 6634, 304, 825, 11652, 13, 151645]] # 这边举例，实
 
 这里我们也会理解一下attention_mask这个东西，这个其实是Padding Mask，不是Decoder里的Causal Mask。假设现在有2个请求需要推理：
 
-```python
+```
 1. I love AI
 2. Hello
 ```
 
 我们走batch推理，为了GPU并行，需要补齐，变成：
 
-```python
+```
 1. ["I", "love", "AI"]
 2. ["Hello", "[PAD]", "[PAD]"]
 ```
@@ -500,7 +502,7 @@ outputs = model(input_ids=input_ids, attention_mask=attention_mask)
 
 最后生成的logits其实就是得到的每个token的预测分数，shape是`[batch, seq_len, vocab_size]` ，词表vocab_size假设是151936，那么我么这边表现出来的是`[1, 8, 151936]` ，一个三维张量（tensor），白话讲就是：1个样本，每个样本里有8个token位置，每个token位置对151936个token（词表的所有token）都给出一个分数
 
-```python
+```
 第0个样本
   ├── 第0个位置 -> 151936个分数
   ├── 第1个位置 -> 151936个分数
@@ -526,14 +528,14 @@ next_logits = outputs.logits[:, -1, :]
 
 对应到
 
-```python
+```
 [1, 8, 151936]
 [:, -1, :]
 ```
 
 得到
 
-```python
+```
 [1, 151936]
 ```
 
@@ -579,7 +581,7 @@ attention_mask = torch.cat([attention_mask, torch.ones_like(next_token)], dim=-1
 
 之后就是再次把新的input_ids送入进行新一轮的forward，不断往复，直到生成100个token就结束了。然后这边我们可以注意到，在做forward的时候都是一次完整的forward：
 
-```python
+```
 第 1 轮：
 [1, 8]
 
@@ -595,7 +597,7 @@ attention_mask = torch.cat([attention_mask, torch.ones_like(next_token)], dim=-1
 
 也就是每轮都会重复计算整段序列的attention，可以轻而易举的想到，我们之前的计算不要重复计算，这样就可以节省大量的算力和时间了，没错，这个就是KV Cache的由来了：
 
-```python
+```
 第 1 次：输入完整 prompt，计算并保存 KV cache
 第 2 次：只输入新生成的 1 个 token，复用前面的 KV cache
 第 3 次：只输入新生成的 1 个 token，继续复用 KV cache
@@ -606,7 +608,7 @@ attention_mask = torch.cat([attention_mask, torch.ones_like(next_token)], dim=-1
 
 整个推理的过程大概如下：
 
-```python
+```
 prompt
   ↓
 forward
@@ -624,7 +626,7 @@ argmax（decoding strategy，解码策略，argmax只是一种，还有其他）
 
 实际的大模型推理中，比较成熟的推理引擎会是这样的流程：
 
-```python
+```
 input_ids
     ↓
 Transformer forward

@@ -51,20 +51,21 @@ These model weights will be used for inference. When we open Files, we can see t
 </div>
     </div>
 </div>
-| File | Purpose |
-| --- | --- |
-| .gitattributes | File-management config for git/hf |
-| LICENSE | Model license |
-| README.md | Model card, including model introduction, usage, limitations, sample code, and so on |
-| config.json | Model architecture config, such as layer count, hidden size, attention heads, vocabulary size, RoPE parameters, dtype, and so on. Transformers reads this file first when loading the model |
-| generation_config.json | Default generation parameters, such as temperature: 0.6, top_p: 0.95, top_k: 20, do_sample: true, EOS/PAD token, and so on |
-| tokenizer.json | Tokenizer file, including tokenization model, rules, special tokens, and so on |
-| tokenizer_config.json | Extra tokenizer config, mainly including chat template, special tokens, max length, and so on. Qwen's chat format mainly lives here |
-| vocab.json | Vocabulary for the BPE tokenizer, mapping tokens to ids |
-| merges.txt | BPE merge rules, determining how characters/subwords are gradually merged into tokens |
-| model.safetensors | Model weights file for 0.6B, in the safe tensor format |
-| model-00001-of-00005.safetensors, etc. | Model weight shards for 8B. When files are too large, they are split into multiple shards |
-| model.safetensors.index.json | Only needed for sharded models. It records which `.safetensors` shard each weight tensor is stored in, so the loader can stitch the full model back together |
+
+| File                                | Purpose                                                                                                                                                                                        |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| .gitattributes                      | File-management config for git/hf                                                                                                                                                             |
+| LICENSE                             | Model license                                                                                                                                                                                  |
+| README.md                           | Model card, including model introduction, usage, limitations, sample code, and so on                                                                                                           |
+| config.json                         | Model architecture config, such as layer count, hidden size, attention heads, vocabulary size, RoPE parameters, dtype, and so on. Transformers reads this file first when loading the model     |
+| generation_config.json              | Default generation parameters, such as temperature: 0.6, top_p: 0.95, top_k: 20, do_sample: true, EOS/PAD token, and so on                                                                     |
+| tokenizer.json                      | Tokenizer file, including tokenization model, rules, special tokens, and so on                                                                                                                  |
+| tokenizer_config.json               | Extra tokenizer config, mainly including chat template, special tokens, max length, and so on. Qwen's chat format mainly lives here                                                            |
+| vocab.json                          | Vocabulary for the BPE tokenizer, mapping tokens to ids                                                                                                                                        |
+| merges.txt                          | BPE merge rules, determining how characters/subwords are gradually merged into tokens                                                                                                           |
+| model.safetensors                   | Model weights file for 0.6B, in the safe tensor format                                                                                                                                         |
+| model-00001-of-00005.safetensors etc. | Model weight shards for 8B. When files are too large, they are split into multiple shards                                                                                                      |
+| model.safetensors.index.json        | Only needed for sharded models. It records which `.safetensors` shard each weight tensor is stored in, so the loader can stitch the full model back together                                   |
 
 # Tokenizer
 
@@ -210,7 +211,7 @@ Let me briefly explain what these parameters mean.
 
 The output result is:
 
-```plain text
+```
  KV cache is a technique used in transformer models to store the keys and values of previous attention computations, allowing the model to efficiently process sequential data by reusing these cached values instead of recalculating them for each new input token.
 KV cache is a technique used in transformer models to store the keys and values of previous attention computations, allowing the model to efficiently process sequential data by reusing these cached values instead of recalculating them for each new input token.
 Okay, I need to explain what a
@@ -220,7 +221,7 @@ This is the inference process. This is the most primitive, bare model output. It
 
 As for the final line:
 
-```plain text
+```
 prompt_tokens=8 generated_tokens=100 elapsed_seconds=3.932 tokens_per_second=25.43 device=cuda dtype=bfloat16
 ```
 
@@ -279,7 +280,7 @@ model.eval() # switch model to inference mode; there is also model.train() for t
 
 Here we use hf's [transformers](https://github.com/huggingface/transformers) library to load the model and tokenizer, through `AutoTokenizer` and `AutoModelForCausalLM`. The tokenizer reads:
 
-```python
+```
 /data2/nanoLLMServe/models/Qwen3-8B/tokenizer_config.json
 /data2/nanoLLMServe/models/Qwen3-8B/tokenizer.json
 ```
@@ -288,7 +289,7 @@ Only when fallback is needed will it read `vocab.json` and `merges.txt`. Otherwi
 
 Model loading reads the corresponding model architecture config and safetensor files:
 
-```python
+```
 config.json
 model.safetensors.index.json
 model-00001-of-00005.safetensors
@@ -300,7 +301,7 @@ model-00005-of-00005.safetensors
 
 In STDOUT we can see one line:
 
-```python
+```
 Loading checkpoint shards: 100%|███████| 5/5 [00:00<00:00, 136.32it/s]
 ```
 
@@ -320,7 +321,7 @@ model.eval() # switch model to inference mode; there is also model.train() for t
 
 That is, when we call `AutoModelForCausalLM.from_pretrained`, the model has already been loaded from the on-disk weight files into CPU memory and constructed according to the model architecture and config. So machine RAM is usually very large; otherwise loading the model would already be a problem. But because CPU compute parallelism is not enough and is too slow, the model still needs to be moved into GPU memory and computed in parallel by GPU compute cores.
 
-| **Item**                         | **8x A100 80GB (typical DGX/HGX A100)**     | **8x H100 80GB (typical DGX/HGX H100)**    |
+| **Item**                         | **8× A100 80GB (typical DGX/HGX A100)**     | **8× H100 80GB (typical DGX/HGX H100)**    |
 | -------------------------------- | ------------------------------------------- | ------------------------------------------ |
 | GPU model                        | NVIDIA A100 80GB SXM4                       | NVIDIA H100 80GB SXM5                      |
 | GPU count                        | 8                                           | 8                                          |
@@ -333,24 +334,24 @@ That is, when we call `AutoModelForCausalLM.from_pretrained`, the model has alre
 | FP8 support                      | No                                          | Yes (Transformer Engine)                   |
 | BF16 support                     | Yes                                         | Yes                                        |
 | NVLink version                   | NVLink 3                                    | NVLink 4                                   |
-| Per-GPU NVLink bandwidth         | 600 GB/s bidirectional                      | 900 GB/s bidirectional                     |
-| NVSwitch                         | 6x NVSwitch                                 | 3rd-generation NVSwitch                    |
+| Per-GPU NVLink bandwidth         | 600 GB/s (bidirectional)                    | 900 GB/s (bidirectional)                   |
+| NVSwitch                         | 6× NVSwitch                                 | 3rd-generation NVSwitch                    |
 | GPU topology                     | all-to-all                                  | all-to-all                                 |
-| GPU-to-GPU communication         | NVSwitch Fabric                             | NVSwitch Fabric                            |
+| GPU ↔ GPU communication          | NVSwitch Fabric                             | NVSwitch Fabric                            |
 | PCIe generation                  | PCIe Gen4                                   | PCIe Gen5                                  |
 | PCIe x16 one-way bandwidth       | ~32 GB/s                                    | ~64 GB/s                                   |
 | PCIe x16 bidirectional bandwidth | ~64 GB/s                                    | ~128 GB/s                                  |
 | CPU (official DGX typical)       | dual AMD EPYC 7742                          | dual Intel Xeon Sapphire Rapids            |
-| CPU core count                   | 64C x2 = 128 cores                          | ~56-60C x2                                 |
+| CPU core count                   | 64C ×2 = 128 cores                          | ~56–60C ×2                                 |
 | CPU architecture codename        | Rome                                        | Sapphire Rapids                            |
-| System memory                    | 1TB-2TB DDR4                                | 2TB DDR5                                   |
-| Memory bandwidth                 | DDR4                                        | DDR5, higher                               |
+| System memory                    | 1TB–2TB DDR4                                | 2TB DDR5                                   |
+| Memory bandwidth                 | DDR4                                        | DDR5 (higher)                              |
 | Local NVMe                       | multiple NVMe SSDs                          | multiple Gen4/Gen5 NVMe                    |
 | Network                          | Mellanox ConnectX-6                         | ConnectX-7                                 |
 | InfiniBand                       | HDR 200Gbps                                 | NDR 400Gbps                                |
 | RDMA                             | supported                                   | supported                                  |
 | DPU                              | usually none                                | BlueField-3                                |
-| Whole-machine power              | ~6.5-8 kW                                   | ~10-12 kW                                  |
+| Whole-machine power              | ~6.5–8 kW                                   | ~10–12 kW                                  |
 | Cooling                          | high-pressure air cooling                   | high-pressure air cooling / liquid cooling |
 | Typical use                      | GPT-3/LLaMA1-era training                   | GPT-4-era training/inference               |
 | Typical bottleneck               | NVLink/memory bandwidth                     | power/cooling/cross-node communication     |
@@ -358,7 +359,7 @@ That is, when we call `AutoModelForCausalLM.from_pretrained`, the model has alre
 | MoE support                      | possible but communication pressure is high | very suitable                              |
 | Tensor Parallel                  | strong                                      | extremely strong                           |
 | Inference KV Cache performance   | strong                                      | extremely strong                           |
-| Typical price (whole machine)    | ~$120k-200k                                 | ~$250k-500k+                               |
+| Typical price (whole machine)    | ~$120k–200k                                 | ~$250k–500k+                               |
 
 Looking briefly at this table, we can see that machine RAM is often above 1T, which is no longer in the same dimension as the 32GB/64GB/128GB computers or servers we usually think of. Another thing worth noting here is the speed difference between PCIe, NVLink, and HBM.
 
@@ -373,7 +374,7 @@ Looking briefly at this table, we can see that machine RAM is often above 1T, wh
 | GPU topology           | NVSwitch all-to-all       | NVSwitch all-to-all       |
 | Cross-machine network  | 200G IB                   | 400G IB                   |
 
-```python
+```
          [ GPU Compute ]
                 │
                 │ ultra high speed
@@ -413,7 +414,7 @@ attention_mask = encoded.get("attention_mask")
 
 What happens here is basically tokenizing the input prompt and then moving it to the GPU. The behavior is roughly like this:
 
-```python
+```
 "Explain KV cache in one sentence."
   -> tokenizer
   -> input_ids: shape [1, 8]
@@ -441,7 +442,7 @@ with torch.inference_mode():
 
 The overall flow is like this. At the end of step 3, we got token ids, which are the first `input_ids` here:
 
-```python
+```
 Explain KV cache in one sentence.
 input_ids = [[849, 735, 6634, 304, 825, 11652, 13, 151645]] # example only; actual token ids are not these
 ```
@@ -453,14 +454,14 @@ At this point, the shape is `[1, 8]`. A simple way to understand it is that ther
 
 Here we also need to understand what `attention_mask` is. It is actually a padding mask, not the causal mask inside the decoder. Suppose we now have 2 requests that need inference:
 
-```python
+```
 1. I love AI
 2. Hello
 ```
 
 If we run batched inference, to enable GPU parallelism, we need to pad them to the same length:
 
-```python
+```
 1. ["I", "love", "AI"]
 2. ["Hello", "[PAD]", "[PAD]"]
 ```
@@ -491,7 +492,7 @@ This sends the token sequence and padding mask into the model together. After th
 
 The final logits are the prediction scores for every token. Their shape is `[batch, seq_len, vocab_size]`. Suppose the vocabulary size is 151936. Then here it appears as `[1, 8, 151936]`, a three-dimensional tensor. In plain language: there is 1 sample; each sample has 8 token positions; and each token position gives a score for 151936 tokens, all tokens in the vocabulary.
 
-```python
+```
 sample 0
   ├── position 0 -> 151936 scores
   ├── position 1 -> 151936 scores
@@ -517,14 +518,14 @@ next_logits = outputs.logits[:, -1, :]
 
 Corresponding to:
 
-```python
+```
 [1, 8, 151936]
 [:, -1, :]
 ```
 
 We get:
 
-```python
+```
 [1, 151936]
 ```
 
@@ -570,7 +571,7 @@ The original shape was `[1, 8]`. After generating one token, `next_token` has sh
 
 After that, the new `input_ids` are sent into another forward pass, repeating again and again until 100 tokens have been generated. Here we can notice that every forward pass is a full forward pass:
 
-```python
+```
 round 1:
 [1, 8]
 
@@ -586,7 +587,7 @@ round 100:
 
 That is, each round repeatedly computes attention for the entire sequence. It is easy to think that we should avoid recomputing previous work, so we can save a lot of compute and time. Exactly. This is where KV Cache comes from:
 
-```python
+```
 1st time: input the full prompt, compute and save KV cache
 2nd time: only input the newly generated 1 token, reuse the previous KV cache
 3rd time: only input the newly generated 1 token, continue reusing KV cache
@@ -597,7 +598,7 @@ This is also what we will do later.
 
 The overall inference process is roughly:
 
-```python
+```
 prompt
   ↓
 forward
@@ -615,7 +616,7 @@ continue forward
 
 In real large-model inference, a more mature inference engine follows a process like this:
 
-```python
+```
 input_ids
     ↓
 Transformer forward
