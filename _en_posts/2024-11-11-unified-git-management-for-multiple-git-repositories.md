@@ -13,6 +13,8 @@ toc:
 pretty_table: true
 ---
 
+> **Note:** This article was translated for me by AI. I wrote the original in Chinese. I never use AI to write my articles, because that would cost me my own expression; my freedom to express myself is always the most valuable part of my work. So if you can read Chinese, I recommend reading the Chinese version, where you will get the most original and unfiltered version. That said, technological progress exists to give us more convenience, so I will continue using AI to translate my writing into multiple languages, allowing valuable content to reach more people.
+
 I usually deal with many projects, during this time I will encounter Git-related configuration management issues. In the past, I manually managed them, and sometimes I missed them.
 Now I have too many projects to handle, including the open-source projects. It is very troublesome to manage them manually. I looked at Git and found that it supports configuration based on the path.
 

@@ -4,7 +4,7 @@ title: "AI辅助编程时代，面试流程将如何改变？"
 date: 2025-08-05T08:00:00+08:00
 tags:
   - AI
-  - Thoughts
+  - thoughts
 categories: AI
 giscus_comments: true
 tabs: true

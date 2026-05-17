@@ -3,7 +3,7 @@ layout: post
 title: "AI时代的教育反思"
 date: 2025-07-13T08:00:00+08:00
 tags:
-  - Thoughts
+  - thoughts
   - Education
 categories: Thoughts
 giscus_comments: true

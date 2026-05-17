@@ -2,7 +2,7 @@
 layout: post
 title: "被AI音乐广告洗脑了"
 date: 2025-08-03T08:00:00+08:00
-tags: Thoughts
+tags: thoughts
 categories: Thoughts
 giscus_comments: true
 tabs: true

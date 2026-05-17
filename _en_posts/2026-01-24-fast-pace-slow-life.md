@@ -13,6 +13,8 @@ toc:
   sidebar: left
 ---
 
+> **Note:** This article was translated for me by AI. I wrote the original in Chinese. I never use AI to write my articles, because that would cost me my own expression; my freedom to express myself is always the most valuable part of my work. So if you can read Chinese, I recommend reading the Chinese version, where you will get the most original and unfiltered version. That said, technological progress exists to give us more convenience, so I will continue using AI to translate my writing into multiple languages, allowing valuable content to reach more people.
+
 There is only one month left before Lunar New Year. Time flies, and I have successfully renewed myself for another year. Maybe I can keep renewing for another 51 years until 2077.
 
 <div class="row mt-3">

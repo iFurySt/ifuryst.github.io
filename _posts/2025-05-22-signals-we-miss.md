@@ -2,7 +2,7 @@
 layout: post
 title: "关于转向灯的思考"
 date: 2025-05-22T22:51:00+08:00
-tags: Thoughts
+tags: thoughts
 categories: Thoughts
 giscus_comments: true
 tabs: true

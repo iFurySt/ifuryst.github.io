@@ -15,6 +15,8 @@ toc:
   sidebar: left
 ---
 
+> **Note:** This article was translated for me by AI. I wrote the original in Chinese. I never use AI to write my articles, because that would cost me my own expression; my freedom to express myself is always the most valuable part of my work. So if you can read Chinese, I recommend reading the Chinese version, where you will get the most original and unfiltered version. That said, technological progress exists to give us more convenience, so I will continue using AI to translate my writing into multiple languages, allowing valuable content to reach more people.
+
 It is time to write something about Harness. Previously I had only scattered thoughts across different places, all very fragmented. After making it public, the feedback I received was all positive, so I think this thing is valuable for many people. I am sacrificing two hours of my own time and giving this to whoever is meant to find it.
 
 # Free Your Mind

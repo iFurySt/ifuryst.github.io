@@ -2,7 +2,7 @@
 layout: post
 title: "Claude Code实测报告: 当我不再Debug"
 date: 2025-07-03T20:30:00+08:00
-tags: AI Thoughts Tech
+tags: AI thoughts Tech
 categories: AI Thoughts Tech
 giscus_comments: true
 tabs: true

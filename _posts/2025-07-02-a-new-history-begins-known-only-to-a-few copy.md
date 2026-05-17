@@ -2,8 +2,8 @@
 layout: post
 title: "历史刚被创造出来，而世界上只有少数人知道"
 date: 2025-07-02T22:30:00+08:00
-tags: AI Thoughts Insights
-categories: AI Thoughts Insights
+tags: AI thoughts insights
+categories: AI Thoughts insights
 giscus_comments: true
 tabs: true
 toc:

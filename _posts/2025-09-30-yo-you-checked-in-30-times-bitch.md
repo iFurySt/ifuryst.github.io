@@ -4,7 +4,7 @@ title: "同学你好，你已经签到30次了"
 date: 2025-09-30T08:00:00+08:00
 tags:
   - PersonalUpdate
-  - Thoughts
+  - thoughts
 categories: PersonalUpdate
 giscus_comments: true
 tabs: true

@@ -2,8 +2,8 @@
 layout: post
 title: "Duolingo w/ AI"
 date: 2025-05-28T22:51:00+08:00
-tags: Insights
-categories: Insights
+tags: insights
+categories: insights
 giscus_comments: true
 tabs: true
 pretty_table: true

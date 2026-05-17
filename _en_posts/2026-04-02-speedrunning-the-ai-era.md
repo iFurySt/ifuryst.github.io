@@ -16,6 +16,8 @@ toc:
   sidebar: left
 ---
 
+> **Note:** This article was translated for me by AI. I wrote the original in Chinese. I never use AI to write my articles, because that would cost me my own expression; my freedom to express myself is always the most valuable part of my work. So if you can read Chinese, I recommend reading the Chinese version, where you will get the most original and unfiltered version. That said, technological progress exists to give us more convenience, so I will continue using AI to translate my writing into multiple languages, allowing valuable content to reach more people.
+
 # Before We Start
 
 It has been a long time since I properly sat down and wrote something worth sharing. Recently we have been fighting continuously for more than three weeks, so it is also time to loosen the throttle a little and talk about what we are doing. From the perspectives of the individual, the team, and the organization, I want to talk about how we respond to and embrace change in an era where AI is running wild.

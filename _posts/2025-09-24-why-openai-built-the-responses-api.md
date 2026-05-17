@@ -4,7 +4,7 @@ title: "为什么OpenAI要推出Responses API"
 date: 2025-09-24T08:00:00+08:00
 tags:
   - AI
-  - Insights
+  - insights
 categories: AI
 giscus_comments: true
 tabs: true

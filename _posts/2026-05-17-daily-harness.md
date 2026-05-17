@@ -6,7 +6,7 @@ lang: zh
 translation_key: daily-harness
 tags:
   - AI
-  - Thoughts
+  - thoughts
 categories: AI
 giscus_comments: true
 tabs: true

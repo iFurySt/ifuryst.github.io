@@ -4,7 +4,7 @@ title: "GPT-5发布会后的观察与趋势分析"
 date: 2025-08-11T08:00:00+08:00
 tags:
   - AI
-  - Insights
+  - insights
 categories: AI
 giscus_comments: true
 tabs: true

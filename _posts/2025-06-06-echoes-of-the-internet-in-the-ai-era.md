@@ -2,7 +2,7 @@
 layout: post
 title: "从互联网的历史思考AI时代"
 date: 2025-06-06T13:47:00+08:00
-tags: Thoughts
+tags: thoughts
 categories: Thoughts
 giscus_comments: true
 tabs: true

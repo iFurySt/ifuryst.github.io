@@ -3,7 +3,7 @@ layout: post
 title: "我是如何在1年的时间里成为AI专家的"
 date: 2025-07-31T08:00:00+08:00
 tags:
-  - Thoughts
+  - thoughts
   - Opinion
 categories: Thoughts
 giscus_comments: true

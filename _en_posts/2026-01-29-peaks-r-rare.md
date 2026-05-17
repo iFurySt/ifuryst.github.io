@@ -16,6 +16,8 @@ toc:
   sidebar: left
 ---
 
+> **Note:** This article was translated for me by AI. I wrote the original in Chinese. I never use AI to write my articles, because that would cost me my own expression; my freedom to express myself is always the most valuable part of my work. So if you can read Chinese, I recommend reading the Chinese version, where you will get the most original and unfiltered version. That said, technological progress exists to give us more convenience, so I will continue using AI to translate my writing into multiple languages, allowing valuable content to reach more people.
+
 These two days I heard a view: peaks are rare. I strongly agree with it. This sentence works when talking about an era, and it also works when talking about a life. In both contexts, the flavor is right.
 
 I believe many people already know what I want to talk about: AI, the thing now burning red-hot. I believe a lot of people feel this is an unprecedented technological transformation, perhaps even far beyond the PC, the internet, and mobile internet. I also firmly believe this may be a technological transformation I will not encounter again in my lifetime.

@@ -5,9 +5,9 @@ date: 2026-04-02T08:00:00+08:00
 lang: zh
 translation_key: speedrunning-the-ai-era
 tags:
-  - Thoughts
+  - thoughts
   - AI
-  - Insights
+  - insights
 categories: Thoughts
 giscus_comments: true
 tabs: true

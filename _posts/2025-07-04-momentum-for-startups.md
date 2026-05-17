@@ -5,7 +5,7 @@ date: 2025-07-04T08:00:00+08:00
 tags:
   - AI
   - Tech
-  - Insights
+  - insights
 categories: AI
 giscus_comments: true
 tabs: true
