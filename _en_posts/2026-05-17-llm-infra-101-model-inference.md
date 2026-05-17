@@ -52,20 +52,20 @@ These model weights will be used for inference. When we open Files, we can see t
     </div>
 </div>
 
-| File                                | Purpose                                                                                                                                                                                        |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| .gitattributes                      | File-management config for git/hf                                                                                                                                                             |
-| LICENSE                             | Model license                                                                                                                                                                                  |
-| README.md                           | Model card, including model introduction, usage, limitations, sample code, and so on                                                                                                           |
-| config.json                         | Model architecture config, such as layer count, hidden size, attention heads, vocabulary size, RoPE parameters, dtype, and so on. Transformers reads this file first when loading the model     |
-| generation_config.json              | Default generation parameters, such as temperature: 0.6, top_p: 0.95, top_k: 20, do_sample: true, EOS/PAD token, and so on                                                                     |
-| tokenizer.json                      | Tokenizer file, including tokenization model, rules, special tokens, and so on                                                                                                                  |
-| tokenizer_config.json               | Extra tokenizer config, mainly including chat template, special tokens, max length, and so on. Qwen's chat format mainly lives here                                                            |
-| vocab.json                          | Vocabulary for the BPE tokenizer, mapping tokens to ids                                                                                                                                        |
-| merges.txt                          | BPE merge rules, determining how characters/subwords are gradually merged into tokens                                                                                                           |
-| model.safetensors                   | Model weights file for 0.6B, in the safe tensor format                                                                                                                                         |
-| model-00001-of-00005.safetensors etc. | Model weight shards for 8B. When files are too large, they are split into multiple shards                                                                                                      |
-| model.safetensors.index.json        | Only needed for sharded models. It records which `.safetensors` shard each weight tensor is stored in, so the loader can stitch the full model back together                                   |
+| File                                  | Purpose                                                                                                                                                                                     |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| .gitattributes                        | File-management config for git/hf                                                                                                                                                           |
+| LICENSE                               | Model license                                                                                                                                                                               |
+| README.md                             | Model card, including model introduction, usage, limitations, sample code, and so on                                                                                                        |
+| config.json                           | Model architecture config, such as layer count, hidden size, attention heads, vocabulary size, RoPE parameters, dtype, and so on. Transformers reads this file first when loading the model |
+| generation_config.json                | Default generation parameters, such as temperature: 0.6, top_p: 0.95, top_k: 20, do_sample: true, EOS/PAD token, and so on                                                                  |
+| tokenizer.json                        | Tokenizer file, including tokenization model, rules, special tokens, and so on                                                                                                              |
+| tokenizer_config.json                 | Extra tokenizer config, mainly including chat template, special tokens, max length, and so on. Qwen's chat format mainly lives here                                                         |
+| vocab.json                            | Vocabulary for the BPE tokenizer, mapping tokens to ids                                                                                                                                     |
+| merges.txt                            | BPE merge rules, determining how characters/subwords are gradually merged into tokens                                                                                                       |
+| model.safetensors                     | Model weights file for 0.6B, in the safe tensor format                                                                                                                                      |
+| model-00001-of-00005.safetensors etc. | Model weight shards for 8B. When files are too large, they are split into multiple shards                                                                                                   |
+| model.safetensors.index.json          | Only needed for sharded models. It records which `.safetensors` shard each weight tensor is stored in, so the loader can stitch the full model back together                                |
 
 # Tokenizer
 
@@ -337,7 +337,7 @@ That is, when we call `AutoModelForCausalLM.from_pretrained`, the model has alre
 | Per-GPU NVLink bandwidth         | 600 GB/s (bidirectional)                    | 900 GB/s (bidirectional)                   |
 | NVSwitch                         | 6× NVSwitch                                 | 3rd-generation NVSwitch                    |
 | GPU topology                     | all-to-all                                  | all-to-all                                 |
-| GPU ↔ GPU communication          | NVSwitch Fabric                             | NVSwitch Fabric                            |
+| GPU ↔ GPU communication         | NVSwitch Fabric                             | NVSwitch Fabric                            |
 | PCIe generation                  | PCIe Gen4                                   | PCIe Gen5                                  |
 | PCIe x16 one-way bandwidth       | ~32 GB/s                                    | ~64 GB/s                                   |
 | PCIe x16 bidirectional bandwidth | ~64 GB/s                                    | ~128 GB/s                                  |
