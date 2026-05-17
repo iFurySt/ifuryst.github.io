@@ -2,6 +2,8 @@
 layout: post
 title: "日常Harness"
 date: 2026-05-17T08:00:00+08:00
+lang: zh
+translation_key: daily-harness
 tags:
   - AI
   - Thoughts
