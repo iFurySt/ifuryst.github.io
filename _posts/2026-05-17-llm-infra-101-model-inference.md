@@ -42,11 +42,25 @@ toc:
     <div class="col-sm mt-0 mb-0">
         <div class="row mt-3">
     <div class="col-sm mt-0 mb-0">
-        {% include figure.liquid loading="eager" path="/assets/img/2026-05-17-llm-infra-101-model-inference/1779002828_1.png" class="img-fluid rounded z-depth-1" zoomable=true %}
+        {% include figure.liquid loading="eager" path="/assets/img/2026-05-17-llm-infra-101-model-inference/1779004380_1.png" class="img-fluid rounded z-depth-1" zoomable=true %}
     </div>
 </div>
     </div>
 </div>
+| 文件 | 作用 |
+| --- | --- |
+| .gitattributes | git/hf 的文件管理配置 |
+| LICENSE | 模型许可证 |
+| README.md | 模型卡，包含模型介绍、用法、限制、示例代码等 |
+| config.json | 模型结构配置，比如层数、hidden size、attention heads、词表大小、RoPE 参数、dtype 等。Transformers 加载模型时会先读这个文件 |
+| generation_config.json | 默认生成参数。比如 temperature: 0.6、top_p: 0.95、top_k: 20、do_sample: true、EOS/PAD token 等 |
+| tokenizer.json | tokenizer文件，包含分词模型、规则、特殊token等 |
+| tokenizer_config.json | tokenizer的额外配置，重点包括chat template、特殊token、最大长度等。Qwen聊天格式主要放在这里 |
+| vocab.json | BPE tokenizer的词表，token到id的映射。 |
+| merges.txt | BPE合并规则，决定字符/子词如何逐步合并成token。 |
+| model.safetensors | 0.6B的模型权重文件，安全张量格式 |
+| model-00001-of-00005.safetensors 等 | 8B的模型权重分片，文件太大时会拆成多个 shard |
+| model.safetensors.index.json | 只在分片模型里需要，记录每个权重tensor存在哪个.safetensors分片里，加载器靠它拼回完整模型 |
 
 # Tokenizer
 
@@ -174,7 +188,20 @@ prompt_tokens=8 generated_tokens=100 elapsed_seconds=3.932 tokens_per_second=25.
 ```
 
 稍微解释一下这些参数都是什么意义
-
+| 参数 | 含义 |
+| --- | --- |
+| CUDA_VISIBLE_DEVICES=0 | 只让程序看到第0张GPU，我们现在聚焦单卡 |
+| PYTHONPATH=src | 把仓库的src/加到python import路径，方便直接运行源码 |
+| /data/anaconda3/bin/python | 用conda的python |
+| -m nanollmserve.cli.generate | 以模块方式运行命令行入口 |
+| --model "$MODEL" | 指定模型路径或hf上的模型名，这边我们提前下载离线模型文件了，所以我们前面设置了路径 |
+| --local-files-only | 只使用本地已有模型文件，不联网下载 |
+| --prompt "xxxx" | 输入给模型的prompt，现在是很裸的，实际上一般会有system prompt+user prompt这种结合起来的 |
+| --max-new-tokens 100 | 最多生成100个新 token，现在没有吃EOS之类的结束符，我们会一直推理到100个token才结束，所以实际上可以看到哪怕应该结束了还是重复在输出知道100个token |
+| --temperature 0 | 温度为0，使用贪心解码（greedy decoding），每步选概率最高的token（重复输出也有这个参数的原因） |
+| --device cuda | 把模型放到CUDA GPU上运行 |
+| --dtype bfloat16 | 使用bfloat16精度（dtype=data type，数据用什么数值格式存储和计算） |
+| --show-stats | 输出生成统计信息，比如token数、耗时、tokens/s、device、dtype |
 然后输出的结果是
 
 ```plain text
@@ -283,8 +310,56 @@ model.eval() # 模型切换到推理模式，还有model.train()训练模式
 ```
 
 也就是我们前面在做`AutoModelForCausalLM.from_pretrained` 的时候，模型已经从磁盘里的权重文件被加载到CPU内存里按模型结构和配置构建好了，所以整机的内存一般都很大，否则加载进来都是个问题。但是因为CPU计算并行度不够，太慢了，所以仍然需要把模型送到GPU显存里，在GPU的计算核心里并行的计算。
-
+| **项目** | **8× A100 80GB（DGX/HGX A100 典型）** | **8× H100 80GB（DGX/HGX H100 典型）** |
+| --- | --- | --- |
+| GPU 型号 | NVIDIA A100 80GB SXM4 | NVIDIA H100 80GB SXM5 |
+| GPU 数量 | 8 | 8 |
+| 单卡显存 | 80GB HBM2e | 80GB HBM3 |
+| 总 GPU 显存 | 640GB | 640GB |
+| 单卡显存带宽 | ~2.0 TB/s | ~3.0 TB/s |
+| GPU 峰值功耗（TDP） | ~400W | ~700W |
+| GPU 架构 | Ampere | Hopper |
+| Tensor Core | 第三代 | 第四代 |
+| FP8 支持 | 无 | 有（Transformer Engine） |
+| BF16 支持 | 有 | 有 |
+| NVLink 版本 | NVLink 3 | NVLink 4 |
+| 单 GPU NVLink 带宽 | 600 GB/s（双向） | 900 GB/s（双向） |
+| NVSwitch | 6× NVSwitch | 第三代 NVSwitch |
+| GPU 拓扑 | 全互联（all-to-all） | 全互联（all-to-all） |
+| GPU ↔ GPU 通信 | NVSwitch Fabric | NVSwitch Fabric |
+| PCIe 代际 | PCIe Gen4 | PCIe Gen5 |
+| PCIe x16 单向带宽 | ~32 GB/s | ~64 GB/s |
+| PCIe x16 双向带宽 | ~64 GB/s | ~128 GB/s |
+| CPU（官方 DGX 典型） | 双路 AMD EPYC 7742 | 双路 Intel Xeon Sapphire Rapids |
+| CPU 核心数 | 64C ×2 = 128 核 | ~56–60C ×2 |
+| CPU 架构代号 | Rome | Sapphire Rapids |
+| 系统内存 | 1TB–2TB DDR4 | 2TB DDR5 |
+| 内存带宽 | DDR4 | DDR5（更高） |
+| 本地 NVMe | 多块 NVMe SSD | 多块 Gen4/Gen5 NVMe |
+| 网络 | Mellanox ConnectX-6 | ConnectX-7 |
+| InfiniBand | HDR 200Gbps | NDR 400Gbps |
+| RDMA | 支持 | 支持 |
+| DPU | 通常无 | BlueField-3 |
+| 单机整机功耗 | ~6.5–8 kW | ~10–12 kW |
+| 散热 | 高压风冷 | 高压风冷/液冷 |
+| 典型用途 | GPT-3/LLaMA1时代训练 | GPT-4时代训练/推理 |
+| 典型瓶颈 | NVLink/显存带宽 | 电力/散热/跨节点通信 |
+| 训练特点 | Compute-bound 较多 | Memory/Communication-bound 更明显 |
+| MoE 支持 | 可以但通信压力大 | 非常适合 |
+| Tensor Parallel | 强 | 极强 |
+| 推理 KV Cache 性能 | 较强 | 极强 |
+| 典型价格（整机） | ~$120k–200k | ~$250k–500k+ |
 简单看这个表格，我们就能看到整机内存都是1T以上的这种级别，和我们认知里的电脑或者服务器里32GB/64GB/128GB已经不是一个纬度的了。另外这里值得留意的是PCIe、NVLINK和HBM的速度差异
+| **项目** | **NVIDIA A100 80GB SXM4** | **NVIDIA H100 80GB SXM5** |
+| --- | --- | --- |
+| HBM 类型 | HBM2e | HBM3 |
+| HBM 带宽 | ~2 TB/s | ~3 TB/s |
+| PCIe | Gen4 x16 | Gen5 x16 |
+| PCIe 单向带宽 | ~32 GB/s | ~64 GB/s |
+| NVLink | NVLink 3 | NVLink 4 |
+| NVLink 带宽 | 600 GB/s | 900 GB/s |
+| GPU 拓扑 | NVSwitch 全互联 | NVSwitch 全互联 |
+| 跨机网络 | 200G IB | 400G IB |
 
 ```python
          [ GPU Compute ]
@@ -304,7 +379,11 @@ model.eval() # 模型切换到推理模式，还有model.train()训练模式
 ```
 
 这个在成熟的Infra里尤其重要，因为Infra解决的正是通信问题，现在模型推理里最重要的问题不是算力，而是传输速度，很多时候都是在等待传输导致计算的利用率不能最大化拉满，效率不足就会有闲置。现在NVIDIA的护城河也是其做到诸如**NVL72**这种整机柜，让72张GPU尽可能像一张GPU一样协同工作
-
+| **平台** | **HBM** | **NVLink** |
+| --- | --- | --- |
+| A100 | 2 TB/s | 600 GB/s |
+| H100 | 3 TB/s | 900 GB/s |
+| GB200 NVL72 | 8 TB/s | 1.8 TB/s |
 题外话，就当提前了解有个全局的认知。我们继续
 
 ## 3. Prompt编码并送到GPU
