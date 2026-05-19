@@ -2,6 +2,8 @@
 layout: post
 title: "LLM Infra 101 v0.2: KV Cache"
 date: 2026-05-19T08:00:00+08:00
+lang: zh
+translation_key: llm-infra-101-v0-2-kv-cache-decode
 tags:
   - Blog
   - 微信公众号
@@ -24,7 +26,7 @@ toc:
 
 上一期过完，能通过API调用模型了。这期我们来支持KV Cache。在第一集的时候我们发现，每次forward 的时候都会重复计算：
 
-```plain text
+```plaintext
 prompt
 -> forward(prompt)
 -> 采样 token1
@@ -36,7 +38,7 @@ prompt
 
 这里每次推入的序列都会重新计算一遍，Transformer的计算就贵在Attention的计算：
 
-```plain text
+```plaintext
 Q = xW_Q
 K = xW_K
 V = xW_V
@@ -107,7 +109,7 @@ Attention(Q, K, V)
 
 本质上KV Cache就是为了后续计算可以重复利用，我们来看一个实际推理过程中的环节：
 
-```plain text
+```plaintext
 Token
  ↓
 Attention（看上下文）
@@ -119,7 +121,7 @@ FFN（自己思考）
 
 可以看到Attention里的K/V都Cache里，但是FFN里没有任何Cache的，这个是因为Attention的计算都是依赖于之前计算的，但是FFN都是针对当前token自己去做计算（非线性变换）的
 
-```plain text
+```plaintext
 token3
  ↓
 Linear Up Projection（升维，高纬空间有更复杂的表达能力）
