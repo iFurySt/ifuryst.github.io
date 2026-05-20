@@ -1,0 +1,3 @@
+display_name: GA Article Analytics
+short_description: Analyze GA article traffic and sources.
+default_prompt: Analyze this site's Google Analytics article performance and produce a concise content strategy report.
