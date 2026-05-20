@@ -12,16 +12,19 @@ Use this skill to produce a repeatable GA4 content report for `ifuryst.github.io
 ## Core Workflow
 
 1. Confirm local site tracking configuration:
+
    - Check `_config.yml` for `google_analytics`, `enable_google_analytics`, and site URL.
    - Check `_includes/scripts/analytics.liquid` and layouts that include it.
    - If needed, serve `_site` locally and verify exactly one `gtag.js` script and one `gtag('config', ...)` call on representative home, Chinese post, and English post pages.
 
 2. Audit translation coverage:
+
    - Run `ruby skills/ga-article-analytics/scripts/audit_translations.rb`.
    - Treat posts without `translation_key` as outside the pairing system unless the user expects every recent post to be translated.
    - Report missing English pages separately from "not configured for translation".
 
 3. Collect GA4 tables with OBU:
+
    - Read `references/ga4-obu-workflow.md` for exact report URLs and extraction snippets.
    - Capture at least:
      - Pages and screens by page path.
@@ -31,6 +34,7 @@ Use this skill to produce a repeatable GA4 content report for `ifuryst.github.io
    - Keep the date range explicit, usually the current GA default or the range requested by the user.
 
 4. Parse and classify rows:
+
    - Use `python3 skills/ga-article-analytics/scripts/parse_ga_table.py --kind pages < exported-text.txt>` when working from copied GA table text.
    - For in-browser extraction, use the JavaScript snippets in the reference and then classify article rows with the same path rules:
      - Article path: `^/(en/)?blog/\d{4}/`

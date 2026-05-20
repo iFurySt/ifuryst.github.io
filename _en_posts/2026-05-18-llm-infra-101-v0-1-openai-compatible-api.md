@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "LLM Infra 101 v0.1: API调用"
+title: "LLM Infra 101 v0.1: API Calls"
 date: 2026-05-18T08:00:00+08:00
-lang: zh
+lang: en
 translation_key: llm-infra-101-v0-1-openai-compatible-api
 tags:
   - AI
@@ -15,50 +15,52 @@ toc:
   sidebar: left
 ---
 
-系列的第二集，前面的可以看：
+> **Note:** This article was translated for me by AI. I wrote the original in Chinese. I never use AI to write my articles, because that would cost me my own expression; my freedom to express myself is always the most valuable part of my work. So if you can read Chinese, I recommend reading the Chinese version, where you will get the most original and unfiltered version. That said, technological progress exists to give us more convenience, so I will continue using AI to translate my writing into multiple languages, allowing valuable content to reach more people.
 
-1. [LLM Infra 101 v0.0: 推理模型](https://www.ifuryst.com/blog/2026/llm-infra-101-model-inference/)
+This is the second episode in the series. You can read the previous one here:
 
-这一期的代码在 [https://github.com/iFurySt/nanoLLMServe/tree/release/v0.1.0](https://github.com/iFurySt/nanoLLMServe/tree/release/v0.1.0)
+1. [LLM Infra 101 v0.0: Model Inference](https://www.ifuryst.com/blog/2026/llm-infra-101-model-inference/)
 
-上一期过完，有了一个能通过CLI调用的，这一期我们做个新的特性，我们做一个兼容OpenAI的API调用接口，这样现有的大部分sdk都可以无缝接入了。大体上会支持这样的内容：
+The code for this episode is at [https://github.com/iFurySt/nanoLLMServe/tree/release/v0.1.0](https://github.com/iFurySt/nanoLLMServe/tree/release/v0.1.0)
+
+After the previous episode, we had something that could be called through the CLI. In this episode, we will build a new feature: an OpenAI-compatible API interface, so most existing SDKs can connect to it seamlessly. At a high level, it will support:
 
 1. HTTP Server
 
-2. OpenAI-Compatible endpoint
+2. OpenAI-compatible endpoint
 
-3. 支持stream参数，可以全量返回也可以流式返回
+3. Support for the `stream` parameter, so it can return either a full response or a streaming response
 
-4. 支持chat接口，暂时不支持response接口
+4. Support for the chat interface, with no support for the responses interface for now
 
-# 实现
+# Implementation
 
-这次改动的不多，基本上就是包装了API，相关改动情况：
+There are not many changes this time. It is basically an API wrapper. The relevant changes are:
 
 ```shell
 .
 └── src/
     └── nanollmserve/
         ├── api/
-        │   ├── __init__.py        # API 包入口，占位导出用
-        │   ├── openai_server.py   # OpenAI-compatible HTTP server：/v1/models、/v1/responses、/v1/chat/completions、/v1/completions
-        │   └── protocol.py        # OpenAI-compatible 协议模型：请求/响应 schema、prompt 转换、usage/response 构造
+        │   ├── __init__.py        # API package entry point, used as a placeholder export
+        │   ├── openai_server.py   # OpenAI-compatible HTTP server: /v1/models, /v1/responses, /v1/chat/completions, /v1/completions
+        │   └── protocol.py        # OpenAI-compatible protocol models: request/response schema, prompt conversion, usage/response construction
         └── engine/
-            └── engine.py          # 增加 streaming generation：GenerationStep、stream_generate_one，并让 generate_one 复用流式路径
+            └── engine.py          # Adds streaming generation: GenerationStep, stream_generate_one, and makes generate_one reuse the streaming path
 ```
 
-新增接口如下：
+The newly added endpoints are:
 
-| **接口**             | **用途**                                                             |
-| -------------------- | -------------------------------------------------------------------- |
-| /v1/models           | 返回当前 server 暴露的模型列表                                       |
-| /v1/responses        | OpenAI 新推荐的 Responses API，支持 text-only create/stream/retrieve |
-| /v1/chat/completions | 兼容传统 chat messages 格式                                          |
-| /v1/completions      | 兼容 legacy prompt completion 格式                                   |
+| **Endpoint**         | **Purpose**                                                                         |
+| -------------------- | ----------------------------------------------------------------------------------- |
+| /v1/models           | Returns the list of models exposed by the current server                            |
+| /v1/responses        | OpenAI's newly recommended Responses API, supports text-only create/stream/retrieve |
+| /v1/chat/completions | Compatible with the traditional chat messages format                                |
+| /v1/completions      | Compatible with the legacy prompt completion format                                 |
 
-实现里关注Chat和Response API，一个原因是这两个接口都是主流使用，另一个是这两个接口是典型对比。比如现在很多AI Agent都接入Response了，因为可以走前缀缓存，命中缓存后，不管速度和费用都能得到收益
+The implementation focuses on the Chat and Responses APIs. One reason is that both are mainstream interfaces. Another is that they make for a typical comparison. For example, many AI Agents now connect to Responses, because it can use prefix caching. Once the cache is hit, both speed and cost can benefit.
 
-整体基本就是兼容OpenAI的接口协议，比如Chat Completion：
+Overall, this is basically compatibility with OpenAI's interface protocol. For example, Chat Completion:
 
 ```json
 {
@@ -67,7 +69,7 @@ toc:
 }
 ```
 
-Response类似：
+Responses is similar:
 
 ```json
 {
@@ -76,11 +78,11 @@ Response类似：
 }
 ```
 
-之后就是数据转换，转成Engine能识别的格式。其他就没有太多值得展开讲的
+After that, it is just data conversion: turning the request into a format the Engine can understand. There is not much else worth expanding on.
 
-# 推理
+# Inference
 
-过一下整体的推理过程，首先是启动HTTP服务
+Let us go through the overall inference process. First, start the HTTP service:
 
 ```shell
 CUDA_VISIBLE_DEVICES=0 PYTHONPATH=src /data/anaconda3/bin/python -m nanollmserve.api.openai_server \
@@ -93,7 +95,7 @@ CUDA_VISIBLE_DEVICES=0 PYTHONPATH=src /data/anaconda3/bin/python -m nanollmserve
   --dtype bfloat16
 ```
 
-启动后可以看看模型列表
+After it starts, we can check the model list:
 
 ```shell
 curl -s http://127.0.0.1:18080/v1/models | jq .
@@ -109,7 +111,7 @@ curl -s http://127.0.0.1:18080/v1/models | jq .
     </div>
 </div>
 
-请求Response API
+Request the Responses API:
 
 ```shell
 curl -sS http://127.0.0.1:18080/v1/responses \
@@ -134,7 +136,7 @@ curl -sS http://127.0.0.1:18080/v1/responses \
     </div>
 </div>
 
-Response API开启Stream流式返回
+Enable streaming responses for the Responses API:
 
 ```shell
 curl -sS http://127.0.0.1:18080/v1/responses \
@@ -160,7 +162,7 @@ curl -sS http://127.0.0.1:18080/v1/responses \
     </div>
 </div>
 
-尝试用resp id请求之前已经请求过的
+Try requesting a previous response by `resp id`:
 
 ```shell
 curl -sS http://127.0.0.1:18080/v1/responses/resp-1770dd64b5d44d1bbd93fc7dc5857bda | jq .
@@ -176,7 +178,7 @@ curl -sS http://127.0.0.1:18080/v1/responses/resp-1770dd64b5d44d1bbd93fc7dc5857b
     </div>
 </div>
 
-请求Chat Completion API
+Request the Chat Completion API:
 
 ```shell
 curl -sS http://127.0.0.1:18080/v1/chat/completions \
@@ -201,7 +203,7 @@ curl -sS http://127.0.0.1:18080/v1/chat/completions \
     </div>
 </div>
 
-Chat Completion API开启stream流式返回
+Enable streaming responses for the Chat Completion API:
 
 ```shell
 curl -sS http://127.0.0.1:18080/v1/chat/completions \
@@ -227,6 +229,6 @@ curl -sS http://127.0.0.1:18080/v1/chat/completions \
     </div>
 </div>
 
-# 总结
+# Summary
 
-这波很简单，包了一下API，没有太多东西需要讲。总体而言这些Infra对外其实也是一个HTTP Server，屏蔽掉下面模型调度推理的细节，调用方无需感知那么多，从最早的无状态化Chat Completion API慢慢过渡到现在有一些状态信息的Response API，背后也反应了行业在模型推理层面的变化。
+This round is very simple: we wrapped an API, and there is not much else to talk about. Overall, this kind of infra is also an HTTP Server on the outside. It hides the details of model scheduling and inference underneath, so callers do not need to be aware of so much. From the earlier stateless Chat Completion API to today's Responses API with some state information, this also reflects the industry's changes at the model inference layer.
