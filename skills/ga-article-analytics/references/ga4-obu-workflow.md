@@ -49,19 +49,19 @@ https://analytics.google.com/analytics/web/#/a355987152p490146313/reports/explor
 Read visible table text:
 
 ```js
-document.body.innerText
+document.body.innerText;
 ```
 
 Set rows per page to 250 if the selector is visible:
 
 ```js
 (() => {
-  const close = [...document.querySelectorAll('button')].find(b => b.innerText.trim() === 'GOT IT');
+  const close = [...document.querySelectorAll("button")].find((b) => b.innerText.trim() === "GOT IT");
   if (close) close.click();
-  const sel = [...document.querySelectorAll('mat-select')].find(x => x.innerText.trim() === '10');
+  const sel = [...document.querySelectorAll("mat-select")].find((x) => x.innerText.trim() === "10");
   if (sel) sel.click();
   setTimeout(() => {
-    const opt = [...document.querySelectorAll('mat-option, [role=option]')].find(o => o.innerText.trim() === '250');
+    const opt = [...document.querySelectorAll("mat-option, [role=option]")].find((o) => o.innerText.trim() === "250");
     if (opt) opt.click();
   }, 300);
 })();
@@ -71,10 +71,13 @@ Parse visible rows in-browser:
 
 ```js
 (() => {
-  const lines = document.body.innerText.split('\n').map(l => l.trim()).filter(l => /^\d+\t/.test(l));
+  const lines = document.body.innerText
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => /^\d+\t/.test(l));
   return {
     range: (document.body.innerText.match(/\b\d+-\d+ of \d+\b/) || [null])[0],
-    rows: lines
+    rows: lines,
   };
 })();
 ```
@@ -83,8 +86,8 @@ Click next page:
 
 ```js
 (() => {
-  const b = [...document.querySelectorAll('button')].find(x => x.getAttribute('aria-label') === 'Next Page');
-  if (b && !b.disabled && b.getAttribute('aria-disabled') !== 'true') {
+  const b = [...document.querySelectorAll("button")].find((x) => x.getAttribute("aria-label") === "Next Page");
+  if (b && !b.disabled && b.getAttribute("aria-disabled") !== "true") {
     b.click();
     return true;
   }
