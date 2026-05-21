@@ -8,4 +8,3 @@ nav: true
 nav_order: 6
 redirect: https://life-in-weeks.ifuryst.com/
 ---
-
