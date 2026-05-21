@@ -138,10 +138,12 @@
                 <li class="nav-item {% if page.url contains parent_link %}active{% endif %}">
                   {% if p.permalink contains '/blog/' %}
                     {% if current_lang == 'en' %}{% assign url = '/en/blog/' %}{% else %}{% assign url = '/blog/' %}{% endif %}
+                  {% elsif p.redirect %}
+                    {% assign url = p.redirect %}
                   {% else %}
                     {% assign url = p.url %}
                   {% endif %}
-                  <a class="nav-link" href="{{ url | relative_url }}">
+                  <a class="nav-link" href="{% if url contains '://' %}{{ url }}{% else %}{{ url | relative_url }}{% endif %}">
                     {{- p.title }}
                     {% if page.url contains p.url %}
                       <span class="sr-only">(current)</span>
