@@ -2,6 +2,8 @@
 layout: post
 title: "System vs Goal"
 date: 2026-05-21T08:00:00+08:00
+lang: zh
+translation_key: system-vs-goal
 tags: Opinion
 categories: Opinion
 giscus_comments: true

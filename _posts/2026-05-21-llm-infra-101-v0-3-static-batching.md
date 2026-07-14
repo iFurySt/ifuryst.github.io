@@ -2,6 +2,8 @@
 layout: post
 title: "LLM Infra 101 v0.3: 静态批处理"
 date: 2026-05-21T08:00:00+08:00
+lang: zh
+translation_key: llm-infra-101-v0-3-static-batching
 tags:
   - AI
   - LLMInfra-101

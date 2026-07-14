@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "LLM Infra 101 v0.4: 连续批处理"
+title: "LLM Infra 101 v0.4: Continuous Batching"
 date: 2026-05-25T08:00:00+08:00
-lang: zh
+lang: en
 translation_key: llm-infra-101-v0-4-continuous-batching
 tags:
   - AI
@@ -15,42 +15,44 @@ toc:
   sidebar: left
 ---
 
-系列的第五集，前面的可以看：
+> **Note:** This article was translated for me by AI. I wrote the original in Chinese. I never use AI to write my articles, because that would cost me my own expression; my freedom to express myself is always the most valuable part of my work. So if you can read Chinese, I recommend reading the Chinese version, where you will get the most original and unfiltered version. That said, technological progress exists to give us more convenience, so I will continue using AI to translate my writing into multiple languages, allowing valuable content to reach more people.
 
-1. [LLM Infra 101 v0.0: 推理模型](https://www.ifuryst.com/blog/2026/llm-infra-101-model-inference/)
+This is the fifth episode in the series. You can read the previous ones here:
 
-2. [LLM Infra 101 v0.1: API调用](https://www.ifuryst.com/blog/2026/llm-infra-101-v0-1-openai-compatible-api/)
+1. [LLM Infra 101 v0.0: Model Inference](https://www.ifuryst.com/blog/2026/llm-infra-101-model-inference/)
+
+2. [LLM Infra 101 v0.1: API Calls](https://www.ifuryst.com/blog/2026/llm-infra-101-v0-1-openai-compatible-api/)
 
 3. [LLM Infra 101 v0.2: KV Cache](https://www.ifuryst.com/blog/2026/llm-infra-101-v0-2-kv-cache-decode/)
 
-4. [LLM Infra 101 v0.3: 静态批处理](https://www.ifuryst.com/blog/2026/llm-infra-101-v0-3-static-batching/)
+4. [LLM Infra 101 v0.3: Static Batching](https://www.ifuryst.com/blog/2026/llm-infra-101-v0-3-static-batching/)
 
-这一期的代码在 [https://github.com/iFurySt/nanoLLMServe/tree/release/v0.4.0](https://github.com/iFurySt/nanoLLMServe/tree/release/v0.4.0)
+The code for this episode is at [https://github.com/iFurySt/nanoLLMServe/tree/release/v0.4.0](https://github.com/iFurySt/nanoLLMServe/tree/release/v0.4.0)
 
-上期做到Static Batching，遗留下来的问题很明确：
+In the previous episode, we implemented Static Batching. The problems it left behind were clear:
 
-- 新请求不能中途进入
+- New requests cannot join midway through a batch.
 
-- 某个请求结束后，batch里这个请求的位置还会占用着不能释放出来
+- When a request finishes, its position in the batch remains occupied and cannot be released.
 
-- 整个batch生命周期被最慢的那个请求拖住
+- The lifecycle of the entire batch is held back by its slowest request.
 
-为了处理这些问题，我们需要引入连续批处理（Continuous Batching）
+To deal with these problems, we need to introduce Continuous Batching.
 
-# 实现
+# Implementation
 
-这次主要涉及的改动是
+These are the main changes this time:
 
 ```shell
 .
 ├── src/
 │   └── nanollmserve/
 │       └── engine/
-│           ├── engine.py              # 新增 generate_continuous_batch：运行中 admission、每步重建 active batch、完成请求移出
-│           └── scheduler.py           # 核心调度结构：waiting/running/finished 队列、RequestLifecycle、SchedulerStepStats
+│           ├── engine.py              # Add generate_continuous_batch: runtime admission, rebuild active batch each step, remove completed requests
+│           └── scheduler.py           # Core scheduling structures: waiting/running/finished queues, RequestLifecycle, SchedulerStepStats
 └── tests/
-    ├── test_benchmark_generate.py     # continuous_batch benchmark 汇总字段回归：active batch size / request count / scheduler steps
-    └── test_engine.py                 # 连续批处理行为回归：中途加入、完成移除、max_batch_size backpressure
+    ├── test_benchmark_generate.py     # Regression coverage for continuous_batch benchmark summary fields: active batch size / request count / scheduler steps
+    └── test_engine.py                 # Continuous batching regression tests: mid-run admission, completion removal, max_batch_size backpressure
 ```
 
 ## Scheduler
@@ -176,10 +178,9 @@ class ContinuousBatchScheduler:
             completed_request_ids=[state.request.request_id for state in completed],
             active_batch_size=len(running_request_ids),
         )
-
 ```
 
-这次引入了Scheduler用来处理和调度请求，首先是定义请求的生命周期：
+This time, we introduced a Scheduler to process and schedule requests. First, we define the request lifecycle:
 
 ```python
 class RequestLifecycle(str, Enum):
@@ -188,9 +189,9 @@ class RequestLifecycle(str, Enum):
     FINISHED = "finished"
 ```
 
-请求刚来的时候在waiting中，到了某个scheduler step的时候，被admit进入active batch的时候，就会变成running，在生成结束后，从running set里被移出后，会变成finished
+When a request first arrives, it is in `waiting`. At a particular scheduler step, when it is admitted into the active batch, it becomes `running`. Once generation finishes and it is removed from the running set, it becomes `finished`.
 
-现在进来的请求长这样：
+An incoming request now looks like this:
 
 ```python
 @dataclass(frozen=True)
@@ -201,16 +202,16 @@ class ContinuousBatchRequest:
     arrival_step: int = 0
 ```
 
-类似这样调用
+And is called like this:
 
 ```python
 ContinuousBatchRequest("req-0", "hello", arrival_step=0)
 ContinuousBatchRequest("req-1", "你好", arrival_step=2)
 ```
 
-这个代表了2个请求，req-0在step0的时候到达，req-1在step2的时候到达
+This represents two requests: `req-0` arrives at step 0, and `req-1` arrives at step 2.
 
-这里面定义了2个列表和1个队列：
+Two lists and one queue are defined here:
 
 ```python
 @dataclass
@@ -222,7 +223,7 @@ class ContinuousBatchScheduler:
     finished: list[ScheduledRequestState] = field(default_factory=list, init=False)
 ```
 
-分别代表了前面提到的3个不同生命周期阶段对应的请求，另外配套了两个重要的方法
+They correspond to requests in the three lifecycle stages above. Two important methods support them:
 
 ```python
 def admit(self, step: int) -> list[ScheduledRequestState]:
@@ -252,11 +253,11 @@ def finish(self, request_ids: set[str], step: int) -> list[ScheduledRequestState
     return completed
 ```
 
-admin会把已经到达在等待的请求从waiting移到running，而finish会把已经完成的请求从running移到finished
+`admit` moves arrived requests from `waiting` to `running`, while `finish` moves completed requests from `running` to `finished`.
 
 ## Engine
 
-真正处理Continuous Batching是在`src/nanollmserve/engine/engine.py` 里的`generate_continuous_batch`
+Continuous Batching is actually handled by `generate_continuous_batch` in `src/nanollmserve/engine/engine.py`:
 
 ```python
 with torch.inference_mode():
@@ -327,7 +328,7 @@ with torch.inference_mode():
         step += 1
 ```
 
-先让scheduler（基于当前step）把可以执行的请求加到running里：
+First, we let the Scheduler add requests that can execute at the current step to `running`:
 
 ```python
 admitted = scheduler.admit(step)
@@ -340,7 +341,7 @@ for scheduled in admitted:
     admitted_at[scheduled.request.request_id] = perf_counter()
 ```
 
-然后拿到所有的running_ids，并根据running_ids去重建active batch
+Then we retrieve all `running_ids` and use them to rebuild the active batch:
 
 ```python
 running_ids = [state.request.request_id for state in scheduler.running]
@@ -350,9 +351,9 @@ if not running_ids:
 batch = _continuous_batch_tensors(states, running_ids, tokenizer, device)
 ```
 
-其中\_continuous_batch_tensors是把running的多个请求拼成一个padding后的batch，之前我们也有说过，batch的请求是需要对齐的
+`_continuous_batch_tensors` combines the running requests into a padded batch. As we discussed before, requests in a batch need to be aligned.
 
-然后后面的处理和之前的就都一样了，得到logits，采样出下个token
+Everything after that is the same as before: obtain the logits and sample the next token.
 
 ```python
 outputs = model(
@@ -369,7 +370,7 @@ next_tokens = _sample_from_logits(
 )
 ```
 
-接着过一遍这次forward的请求，把生成的token追加回每个请求的state里，包括attention mask增加一位。最后看看有哪些请求已经结束了，可以反馈给Scheduler
+Next, we go through the requests in this forward pass and append each generated token to its request state, while extending its attention mask by one position. Finally, we check which requests have finished and report them back to the Scheduler.
 
 ```python
 completed_ids: set[str] = set()
@@ -398,17 +399,17 @@ for index, request_id in enumerate(running_ids):
 completed = scheduler.finish(completed_ids, step)
 ```
 
-这就是完整的Continuous Batching。但是这里面还有一些问题，粒度太粗，性能不是最优的
+That is the complete Continuous Batching implementation. But there are still some problems: the granularity is too coarse, and performance is not optimal.
 
-现在每次`_continuous_batch_tensors` 的时候，都是
+Every time we call `_continuous_batch_tensors`, we do this:
 
 ```python
 sequence = state.prompt_token_ids + state.generated_token_ids
 ```
 
-把整个序列都重新forward了，也就是KV Cache又掉了，也就是我们v0.2的KV Cache并没有实际运用进来。这个是后续我们会做的一个paged-KV continuous batching
+The entire sequence is forwarded again. In other words, we have lost KV Cache again: the KV Cache from v0.2 is not actually being used here. Later, we will implement paged-KV continuous batching to address this.
 
-# 推理
+# Inference
 
 <div class="row mt-3">
     <div class="col-sm mt-0 mb-0">
@@ -420,10 +421,10 @@ sequence = state.prompt_token_ids + state.generated_token_ids
     </div>
 </div>
 
-我们这波也还只能在bench里观测，可以看到`continuous_batch` 里的数据指标
+For now, we can still only observe it in the benchmark. You can see the metrics under `continuous_batch`.
 
-# 总结
+# Summary
 
-这波支持了Continuous Batching了，实现谁结束了谁滚蛋，谁来了谁补位的目标，不会在batch里有请求已经结束的情况下还占用显存的slot
+This time we added Continuous Batching, achieving the goal that whoever finishes gets out and whoever arrives fills the vacancy. A finished request no longer continues occupying a VRAM slot in the batch.
 
-但是我们前面也提到，现在的更多是完整展示Continuous Batching这个概念本身，实际并不是vllm/sglang之类在生产环境上能跑的版本，我们还需要做一些工作来支持，下一步我们要做的就是借助Paged KV Cache（Block）来支持Paged-KV Continuous Batching
+But as mentioned earlier, this version is more of a complete demonstration of the Continuous Batching concept itself. It is not yet something that can run in production like vLLM or SGLang. We still have work to do. The next step is to use Paged KV Cache blocks to support Paged-KV Continuous Batching.

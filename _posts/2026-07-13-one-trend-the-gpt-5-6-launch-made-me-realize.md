@@ -2,6 +2,8 @@
 layout: post
 title: "GPT 5.6发布会让我意识到一个趋势"
 date: 2026-07-13T08:00:00+08:00
+lang: zh
+translation_key: one-trend-the-gpt-5-6-launch-made-me-realize
 tags:
   - AI
   - Product

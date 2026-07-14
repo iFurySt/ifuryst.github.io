@@ -2,6 +2,8 @@
 layout: post
 title: "LLM Infra 101 v0.5: KV Cache分块管理"
 date: 2026-05-28T08:00:00+08:00
+lang: zh
+translation_key: llm-infra-101-v0-5-kv-cache-block
 tags:
   - AI
   - LLMInfra-101
