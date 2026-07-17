@@ -8,6 +8,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "The Pulse: What can we learn from Bun’s rapid Rust rewrite with AI?"
+    url: "https://newsletter.pragmaticengineer.com/p/the-pulse-what-can-we-learn-from-07f"
+    reason: "11 days. $165K with Fable API pricing. 535K lines of Zig rewritten into Rust, 6,502 commits. The signal is obvious: if we still cannot think this way, we cannot dance with AI, and we cannot keep up with this era."
+    added_at: "2026-07-17"
+    tag: "article"
   - title: "Why Blog If Nobody Reads It?"
     url: "https://andysblog.uk/why-blog-if-nobody-reads-it/"
     reason: "Good point of writing and photographing. I like it."

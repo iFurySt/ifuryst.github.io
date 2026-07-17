@@ -8,6 +8,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "The Pulse: What can we learn from Bun’s rapid Rust rewrite with AI?"
+    url: "https://newsletter.pragmaticengineer.com/p/the-pulse-what-can-we-learn-from-07f"
+    reason: "11天，Fable $16.5w (API Pricing)，53w行 Zig 重写成 Rust，6502个 commits。启示意义非常明显：如果还不能以这种思维思考，无法与 AI 共舞，也就无法与时代同行。"
+    added_at: "2026-07-17"
+    tag: "article"
   - title: "How We Used Go 1.22 To Cut Our Search Indexing Build Time By 50%"
     url: "https://www.datadoghq.com/blog/engineering/go-swiss-tables/"
     reason: "Datadog通过实际生产应用的收益讲解了Swiss Tables，在追求性能或大规模场景下，很值得阅读和学习"
