@@ -8,6 +8,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "There's no room for The Idea Guy"
+    url: "https://signalvnoise.com/posts/2188-theres-no-room-for-the-idea-guy"
+    reason: "idea 太廉价了，现在有了 AI 更是被放大了。想法很多的人大把，真正能执行、能做出 MVP、找到 PMF、把一个产品打磨成好产品，并且能坚持下去的人，少之又少。"
+    added_at: "2026-08-02"
+    tag: "article"
   - title: "The Pulse: What can we learn from Bun’s rapid Rust rewrite with AI?"
     url: "https://newsletter.pragmaticengineer.com/p/the-pulse-what-can-we-learn-from-07f"
     reason: "11天，Fable $16.5w (API Pricing)，53w行 Zig 重写成 Rust，6502个 commits。启示意义非常明显：如果还不能以这种思维思考，无法与 AI 共舞，也就无法与时代同行。"

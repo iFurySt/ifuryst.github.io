@@ -8,6 +8,11 @@ description: "A collection of must-read articles, papers, and resources that hav
 nav: true
 nav_order: 4
 links:
+  - title: "There's no room for The Idea Guy"
+    url: "https://signalvnoise.com/posts/2188-theres-no-room-for-the-idea-guy"
+    reason: "Ideas have always been cheap, and AI only amplifies that. Plenty of people can generate endless ideas; very few can execute, ship an MVP, find PMF, keep polishing a product into something genuinely good, and stay with it long enough to matter."
+    added_at: "2026-08-02"
+    tag: "article"
   - title: "The Pulse: What can we learn from Bun’s rapid Rust rewrite with AI?"
     url: "https://newsletter.pragmaticengineer.com/p/the-pulse-what-can-we-learn-from-07f"
     reason: "11 days. $165K with Fable API pricing. 535K lines of Zig rewritten into Rust, 6,502 commits. The signal is obvious: if we still cannot think this way, we cannot dance with AI, and we cannot keep up with this era."
