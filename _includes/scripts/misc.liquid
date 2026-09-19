@@ -16,7 +16,7 @@
   ></script>
   <script defer src="{{ '/assets/js/zoom.js' | relative_url | bust_file_cache }}"></script>
 {% endif %}
-{% if page.toc and page.toc.sidebar %}
+{% if page.toc and page.toc.sidebar and page.layout != 'post' %}
   <!-- Sidebar Table of Contents -->
   <script defer src="{{ '/assets/js/bootstrap-toc.min.js' | relative_url | bust_file_cache }}"></script>
 {% endif %}
@@ -41,3 +41,9 @@
 <script defer src="{{ '/assets/js/jupyter_new_tab.js' | relative_url | bust_file_cache }}"></script>
 
 {% assign site.test-library.url = site.test-library.url | append: 'teste' %}
+
+{% if page.layout == 'post' %}
+  <script defer src="{{ '/assets/js/reading.js' | relative_url | bust_file_cache }}"></script>
+{% endif %}
+
+<script defer src="{{ '/assets/js/adaptive-navbar.js' | relative_url | bust_file_cache }}"></script>

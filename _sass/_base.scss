@@ -241,6 +241,26 @@ ul.task-list input[type="checkbox"] {
   font-size: 1.2rem;
 }
 
+// Measure the real horizontal menu off-flow, including loaded fonts and icons.
+// The class only exists during a synchronous layout measurement.
+#navbar.navbar-measuring #navbarNav {
+  display: flex !important;
+  position: absolute !important;
+  visibility: hidden !important;
+  width: max-content !important;
+  height: auto !important;
+  flex: none !important;
+  overflow: visible !important;
+  transition: none !important;
+}
+#navbar.navbar-adaptive .navbar-nav > li { flex-shrink: 0; }
+
+// Keep multi-word navigation labels and the language switch on one line.
+#navbar .nav-link,
+#navbar .navbar-brand {
+  white-space: nowrap;
+}
+
 .navbar .dropdown-menu {
   background-color: var(--global-bg-color);
   border: 1px solid var(--global-divider-color);
@@ -1074,11 +1094,12 @@ progress {
   position: fixed;
   left: 0;
   top: 56px;
-  z-index: 10;
+  z-index: 1031;
+  pointer-events: none;
 
   /* Dimensions */
   width: 100%;
-  height: 1px;
+  height: 2px;
 
   /* Reset the appearance */
   -webkit-appearance: none;

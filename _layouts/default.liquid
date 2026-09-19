@@ -27,8 +27,10 @@
     {% include header.liquid %}
 
     <!-- Content -->
-    <div class="container mt-3 mt-md-4 mt-lg-5 mt-xl-5 mt-xxl-5" role="main">
-      {% if page.toc and page.toc.sidebar %}
+    <div class="container mt-3 mt-md-4 mt-lg-5 mt-xl-5 mt-xxl-5{% if page.layout == 'post' %} reading-shell{% endif %}" role="main">
+      {% if page.layout == 'post' %}
+        {{ content }}
+      {% elsif page.toc and page.toc.sidebar %}
         {% if page.toc.sidebar == 'right' %}
           <div class="row">
             <!-- main content area -->
