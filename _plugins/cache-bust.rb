@@ -21,7 +21,9 @@ module Jekyll
 
       def directory_files_content
         target_path = File.join(directory, '**', '*')
-        Dir[target_path].map{|f| File.read(f) unless File.directory?(f) }.join
+        # Compiler settings and the import entry point also affect the final CSS.
+        paths = Dir[target_path] + ['assets/css/main.scss', '_config.yml']
+        paths.sort.map{|f| File.read(f) unless File.directory?(f) }.join
       end
 
       def file_content

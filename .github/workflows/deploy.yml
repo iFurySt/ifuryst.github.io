@@ -188,6 +188,7 @@ jobs:
             npm ci --no-audit --no-fund
           fi
           ./node_modules/.bin/purgecss -c purgecss.config.js
+          node .github/scripts/check-reading-css.cjs
       - name: Deploy 🚀
         if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@v4

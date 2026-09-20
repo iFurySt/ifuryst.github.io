@@ -280,6 +280,8 @@ sass:
 # -----------------------------------------------------------------------------
 
 jekyll-minifier:
+  # Sass already compresses CSS. CSSminify2 removes required whitespace in calc().
+  compress_css: false
   exclude: ["robots.txt", "assets/js/search/*.js"]
   uglifier_args:
     harmony: true
