@@ -73,7 +73,11 @@ layout: default
   {% if page.toc and page.toc.sidebar %}
     <aside class="reading-toc" data-side="{{ page.toc.sidebar }}" hidden>
       <details>
-        <summary><span>{% if current_lang == 'en' %}On this page{% else %}本文目录{% endif %}</span></summary>
+        <summary>
+          <span>
+            {%- if current_lang == 'en' %}On this page{% else %}本文目录{% endif -%}
+          </span>
+        </summary>
         <nav aria-label="{% if current_lang == 'en' %}On this page{% else %}本文目录{% endif %}"></nav>
       </details>
     </aside>

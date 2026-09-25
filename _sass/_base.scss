@@ -253,7 +253,9 @@ ul.task-list input[type="checkbox"] {
   overflow: visible !important;
   transition: none !important;
 }
-#navbar.navbar-adaptive .navbar-nav > li { flex-shrink: 0; }
+#navbar.navbar-adaptive .navbar-nav > li {
+  flex-shrink: 0;
+}
 
 // Keep multi-word navigation labels and the language switch on one line.
 #navbar .nav-link,

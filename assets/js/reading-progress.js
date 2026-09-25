@@ -1,7 +1,7 @@
 (() => {
-  const progress = document.getElementById('progress');
+  const progress = document.getElementById("progress");
   if (!progress) return;
-  const navbar = document.getElementById('navbar');
+  const navbar = document.getElementById("navbar");
   let scheduled = false;
   const update = () => {
     const root = document.scrollingElement || document.documentElement;
@@ -17,9 +17,9 @@
     scheduled = true;
     requestAnimationFrame(update);
   };
-  addEventListener('scroll', schedule, { passive: true });
-  addEventListener('resize', schedule);
-  addEventListener('pageshow', schedule);
+  addEventListener("scroll", schedule, { passive: true });
+  addEventListener("resize", schedule);
+  addEventListener("pageshow", schedule);
   // Lazy-loaded images and embedded content can change the page height after load.
   const observer = new ResizeObserver(schedule);
   observer.observe(document.body);

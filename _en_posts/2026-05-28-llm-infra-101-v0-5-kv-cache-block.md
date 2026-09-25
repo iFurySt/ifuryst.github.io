@@ -318,14 +318,14 @@ step 2: late-1 running
 
 We will again use a benchmark to observe the Blocks. Here is what the metrics mean:
 
-| **Field**                     | **Meaning**                                                                    |
-| ----------------------------- | ------------------------------------------------------------------------------ |
-| used_blocks                   | Number of blocks currently occupied by requests                               |
-| free_blocks                   | Number of blocks currently free                                               |
-| allocated_tokens              | Number of tokens actually needed by requests                                  |
-| reserved_tokens               | Token capacity actually reserved by blocks—that is, their `block_size`         |
-| internal_fragmentation_tokens | Token capacity wasted inside blocks                                           |
-| block_utilization             | allocated_tokens / reserved_tokens                                            |
+| **Field**                     | **Meaning**                                                            |
+| ----------------------------- | ---------------------------------------------------------------------- |
+| used_blocks                   | Number of blocks currently occupied by requests                        |
+| free_blocks                   | Number of blocks currently free                                        |
+| allocated_tokens              | Number of tokens actually needed by requests                           |
+| reserved_tokens               | Token capacity actually reserved by blocks—that is, their `block_size` |
+| internal_fragmentation_tokens | Token capacity wasted inside blocks                                    |
+| block_utilization             | allocated_tokens / reserved_tokens                                     |
 
 For example:
 
@@ -390,24 +390,24 @@ Utilization is only about 56%. Now let's look at the benchmark results.
 This simulates six requests with 9, 17, 33, 5, 41, and 12 tokens respectively, using a Block size of 16:
 
 | **Request** | **Actual Tokens (**allocated_tokens**)** | **Blocks Used (**used_blocks**)** | **Reserved Capacity (**reserved_tokens**)** | **Internal Fragmentation** | **Utilization** |
-| ----------- | ---------------------------------------- | -------------------------------- | ------------------------------------------- | -------------------------- | --------------- |
-| Req A       | 9                                        | 1                                | 16                                          | 7                          | 56.3%           |
-| Req B       | 17                                       | 2                                | 32                                          | 15                         | 53.1%           |
-| Req C       | 33                                       | 3                                | 48                                          | 15                         | 68.8%           |
-| Req D       | 5                                        | 1                                | 16                                          | 11                         | 31.3%           |
-| Req E       | 41                                       | 3                                | 48                                          | 7                          | 85.4%           |
-| Req F       | 12                                       | 1                                | 16                                          | 4                          | 75.0%           |
+| ----------- | ---------------------------------------- | --------------------------------- | ------------------------------------------- | -------------------------- | --------------- |
+| Req A       | 9                                        | 1                                 | 16                                          | 7                          | 56.3%           |
+| Req B       | 17                                       | 2                                 | 32                                          | 15                         | 53.1%           |
+| Req C       | 33                                       | 3                                 | 48                                          | 15                         | 68.8%           |
+| Req D       | 5                                        | 1                                 | 16                                          | 11                         | 31.3%           |
+| Req E       | 41                                       | 3                                 | 48                                          | 7                          | 85.4%           |
+| Req F       | 12                                       | 1                                 | 16                                          | 4                          | 75.0%           |
 
 So in practice:
 
-| **Metric**           | **Value** |
-| -------------------- | --------- |
-| Actual Tokens        | 117       |
-| Blocks Used          | 11        |
-| Block Size           | 16        |
-| Reserved Capacity    | 176       |
-| Internal Fragmentation | 59      |
-| Overall Utilization  | 66.5%     |
+| **Metric**             | **Value** |
+| ---------------------- | --------- |
+| Actual Tokens          | 117       |
+| Blocks Used            | 11        |
+| Block Size             | 16        |
+| Reserved Capacity      | 176       |
+| Internal Fragmentation | 59        |
+| Overall Utilization    | 66.5%     |
 
 The results include a `contiguous_fixed_slot_baseline` control. It allocates contiguous space according to the longest request, 41 tokens. Let's calculate that too:
 
@@ -422,23 +422,23 @@ The results include a `contiguous_fixed_slot_baseline` control. It allocates con
 
 Overall:
 
-| **Metric**                | **Value** |
-| ------------------------- | --------- |
-| Actual Tokens             | 117       |
-| Number of Requests        | 6         |
-| Fixed Slot per Request    | 41        |
-| Total Reserved Capacity   | 246       |
-| Internal Fragmentation    | 129       |
-| Overall Utilization       | 47.6%     |
+| **Metric**              | **Value** |
+| ----------------------- | --------- |
+| Actual Tokens           | 117       |
+| Number of Requests      | 6         |
+| Fixed Slot per Request  | 41        |
+| Total Reserved Capacity | 246       |
+| Internal Fragmentation  | 129       |
+| Overall Utilization     | 47.6%     |
 
 Putting them into one table for comparison:
 
-| **Metric**           | **Paged Blocks** | **Fixed Contiguous** | **Improvement** |
-| -------------------- | ---------------- | -------------------- | --------------- |
-| Actual Tokens        | 117              | 117                  | —               |
-| Reserved Capacity    | 176              | 246                  | ↓ 70            |
-| Internal Fragmentation | 59             | 129                  | ↓ 70            |
-| Utilization          | 66.5%            | 47.6%                | ↑ 18.9%         |
+| **Metric**             | **Paged Blocks** | **Fixed Contiguous** | **Improvement** |
+| ---------------------- | ---------------- | -------------------- | --------------- |
+| Actual Tokens          | 117              | 117                  | —               |
+| Reserved Capacity      | 176              | 246                  | ↓ 70            |
+| Internal Fragmentation | 59               | 129                  | ↓ 70            |
+| Utilization            | 66.5%            | 47.6%                | ↑ 18.9%         |
 
 It is immediately clear that block-based, or paged, processing improves overall VRAM utilization.
 

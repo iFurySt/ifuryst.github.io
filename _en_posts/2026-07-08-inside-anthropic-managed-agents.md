@@ -49,16 +49,16 @@ That was a tangent. Back to the point: for something like this, once you have re
 
 These are basically the core concepts:
 
-| **Concept**           | **Purpose**                                                                                                      | Notes                                                                                                                                                                                                  |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Agents**            | The core definition: the Agent itself, including `name`, `desc`, `sys prompt`, `tools`, `mcp_servers`, `skills`, and `metadata` | A very standard Agent definition, built on top of Claude Code                                                                                                                            |
-| **Sessions**          | The actual unit of scheduled execution and the item used for `billing`                                           | A Session can be triggered by sending a message through the API/SDK; it only runs after a message is actively sent                                                                                       |
-| **Deployments**       | A periodic scheduler responsible for triggering Sessions on a schedule                                           | Essentially a scheduled job. A Deployment runs on a schedule, with each run becoming a Session                                                                                                          |
-| **Environments**      | The sandbox runtime environment, roughly the Sandbox definition; preinstalled third-party libraries, software, and egress policies can be configured | Covers both predefined cloud scenarios and self-hosted scenarios, serving both cloud and enterprise needs                                                                                |
-| **Credential Vaults** | Management and injection of auth credentials/API keys                                                            | Injects environment variables into the sandbox, or automatically attaches/replaces the appropriate Secret for HTTP or MCP calls at the egress boundary                                                  |
-| **Memory Stores**     | Agent memory storage                                                                                              | Think of it as an LLM wiki. A memory store is mounted to a directory such as `/mnt/mem/test1`; underneath, it and the filestore use rclone + object storage to support read-only or read-write access       |
-| **Files**             | File inputs attached when a Session starts                                                                       | The Files section under Build lets you associate specific files with the Session's Agent at startup. They are mounted read-only at a path such as `/mnt/session/uploads`                                  |
-| **Skills**            | Skills management                                                                                                 | Both built-in and uploaded skills live here, mounted read-only into the sandbox at `/mnt/skills`                                                                                                         |
+| **Concept**           | **Purpose**                                                                                                                                          | Notes                                                                                                                                                                                                 |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Agents**            | The core definition: the Agent itself, including `name`, `desc`, `sys prompt`, `tools`, `mcp_servers`, `skills`, and `metadata`                      | A very standard Agent definition, built on top of Claude Code                                                                                                                                         |
+| **Sessions**          | The actual unit of scheduled execution and the item used for `billing`                                                                               | A Session can be triggered by sending a message through the API/SDK; it only runs after a message is actively sent                                                                                    |
+| **Deployments**       | A periodic scheduler responsible for triggering Sessions on a schedule                                                                               | Essentially a scheduled job. A Deployment runs on a schedule, with each run becoming a Session                                                                                                        |
+| **Environments**      | The sandbox runtime environment, roughly the Sandbox definition; preinstalled third-party libraries, software, and egress policies can be configured | Covers both predefined cloud scenarios and self-hosted scenarios, serving both cloud and enterprise needs                                                                                             |
+| **Credential Vaults** | Management and injection of auth credentials/API keys                                                                                                | Injects environment variables into the sandbox, or automatically attaches/replaces the appropriate Secret for HTTP or MCP calls at the egress boundary                                                |
+| **Memory Stores**     | Agent memory storage                                                                                                                                 | Think of it as an LLM wiki. A memory store is mounted to a directory such as `/mnt/mem/test1`; underneath, it and the filestore use rclone + object storage to support read-only or read-write access |
+| **Files**             | File inputs attached when a Session starts                                                                                                           | The Files section under Build lets you associate specific files with the Session's Agent at startup. They are mounted read-only at a path such as `/mnt/session/uploads`                              |
+| **Skills**            | Skills management                                                                                                                                    | Both built-in and uploaded skills live here, mounted read-only into the sandbox at `/mnt/skills`                                                                                                      |
 
 ## Agents
 
@@ -234,52 +234,52 @@ Additional packages can be installed through apt, cargo, gem, go, npm, and pip.
 Build tools:
 
 | Tool      | Version |
-| --------- | ------ |
-| gcc / g++ | 13.3.0 |
-| GNU Make  | 4.3    |
-| git       | 2.43.0 |
-| curl      | 8.5.0  |
-| wget      | 1.21.4 |
+| --------- | ------- |
+| gcc / g++ | 13.3.0  |
+| GNU Make  | 4.3     |
+| git       | 2.43.0  |
+| curl      | 8.5.0   |
+| wget      | 1.21.4  |
 
 Preinstalled Python packages:
 
-| Category         | Package                       | Version |
-| ----------- | ----------------------------- | ------- |
-| Numerical Computing | numpy                  | 2.4.4   |
-| Data Processing     | pandas                 | 3.0.2   |
-| Scientific Computing | scipy                 | 1.17.1  |
-| Machine Learning    | scikit-learn           | 1.8.0   |
-| Visualization       | matplotlib             | 3.10.8  |
-| Visualization       | seaborn                | 0.13.2  |
-| Image Processing    | Pillow                 | 12.1.1  |
-| Image Processing    | opencv                 | 4.13.0  |
-| Image Processing    | ImageMagick (Wand)     | 0.7.0   |
-| Video/Audio         | imageio                | 2.37.3  |
-| Video/Audio         | imageio-ffmpeg         | 0.6.0   |
-| Video/Audio         | sounddevice            | 0.5.5   |
-| AI/ML       | mediapipe                     | 0.10.33 |
-| AI/ML       | onnxruntime                   | 1.24.4  |
-| AI/ML       | magika                        | 0.6.3   |
-| PDF         | pypdf                         | 5.9.0   |
-| PDF         | pdfplumber                    | 0.11.9  |
-| PDF         | camelot-py                    | 1.0.9   |
-| PDF         | pikepdf                       | 10.5.1  |
-| PDF         | img2pdf                       | 0.6.3   |
-| PDF         | reportlab                     | 4.4.10  |
-| Office Documents | python-docx                | 1.2.0   |
-| Office Documents | python-pptx                | 1.0.2   |
-| Office Documents | openpyxl                   | 3.1.5   |
-| Office Documents | xlsxwriter                 | 3.2.9   |
-| Web         | requests                      | 2.33.1  |
-| Web         | Flask                         | 3.1.3   |
-| Web         | BeautifulSoup4                | 4.14.3  |
-| Web         | playwright                    | 1.56.0  |
-| Mathematics     | sympy                       | 1.14.0  |
-| Mathematics     | mpmath                      | 1.3.0   |
-| Mathematics     | networkx                    | 3.6.1   |
-| OCR             | pytesseract (calls tesseract) | 5.3.4 |
-| Document Conversion | markdownify             | 1.2.2   |
-| Document Conversion | pandoc (system install) | 3.1.3   |
+| Category             | Package                       | Version |
+| -------------------- | ----------------------------- | ------- |
+| Numerical Computing  | numpy                         | 2.4.4   |
+| Data Processing      | pandas                        | 3.0.2   |
+| Scientific Computing | scipy                         | 1.17.1  |
+| Machine Learning     | scikit-learn                  | 1.8.0   |
+| Visualization        | matplotlib                    | 3.10.8  |
+| Visualization        | seaborn                       | 0.13.2  |
+| Image Processing     | Pillow                        | 12.1.1  |
+| Image Processing     | opencv                        | 4.13.0  |
+| Image Processing     | ImageMagick (Wand)            | 0.7.0   |
+| Video/Audio          | imageio                       | 2.37.3  |
+| Video/Audio          | imageio-ffmpeg                | 0.6.0   |
+| Video/Audio          | sounddevice                   | 0.5.5   |
+| AI/ML                | mediapipe                     | 0.10.33 |
+| AI/ML                | onnxruntime                   | 1.24.4  |
+| AI/ML                | magika                        | 0.6.3   |
+| PDF                  | pypdf                         | 5.9.0   |
+| PDF                  | pdfplumber                    | 0.11.9  |
+| PDF                  | camelot-py                    | 1.0.9   |
+| PDF                  | pikepdf                       | 10.5.1  |
+| PDF                  | img2pdf                       | 0.6.3   |
+| PDF                  | reportlab                     | 4.4.10  |
+| Office Documents     | python-docx                   | 1.2.0   |
+| Office Documents     | python-pptx                   | 1.0.2   |
+| Office Documents     | openpyxl                      | 3.1.5   |
+| Office Documents     | xlsxwriter                    | 3.2.9   |
+| Web                  | requests                      | 2.33.1  |
+| Web                  | Flask                         | 3.1.3   |
+| Web                  | BeautifulSoup4                | 4.14.3  |
+| Web                  | playwright                    | 1.56.0  |
+| Mathematics          | sympy                         | 1.14.0  |
+| Mathematics          | mpmath                        | 1.3.0   |
+| Mathematics          | networkx                      | 3.6.1   |
+| OCR                  | pytesseract (calls tesseract) | 5.3.4   |
+| Document Conversion  | markdownify                   | 1.2.2   |
+| Document Conversion  | pandoc (system install)       | 3.1.3   |
 
 Global Node.js packages
 
@@ -310,14 +310,14 @@ Global Node.js packages
 System tools
 
 | Tool                | Version  | Purpose                    |
-| ------------------- | -------- | ------------------ |
+| ------------------- | -------- | -------------------------- |
 | ffmpeg              | 6.1.1    | Audio/video processing     |
 | ImageMagick         | 6.9.12   | Image processing           |
-| tesseract           | 5.3.4    | OCR                |
+| tesseract           | 5.3.4    | OCR                        |
 | pandoc              | 3.1.3    | Document format conversion |
 | LibreOffice         | 24.2.7.2 | Office document processing |
 | unoserver           | 3.6      | LibreOffice as a service   |
-| Playwright Chromium | 1194     | Headless browser            |
+| Playwright Chromium | 1194     | Headless browser           |
 
 ### Managed Agents
 

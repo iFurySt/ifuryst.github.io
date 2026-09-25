@@ -12,7 +12,9 @@
   {% unless have_related_posts %}
     {% assign have_related_posts = true %}
     <section class="reading-related">
-      <h2>{% if current_lang == 'en' %}Keep reading{% else %}继续阅读{% endif %}</h2>
+      <h2>
+        {% if current_lang == 'en' %}Keep reading{% else %}继续阅读{% endif %}
+      </h2>
       <ul>
   {% endunless %}
 
@@ -21,8 +23,8 @@
   </li>
 {% endfor %}
 {% if have_related_posts %}
-      </ul>
-    </section>
+  </ul>
+  </section>
 {% endif %}
 {% if site.newsletter.enabled and site.footer_fixed %}
   <p class="mb-2" style="margin-top: 1.5rem !important">Subscribe to be notified of future articles:</p>

@@ -127,7 +127,7 @@ That is why we often see parameters such as `16kHz 16bit mono`. They mean:
 
 - Mono is one channel and Stereo is two channels. Most models are trained on mono audio.
 
-*Why is 16 kHz generally used in this scenario? According to the Nyquist-Shannon Sampling Theorem, the sample rate must be at least twice the highest frequency. A 16 kHz sample rate can therefore cover frequencies up to 8 kHz, and most of the useful information in human speech—vowels, most consonants, formants, and so on—is concentrated below 8 kHz. So it is enough.*
+_Why is 16 kHz generally used in this scenario? According to the Nyquist-Shannon Sampling Theorem, the sample rate must be at least twice the highest frequency. A 16 kHz sample rate can therefore cover frequencies up to 8 kHz, and most of the useful information in human speech—vowels, most consonants, formants, and so on—is concentrated below 8 kHz. So it is enough._
 
 _The same reasoning applies to 16-bit depth. Using the quantization noise formula, 16-bit audio has a theoretical signal-to-noise ratio of 98 dB. Normal human speech is around 60–70 dB, while shouting is roughly 80–90 dB, so 98 dB fully covers everyday speech scenarios._
 
@@ -174,12 +174,12 @@ Here is a table for comparison:
 
 | Audio Duration | Sample Rate | Encoding/File Format | File Size |
 | -------------- | ----------- | -------------------- | --------- |
-| 4s       | 48kHz  | PCM/WAV           | 416KB    |
-| 9min5s   | 48kHz  | PCM/WAV           | 52.3MB   |
-| 4s       | 16kHz  | PCM/WAV           | 141KB    |
-| 9min5s   | 16kHz  | PCM/WAV           | 17.4MB   |
-| 4s       | 16kHz  | Opus/Ogg          | 10KB     |
-| 9min5s   | 16kHz  | Opus/Ogg          | 1.1MB    |
+| 4s             | 48kHz       | PCM/WAV              | 416KB     |
+| 9min5s         | 48kHz       | PCM/WAV              | 52.3MB    |
+| 4s             | 16kHz       | PCM/WAV              | 141KB     |
+| 9min5s         | 16kHz       | PCM/WAV              | 17.4MB    |
+| 4s             | 16kHz       | Opus/Ogg             | 10KB      |
+| 9min5s         | 16kHz       | Opus/Ogg             | 1.1MB     |
 
 The difference is obvious. Opus/Ogg brings enormous benefits: much less data to transmit, which improves latency, and a dramatic reduction in storage costs. The human ear cannot hear the difference at all, and decoding overhead is negligible. This is also the mainstream approach today.
 
@@ -197,11 +197,11 @@ I ran a simple benchmark, with each model running each Case five times. This sum
 
 | Provider/Model                      | Avg Latency | Median Latency | Avg Score |
 | ----------------------------------- | ----------- | -------------- | --------- |
-| Gemini / 2.5 Flash                  | 3.11s   | 2.86s    | 0.829   |
-| Soniox / stt-rt-v4                  | 19.09s  | 17.99s   | 0.974   |
-| Deepgram / nova-3                   | 18.16s  | 17.52s   | 0.553   |
-| Cloudflare / Whisper large v3 turbo | 3.15s   | 2.44s    | 0.888   |
-| SiliconFlow / SenseVoiceSmall       | 0.76s   | 0.66s    | 0.558   |
+| Gemini / 2.5 Flash                  | 3.11s       | 2.86s          | 0.829     |
+| Soniox / stt-rt-v4                  | 19.09s      | 17.99s         | 0.974     |
+| Deepgram / nova-3                   | 18.16s      | 17.52s         | 0.553     |
+| Cloudflare / Whisper large v3 turbo | 3.15s       | 2.44s          | 0.888     |
+| SiliconFlow / SenseVoiceSmall       | 0.76s       | 0.66s          | 0.558     |
 
 This is not a completely rigorous test; it only provides a basic sense of the landscape. There is still room for tuning, including adjustments to the Prompt and Reasoning Effort for multimodal large models, which I will discuss later. Here are a few rows from the raw data:
 
