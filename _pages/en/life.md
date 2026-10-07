@@ -41,6 +41,18 @@ stories:
     images:
       - url: "https://images.unsplash.com/photo-1721398937841-348e3ec00442?q=80&w=3024&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         description: "Oil painting for Lin. Painted in the summer of 2024."
+      - url: "https://images.unsplash.com/photo-1791357471088-461b5a653c99?q=80&w=3000&auto=format&fit=crop"
+        description: "Liangzai, the cat king of Minnan. Summer 2025."
+      - url: "https://images.unsplash.com/photo-1791357471085-62c0043ca6d8?q=80&w=3000&auto=format&fit=crop"
+        description: "An oil painting of Twinkle Twinkle for Lin. Fall 2026."
+      - url: "https://images.unsplash.com/photo-1791357471079-29db19131a87?q=80&w=3000&auto=format&fit=crop"
+        description: "An oil painting of Twinkle Twinkle for Lin. Fall 2026."
+      - url: "https://images.unsplash.com/photo-1791357471075-53145ea311ed?q=80&w=3000&auto=format&fit=crop"
+        description: "Abao's Tiger King has that mysterious, mythical feel of Black Myth: Wukong. I love the vibe. Spring 2025."
+      - url: "https://images.unsplash.com/photo-1791357471079-7c9d807cc728?q=80&w=3000&auto=format&fit=crop"
+        description: "A hilarious Malayan tapir. I love quirky, absurd toys like this. Summer 2026."
+      - url: "https://images.unsplash.com/photo-1791357471098-63111e5bd6e1?q=80&w=3000&auto=format&fit=crop"
+        description: "Oil King, made entirely by hand by the artist Ahao. I really love absurd toys like this. Fall 2026."
   - subtitle: "Reading 📚"
     description: "I can't stand bookworms or studying just to ace exams. My reading tastes are pretty wide-ranging. I used to love novels, literature, biographies, and history books, but now I'm all about history, finance, economics, tech, and non-fiction bestsellers. I've been hooked on financial magazines for years and now get a kick out of world-class news with deep, objective reporting."
     images:
