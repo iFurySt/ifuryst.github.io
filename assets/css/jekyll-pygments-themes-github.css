@@ -1,7 +1,4 @@
 /* https://github.com/jwarby/jekyll-pygments-themes */
-.highlight .hll {
-  background-color: #ffffcc;
-}
 .highlight .c {
   color: #999988;
   font-style: italic;
@@ -56,10 +53,7 @@
 } /* Generic.Inserted */
 .highlight .go {
   color: #888888;
-} /* Generic.Output */
-.highlight .gp {
-  color: #555555;
-} /* Generic.Prompt */
+} /* Generic.Output */ /* Generic.Prompt */
 .highlight .gs {
   font-weight: bold;
 } /* Generic.Strong */
@@ -80,11 +74,7 @@
 .highlight .kn {
   color: #000000;
   font-weight: bold;
-} /* Keyword.Namespace */
-.highlight .kp {
-  color: #000000;
-  font-weight: bold;
-} /* Keyword.Pseudo */
+} /* Keyword.Namespace */ /* Keyword.Pseudo */
 .highlight .kr {
   color: #000000;
   font-weight: bold;

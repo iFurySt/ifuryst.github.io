@@ -2,9 +2,6 @@
 .highlight pre {
   background-color: #404040;
 }
-.highlight .hll {
-  background-color: #404040;
-}
 .highlight .c {
   color: #999999;
   font-style: italic;
@@ -71,10 +68,7 @@
 } /* Generic.Inserted */
 .highlight .go {
   color: #cccccc;
-} /* Generic.Output */
-.highlight .gp {
-  color: #aaaaaa;
-} /* Generic.Prompt */
+} /* Generic.Output */ /* Generic.Prompt */
 .highlight .gs {
   color: #d0d0d0;
   font-weight: bold;
@@ -97,10 +91,7 @@
 .highlight .kn {
   color: #6ab825;
   font-weight: bold;
-} /* Keyword.Namespace */
-.highlight .kp {
-  color: #6ab825;
-} /* Keyword.Pseudo */
+} /* Keyword.Namespace */ /* Keyword.Pseudo */
 .highlight .kr {
   color: #6ab825;
   font-weight: bold;
@@ -149,10 +140,7 @@
 .highlight .nn {
   color: #447fcf;
   text-decoration: underline;
-} /* Name.Namespace */
-.highlight .nx {
-  color: #d0d0d0;
-} /* Name.Other */
+} /* Name.Namespace */ /* Name.Other */
 .highlight .py {
   color: #d0d0d0;
 } /* Name.Property */
