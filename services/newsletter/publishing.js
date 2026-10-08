@@ -96,7 +96,8 @@ export async function publishing(request, env, api, reply) {
       await update("no_recipients");
       return reply({ id: input.id, status: "no_recipients" });
     }
-    const name = `ifuryst-${input.id}`;
+    // Resend limits broadcast names to 70 characters; retain the full identity.
+    const name = `blog-${input.id}`;
     if (!broadcastId && phase === "creating") {
       // Recover a create timeout using the deterministic broadcast name. Never create blindly.
       let after = "";

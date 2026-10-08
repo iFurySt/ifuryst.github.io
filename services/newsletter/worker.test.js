@@ -68,6 +68,7 @@ function mockBroadcasts({ failCreate = false, failSend = false } = {}) {
       const path = new URL(url).pathname;
       if (path === "/broadcasts" && options.method === "POST") {
         const body = JSON.parse(options.body);
+        if (body.name.length > 70) return Response.json({ message: "Broadcast name exceeds 70 characters" }, { status: 422 });
         broadcasts.push({ ...body, id: `broadcast-${broadcasts.length + 1}`, status: "draft" });
         if (failCreate) {
           failCreate = false;
