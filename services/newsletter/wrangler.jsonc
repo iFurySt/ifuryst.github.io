@@ -1,0 +1,26 @@
+{
+  "name": "ifuryst-newsletter",
+  "main": "worker.js",
+  "compatibility_date": "2025-04-01",
+  "account_id": "c2cc1f625866ee928b71514c60c590cf",
+  "workers_dev": true,
+  "triggers": {
+    "crons": ["20 0 * * *"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ifuryst-newsletter",
+      "database_id": "39d95527-a5ec-4a6a-8486-3fa3afffdf44",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    "ALLOWED_ORIGINS": "https://www.ifuryst.com,https://ifuryst.com,https://ifuryst.github.io",
+    "EMAIL_FROM": "ifuryst <letters@ifuryst.com>",
+    "EMAIL_REPLY_TO": "ifuryst@gmail.com",
+    "DAILY_CONFIRMATION_LIMIT": "80",
+    "SEGMENT_ZH_ID": "50d51f6f-346b-42fc-b9de-4781101b7ba6",
+    "SEGMENT_EN_ID": "abb8740b-5165-4692-8659-188ba85ef36d"
+  }
+}

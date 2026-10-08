@@ -10,7 +10,9 @@ on:
       - "**.bib"
       - "**.html"
       - "**.js"
+      - "**.mjs"
       - "**.liquid"
+      - "_plugins/**"
       - "**/*.md"
       - "**.yml"
       - "Gemfile"
@@ -36,7 +38,9 @@ on:
       - "**.bib"
       - "**.html"
       - "**.js"
+      - "**.mjs"
       - "**.liquid"
+      - "_plugins/**"
       - "**/*.md"
       - "**.yml"
       - "Gemfile"
@@ -98,7 +102,7 @@ jobs:
           BUILD_MODE=incremental
           if git rev-parse --verify HEAD^1 >/dev/null 2>&1; then
             CHANGED_FILES=$(git diff --name-only HEAD^1 HEAD)
-            if echo "$CHANGED_FILES" | grep -Eq "^_config(\\..*)?\\.yml$|^Gemfile$|^Gemfile\\.lock$|^_layouts/|^_includes/|^_data/|^_pages/|^_news/|^_projects/|^_bibliography/|^assets/js/"; then
+            if echo "$CHANGED_FILES" | grep -Eq "^_config(\\..*)?\\.yml$|^Gemfile$|^Gemfile\\.lock$|^_layouts/|^_includes/|^_plugins/|^_data/|^_pages/|^_news/|^_projects/|^_bibliography/|^assets/js/"; then
               BUILD_MODE=full
             fi
           else
@@ -133,6 +137,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+      - name: Setup Node.js for newsletter
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Test newsletter subscription and publishing
+        run: npm test --prefix services/newsletter
+      - name: Test newsletter email rendering
+        run: bundle exec ruby services/newsletter/renderer.test.rb
       - name: Restore node_modules for PurgeCSS
         id: purgecss-node-cache
         if: steps.purgecss-needed.outputs.run_purgecss == 'true'
@@ -159,6 +171,8 @@ jobs:
           fi
 
           echo "configs=$JEKYLL_CONFIGS" >> "$GITHUB_OUTPUT"
+          NEWSLETTER_ENABLED=$(ruby -ryaml -e 'config = YAML.load_file("_config.yml"); puts(config.dig("newsletter", "enabled") == true && config.dig("newsletter", "provider") == "resend")')
+          echo "newsletter=$NEWSLETTER_ENABLED" >> "$GITHUB_OUTPUT"
       - name: Install and Build 🔧
         run: |
           export JEKYLL_ENV=production
@@ -194,3 +208,9 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: _site
+      - name: Send new blog posts to subscribers
+        if: github.event_name != 'pull_request' && steps.jekyll-config.outputs.newsletter == 'true'
+        env:
+          NEWSLETTER_PUBLISH_TOKEN: ${{ secrets.NEWSLETTER_PUBLISH_TOKEN }}
+          NEWSLETTER_VERIFY_LIVE: "true"
+        run: node .github/scripts/send-newsletter.mjs

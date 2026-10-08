@@ -1,0 +1,106 @@
+{% assign newsletter_lang = page.lang | default: 'zh' %}
+<div
+  class="newsletter-form-container newsletter-resend"
+  {% if include.center %}
+    style="margin: 20px"
+  {% endif %}
+>
+  <form
+    class="newsletter-form"
+    action="{{ site.newsletter.endpoint | escape }}"
+    method="post"
+    data-language="{{ newsletter_lang }}"
+    style="flex-wrap: wrap; gap: 10px; justify-content: {% if include.left %}flex-start{% elsif include.right %}flex-end{% else %}center{% endif %}"
+  >
+    <input
+      class="newsletter-form-input"
+      name="email"
+      type="email"
+      autocomplete="email"
+      placeholder="you@example.com"
+      aria-label="Email"
+      required
+      maxlength="254"
+      style="margin: 0"
+    >
+    <select class="newsletter-form-input newsletter-language" name="language" aria-label="Subscription language" style="width: auto; margin: 0">
+      <option
+        value="zh"
+        {% unless newsletter_lang == 'en' %}
+          selected
+        {% endunless %}
+      >
+        中文
+      </option>
+      <option
+        value="en"
+        {% if newsletter_lang == 'en' %}
+          selected
+        {% endif %}
+      >
+        English
+      </option>
+    </select>
+    <input
+      type="text"
+      name="website"
+      tabindex="-1"
+      autocomplete="off"
+      aria-hidden="true"
+      style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none"
+    >
+    <button type="submit" class="newsletter-form-button">
+      {% if newsletter_lang == 'en' %}Subscribe{% else %}邮箱订阅{% endif %}
+    </button>
+  </form>
+  <p class="newsletter-resend-status" role="status" aria-live="polite" style="margin-top: 10px; text-align: center"></p>
+  <noscript>
+    {%- if newsletter_lang == 'en' %}Please enable JavaScript to subscribe.{% else %}请启用 JavaScript 后订阅。{% endif -%}
+  </noscript>
+</div>
+<script>
+  (function () {
+    document.querySelectorAll('.newsletter-resend form:not([data-initialized])').forEach(function (form) {
+      form.dataset.initialized = 'true';
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        var english = form.dataset.language === 'en';
+        var button = form.querySelector('button');
+        var status = form.parentElement.querySelector('[role="status"]');
+        var label = button.textContent;
+        button.disabled = true;
+        button.textContent = english ? 'Please wait…' : '请稍候…';
+        status.textContent = '';
+        try {
+          var data = new FormData(form);
+          var response = await fetch(form.action, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: data.get('email'), language: data.get('language'), website: data.get('website') }),
+            signal: AbortSignal.timeout(20000),
+          });
+          if (!response.ok) {
+            status.textContent =
+              response.status === 429
+                ? english
+                  ? 'Too many requests. Please try again later.'
+                  : '请求过于频繁，请稍后重试。'
+                : english
+                  ? 'Could not subscribe. Please try again later.'
+                  : '暂时无法订阅，请稍后重试。';
+            return;
+          }
+          status.textContent = english
+            ? 'Check your inbox and confirm your subscription. The link expires in 24 hours.'
+            : '请到邮箱中确认订阅，确认链接将在 24 小时后失效。';
+          form.reset();
+        } catch (error) {
+          status.textContent = english ? 'Connection failed. Please try again later.' : '连接失败，请稍后重试。';
+        } finally {
+          button.disabled = false;
+          button.textContent = label;
+        }
+      });
+    });
+  })();
+</script>

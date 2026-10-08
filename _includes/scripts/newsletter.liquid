@@ -1,3 +1,6 @@
+{% if site.newsletter.provider == 'resend' %}
+  {% include scripts/newsletter-resend.liquid center=include.center left=include.left right=include.right %}
+{% else %}
 <div
   class="newsletter-form-container"
   {% if include.center %}
@@ -174,3 +177,4 @@
     }
   </style>
 </noscript>
+{% endif %}

@@ -174,8 +174,10 @@ external_sources:
 # -----------------------------------------------------------------------------
 
 newsletter:
-  enabled: false
-  endpoint: # your loops endpoint (e.g., https://app.loops.so/api/newsletter-form/YOUR-ENDPOINT)
+  enabled: true
+  provider: resend # resend or loops
+  endpoint: https://ifuryst-newsletter.ifuryst.workers.dev/subscribe
+  site_url: https://www.ifuryst.com
   # https://loops.so/docs/forms/custom-form
 
 # -----------------------------------------------------------------------------
@@ -225,6 +227,7 @@ kramdown:
 # Includes & excludes
 include: ["_pages"]
 exclude:
+  - services/
   - bin/
   - CONTRIBUTING.md
   - CUSTOMIZE.md
