@@ -13,6 +13,7 @@ on:
       - "**.mjs"
       - "**.liquid"
       - "_plugins/**"
+      - ".github/scripts/check-travel-albums.rb"
       - "**/*.md"
       - "**.yml"
       - "Gemfile"
@@ -41,6 +42,7 @@ on:
       - "**.mjs"
       - "**.liquid"
       - "_plugins/**"
+      - ".github/scripts/check-travel-albums.rb"
       - "**/*.md"
       - "**.yml"
       - "Gemfile"
@@ -102,7 +104,7 @@ jobs:
           BUILD_MODE=incremental
           if git rev-parse --verify HEAD^1 >/dev/null 2>&1; then
             CHANGED_FILES=$(git diff --name-only HEAD^1 HEAD)
-            if echo "$CHANGED_FILES" | grep -Eq "^_config(\\..*)?\\.yml$|^Gemfile$|^Gemfile\\.lock$|^_layouts/|^_includes/|^_plugins/|^_data/|^_pages/|^_news/|^_projects/|^_bibliography/|^assets/js/"; then
+            if echo "$CHANGED_FILES" | grep -Eq "^_config(\\..*)?\\.yml$|^Gemfile$|^Gemfile\\.lock$|^_layouts/|^_includes/|^_plugins/|^_data/|^_pages/|^_news/|^_projects/|^_bibliography/|^assets/js/|^assets/pdf/travel/"; then
               BUILD_MODE=full
             fi
           else
@@ -145,6 +147,8 @@ jobs:
         run: npm test --prefix services/newsletter
       - name: Test newsletter email rendering
         run: bundle exec ruby services/newsletter/renderer.test.rb
+      - name: Check PDF travel album generation
+        run: bundle exec ruby .github/scripts/check-travel-albums.rb
       - name: Restore node_modules for PurgeCSS
         id: purgecss-node-cache
         if: steps.purgecss-needed.outputs.run_purgecss == 'true'

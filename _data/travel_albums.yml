@@ -1,0 +1,5 @@
+# 可选：键是 assets/pdf/travel/ 下的相对路径，去掉 .pdf。
+# 2026-japan:
+#   title: 日本旅行手记
+#   description: 一路拍下的风景和日常。
+#   pdf_cover: true

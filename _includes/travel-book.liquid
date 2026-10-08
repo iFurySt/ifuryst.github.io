@@ -1,0 +1,29 @@
+<article class="travel-book" id="{{ include.album.id }}">
+  {% if include.album.description != empty %}
+    <p>{{ include.album.description | escape }}</p>
+  {% endif %}
+  <section
+    class="pdf-reader"
+    aria-label="{{ include.album.title | escape }}，点击页面左右两侧或使用方向键翻页"
+    data-pdf-url="{{ include.album.pdf_url | relative_url | escape }}"
+    data-flip-library-url="{{ "/assets/third-party/page-flip/page-flip.js" | relative_url }}"
+    data-cover="{{ include.album.pdf_cover }}"
+    data-library-url="{{ '/assets/third-party/pdfjs/' | relative_url }}"
+  >
+    <div class="pdf-stage" tabindex="0" aria-label="相册页面，点击左侧向前翻，右侧向后翻" title="点击翻页，或按住页面左右拖动">
+      <div class="pdf-pages"></div>
+    </div>
+    <p class="pdf-status is-visible" role="status" aria-live="polite">正在加载相册…</p>
+    <footer class="pdf-footer">
+      <h3 class="pdf-book-title">{{ include.album.title | escape }}</h3>
+      <form class="pdf-page-form">
+        <label class="pdf-page-label"
+          ><span class="sr-only">跳转到 PDF 页码</span>
+          <input type="number" min="1" value="1" aria-label="跳转到 PDF 页码" title="输入页码后按回车跳转" disabled>
+        </label>
+        <span class="pdf-page-count" data-page-count> / —</span>
+      </form>
+    </footer>
+    <noscript><p>启用 JavaScript 即可在线翻阅。</p></noscript>
+  </section>
+</article>

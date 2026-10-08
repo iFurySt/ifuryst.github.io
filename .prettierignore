@@ -1,6 +1,7 @@
 **/*.map
 **/*.min.css
 **/*.min.js
+assets/third-party/**
 assets/css/main.scss
 assets/js/search-data.js
 assets/js/distillpub/template.v2.js

@@ -1,0 +1,198 @@
+.walkers-books {
+  scroll-margin-top: 90px;
+}
+.travel-book {
+  margin-top: 2rem;
+  scroll-margin-top: 90px;
+}
+.pdf-book-title {
+  grid-column: 2;
+  margin: 0;
+  text-align: center;
+  text-wrap: balance;
+  font-size: 18px;
+  font-style: italic;
+  font-weight: inherit;
+  line-height: inherit;
+  color: var(--global-text-color);
+}
+.pdf-reader {
+  position: relative;
+  background: var(--global-bg-color);
+}
+.pdf-stage {
+  padding: 8px 0;
+  overflow: visible;
+  touch-action: none;
+  user-select: none;
+  min-height: 200px;
+  cursor:
+    url("../cursors/page-next.svg") 18 18,
+    pointer;
+}
+.pdf-stage .stf__parent {
+  touch-action: none;
+}
+.pdf-stage[data-turn="previous"],
+.pdf-leaf.--left {
+  cursor:
+    url("../cursors/page-previous.svg") 18 18,
+    pointer;
+}
+.pdf-leaf.--right {
+  cursor:
+    url("../cursors/page-next.svg") 18 18,
+    pointer;
+}
+.pdf-stage:focus,
+.pdf-stage:focus-visible {
+  outline: none;
+}
+.pdf-pages {
+  margin: 0 auto;
+  --paper-depth: clamp(6px, 1vw, 12px);
+}
+/* The outer edges show the balance of turned and remaining paper. */
+.pdf-stage:not(.is-single) .pdf-pages::before,
+.pdf-stage:not(.is-single) .pdf-pages::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: repeating-linear-gradient(to right, #faf8f4 0 1px, #c9c6bf 1px 2px);
+  transition: width 0.45s ease;
+}
+.pdf-stage:not(.is-single) .pdf-pages::before {
+  left: 0;
+  width: calc(var(--paper-depth) * var(--paper-left, 0));
+  transform: translateX(-100%);
+  clip-path: polygon(100% 0, 100% 100%, 0 calc(100% - 3px), 0 0);
+}
+.pdf-stage:not(.is-single) .pdf-pages::after {
+  right: 0;
+  width: calc(var(--paper-depth) * var(--paper-right, 0));
+  transform: translateX(100%);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 3px), 0 100%);
+}
+.pdf-leaf {
+  overflow: hidden;
+  background: var(--global-bg-color);
+}
+/* Uneven, gently curved thread segments follow each folding leaf. */
+.pdf-stage:not(.is-single) .pdf-leaf::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  pointer-events: none;
+  background-size: 3px 237px;
+  background-repeat: repeat-y;
+}
+.pdf-stage:not(.is-single) .pdf-leaf.--left::after {
+  right: 0;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%203%20237%22%20fill%3D%22none%22%20stroke%3D%22%23d0d0d0%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M3%204Q2.5%209%203.1%2014%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M3.1%2024Q3.6%2031%202.9%2038%22%20stroke-width%3D%221.1%22%2F%3E%3Cpath%20d%3D%22M2.9%2048Q2.6%2052%203%2057%22%20stroke-width%3D%220.9%22%2F%3E%3Cpath%20d%3D%22M3%2067Q3.4%2073%203.1%2080%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M3.1%2090Q2.5%2098%202.9%20106%22%20stroke-width%3D%221.1%22%2F%3E%3Cpath%20d%3D%22M2.9%20115Q3.2%20120%203%20126%22%20stroke-width%3D%220.9%22%2F%3E%3Cpath%20d%3D%22M3%20137Q3.5%20143%203.1%20150%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M3.1%20160Q2.7%20164%202.9%20169%22%20stroke-width%3D%221.1%22%2F%3E%3Cpath%20d%3D%22M2.9%20180Q2.6%20187%203%20194%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M3%20205Q3.4%20211%203.1%20218%22%20stroke-width%3D%220.9%22%2F%3E%3Cpath%20d%3D%22M3.1%20228Q3%20231%203%20234%22%20stroke-width%3D%221%22%2F%3E%3Cg%20stroke-width%3D%220.3%22%20stroke-opacity%3D%220.55%22%3E%3Cpath%20d%3D%22M2.9%208l-0.9%20-1.1M3.1%2012l0.7%20-0.6M3.2%2029l0.8%20-1.2M3%2035l-0.8%200.6M2.8%2052l-0.8%20-0.8M3.2%2072l0.9%200.7M2.9%2096l-0.9%20-0.8M2.8%20102l0.8%200.7M3%20121l0.8%20-0.9M3.2%20142l1%20-0.6M3%20147l-0.8%200.9M3%20164l-0.9%20-0.7M2.8%20185l-0.8%201M2.9%20191l0.8%20-0.7M3.2%20210l0.9%200.8M3.1%20231l-0.8%20-0.6%22%2F%3E%3C%2Fg%3E%3Cg%20stroke-width%3D%220.25%22%20stroke-opacity%3D%220.45%22%3E%3Cpath%20d%3D%22M2.8%2026Q2.9%2031%202.6%2035M3.4%2092Q3.1%2097%203.3%20103M2.7%20139Q3%20143%202.8%20148M3.3%20182Q3%20186%203.4%20191M2.8%20207Q3%20212%202.8%20216%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+}
+.pdf-stage:not(.is-single) .pdf-leaf.--right::after {
+  left: 0;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%223%200%203%20237%22%20fill%3D%22none%22%20stroke%3D%22%23d0d0d0%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M3%204Q2.5%209%203.1%2014%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M3.1%2024Q3.6%2031%202.9%2038%22%20stroke-width%3D%221.1%22%2F%3E%3Cpath%20d%3D%22M2.9%2048Q2.6%2052%203%2057%22%20stroke-width%3D%220.9%22%2F%3E%3Cpath%20d%3D%22M3%2067Q3.4%2073%203.1%2080%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M3.1%2090Q2.5%2098%202.9%20106%22%20stroke-width%3D%221.1%22%2F%3E%3Cpath%20d%3D%22M2.9%20115Q3.2%20120%203%20126%22%20stroke-width%3D%220.9%22%2F%3E%3Cpath%20d%3D%22M3%20137Q3.5%20143%203.1%20150%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M3.1%20160Q2.7%20164%202.9%20169%22%20stroke-width%3D%221.1%22%2F%3E%3Cpath%20d%3D%22M2.9%20180Q2.6%20187%203%20194%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M3%20205Q3.4%20211%203.1%20218%22%20stroke-width%3D%220.9%22%2F%3E%3Cpath%20d%3D%22M3.1%20228Q3%20231%203%20234%22%20stroke-width%3D%221%22%2F%3E%3Cg%20stroke-width%3D%220.3%22%20stroke-opacity%3D%220.55%22%3E%3Cpath%20d%3D%22M2.9%208l-0.9%20-1.1M3.1%2012l0.7%20-0.6M3.2%2029l0.8%20-1.2M3%2035l-0.8%200.6M2.8%2052l-0.8%20-0.8M3.2%2072l0.9%200.7M2.9%2096l-0.9%20-0.8M2.8%20102l0.8%200.7M3%20121l0.8%20-0.9M3.2%20142l1%20-0.6M3%20147l-0.8%200.9M3%20164l-0.9%20-0.7M2.8%20185l-0.8%201M2.9%20191l0.8%20-0.7M3.2%20210l0.9%200.8M3.1%20231l-0.8%20-0.6%22%2F%3E%3C%2Fg%3E%3Cg%20stroke-width%3D%220.25%22%20stroke-opacity%3D%220.45%22%3E%3Cpath%20d%3D%22M2.8%2026Q2.9%2031%202.6%2035M3.4%2092Q3.1%2097%203.3%20103M2.7%20139Q3%20143%202.8%20148M3.3%20182Q3%20186%203.4%20191M2.8%20207Q3%20212%202.8%20216%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+}
+.pdf-leaf img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: fill;
+}
+.pdf-stage.is-cover .stf__block {
+  transform: translateX(-25%);
+}
+.pdf-stage[data-state="user_fold"],
+.pdf-stage[data-state="flipping"] {
+  cursor: grabbing;
+}
+.pdf-stage[data-state="user_fold"] .pdf-leaf,
+.pdf-stage[data-state="flipping"] .pdf-leaf {
+  cursor: grabbing;
+}
+.pdf-footer {
+  display: grid;
+  grid-template-columns: minmax(65px, 1fr) minmax(0, auto) minmax(65px, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0 2px;
+  color: var(--global-text-color-light);
+}
+.pdf-page-form {
+  grid-column: 3;
+  justify-self: end;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  margin: 0;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.07em;
+}
+.pdf-page-label {
+  margin: 0;
+}
+.pdf-page-form input {
+  width: 2.6em;
+  padding: 3px 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  color: var(--global-text-color);
+  text-align: right;
+  font: inherit;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.pdf-page-form input::-webkit-inner-spin-button,
+.pdf-page-form input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.pdf-page-form input:focus {
+  border-bottom-color: var(--global-theme-color);
+}
+.pdf-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+.pdf-status.is-visible {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 1rem 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  font-size: 0.9rem;
+  color: var(--global-text-color-light);
+}
+@media (max-width: 600px) {
+  .pdf-footer {
+    padding-top: 10px;
+    gap: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pdf-pages::before,
+  .pdf-pages::after {
+    transition: none;
+  }
+}

@@ -1,6 +1,9 @@
 ---
 layout: default
 ---
+{% if page.lang != 'en' and site.data.generated_travel_albums.size > 0 %}
+  <link rel="stylesheet" href="{{ '/assets/css/travel-albums.css' | relative_url | bust_file_cache }}">
+{% endif %}
 <style>
   .container {
     max-width: 90vw;
@@ -24,6 +27,7 @@ layout: default
   .story .images img {
     width: 100%;
     height: auto;
+    aspect-ratio: var(--life-photo-ratio, auto);
     padding: 0;
     box-sizing: border-box;
     border: 1px solid #333;
@@ -60,13 +64,24 @@ layout: default
         {% if story.images %}
           <div class="images">
             {% for image in story.images %}
-              <div class="image">
+              <div
+                class="image"
+                {% if image.width and image.height %}
+                  style="--life-photo-ratio: {{ image.width }} / {{ image.height }}"
+                {% endif %}
+              >
                 {% if image.url contains 'http' %}
                   {% assign image_url = image.url %}
                   {% comment %}<img src="{{ image.url }}" alt="{{ image.description }}">{% endcomment %}
-                  {% include figure.liquid url=image_url class="img-fluid rounded z-depth-1" zoomable=true %}
+                  {% include figure.liquid url=image_url class="img-fluid rounded z-depth-1" zoomable=true width=image.width height=image.height %}
                 {% else %}
-                  <img src="{{ '/assets/img/' | append: image.url }}" alt="{{ image.description }}">
+                  <img
+                    src="{{ '/assets/img/' | append: image.url }}"
+                    alt="{{ image.description }}"
+                    {% if image.width and image.height %}
+                      width="{{ image.width }}" height="{{ image.height }}"
+                    {% endif %}
+                  >
                 {% endif %}
                 <div class="desc">{{ image.description }}</div>
               </div>
@@ -79,3 +94,12 @@ layout: default
     {% endfor %}
   {% endif %}
 </div>
+{% if page.lang != 'en' and site.data.generated_travel_albums.size > 0 %}
+  <section class="story walkers-books" id="walkers-books">
+    <h2>行者之书</h2>
+    {% for album in site.data.generated_travel_albums %}
+      {% include travel-book.liquid album=album %}
+    {% endfor %}
+  </section>
+  <script type="module" src="{{ '/assets/js/travel-albums.js' | relative_url | bust_file_cache }}"></script>
+{% endif %}

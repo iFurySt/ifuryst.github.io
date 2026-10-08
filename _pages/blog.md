@@ -58,6 +58,11 @@ pagination:
   </div>
   {% endif %}
 
+{% if site.data.generated_travel_albums.size > 0 %}
+
+<p><a href="{{ '/life/#walkers-books' | relative_url }}">行者之书 · 在线翻阅游记 →</a></p>
+{% endif %}
+
 {% assign featured_posts = site.posts | where: "featured", "true" %}
 {% if featured_posts.size > 0 %}
 <br>
