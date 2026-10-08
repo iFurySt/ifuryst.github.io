@@ -5,7 +5,7 @@ import { createHash } from "node:crypto";
 
 export async function waitForPublishedSite(
   directory,
-  { fetcher = fetch, sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)), attempts = 30 } = {}
+  { fetcher = fetch, sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)), attempts = 90 } = {}
 ) {
   const expected = createHash("sha256")
     .update(await readFile(resolve(directory, "newsletter/index.json")))
