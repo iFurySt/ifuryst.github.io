@@ -58,7 +58,8 @@ pagination:
   </div>
   {% endif %}
 
-{% if site.data.generated_travel_albums.size > 0 %}
+{% assign travel_albums = site.data.generated_travel_albums | where: 'lang', 'zh' %}
+{% if travel_albums.size > 0 %}
 
 <p><a href="{{ '/life/#walkers-books' | relative_url }}">行者之书 · 在线翻阅游记 →</a></p>
 {% endif %}

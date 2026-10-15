@@ -1,7 +1,9 @@
 ---
 layout: default
 ---
-{% if page.lang != 'en' and site.data.generated_travel_albums.size > 0 %}
+{% assign travel_language = page.lang | default: 'zh' %}
+{% assign travel_albums = site.data.generated_travel_albums | where: 'lang', travel_language %}
+{% if travel_albums.size > 0 %}
   <link rel="stylesheet" href="{{ '/assets/css/travel-albums.css' | relative_url | bust_file_cache }}">
 {% endif %}
 <style>
@@ -94,10 +96,12 @@ layout: default
     {% endfor %}
   {% endif %}
 </div>
-{% if page.lang != 'en' and site.data.generated_travel_albums.size > 0 %}
+{% if travel_albums.size > 0 %}
   <section class="story walkers-books" id="walkers-books">
-    <h2>行者之书</h2>
-    {% for album in site.data.generated_travel_albums %}
+    <h2>
+      {% if travel_language == 'en' %}Traveler’s Books{% else %}行者之书{% endif %}
+    </h2>
+    {% for album in travel_albums %}
       {% include travel-book.liquid album=album %}
     {% endfor %}
   </section>

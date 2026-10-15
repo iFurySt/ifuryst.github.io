@@ -14,15 +14,16 @@ module TravelAlbums
         relative = path.delete_prefix("#{site.source}/assets/pdf/travel/")
         key = relative.sub(/\.pdf\z/i, '')
         options = metadata.fetch(key, {})
+        language = options.fetch('lang', key.match?(/\.en\z/i) ? 'en' : 'zh')
         encoded_key = key.split('/').map { |part| CGI.escape(part).gsub('+', '%20') }.join('/')
         album = {
-          'title' => File.basename(key).tr('_-', ' '),
+          'title' => File.basename(key).sub(/\.en\z/i, '').tr('_-', ' '),
           'description' => '',
-          'lang' => 'zh',
+          'lang' => language,
           'pdf_cover' => true
         }.merge(options).merge(
           'id' => "book-#{Digest::SHA256.hexdigest(key)[0, 12]}",
-          'url' => "/life/#book-#{Digest::SHA256.hexdigest(key)[0, 12]}",
+          'url' => "#{language == 'en' ? '/en/life/' : '/life/'}#book-#{Digest::SHA256.hexdigest(key)[0, 12]}",
           'pdf_url' => '/assets/pdf/travel/' + relative.split('/').map { |part| CGI.escape(part).gsub('+', '%20') }.join('/')
         )
         page = Jekyll::PageWithoutAFile.new(site, site.source, "travel/#{key}", 'index.html')

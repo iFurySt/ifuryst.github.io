@@ -3,3 +3,10 @@
 #   title: 日本旅行手记
 #   description: 一路拍下的风景和日常。
 #   pdf_cover: true
+
+UK:
+  title: Travel in the UK
+  pdf_cover: true
+UK.en:
+  title: Travel in the UK
+  pdf_cover: true

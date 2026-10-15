@@ -57,6 +57,12 @@ pagination:
   </div>
   {% endif %}
 
+{% assign travel_albums = site.data.generated_travel_albums | where: 'lang', 'en' %}
+{% if travel_albums.size > 0 %}
+
+  <p><a href="{{ '/en/life/#walkers-books' | relative_url }}">Traveler’s Books · Read travel journals →</a></p>
+  {% endif %}
+
   <ul class="post-list">
 
     {% if page.pagination.enabled %}

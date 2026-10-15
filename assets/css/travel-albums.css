@@ -106,8 +106,18 @@
   border: 0;
   object-fit: fill;
 }
+.pdf-stage .stf__block {
+  transform: translateX(0);
+  transition:
+    transform 350ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 200ms ease;
+}
 .pdf-stage.is-cover .stf__block {
   transform: translateX(-25%);
+}
+.pdf-stage.is-cover[data-state="flipping"] .stf__block,
+.pdf-stage.is-cover[data-state="user_fold"] .stf__block {
+  transform: translateX(0);
 }
 .pdf-stage[data-state="user_fold"],
 .pdf-stage[data-state="flipping"] {
@@ -191,8 +201,17 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .pdf-stage .stf__block,
   .pdf-pages::before,
   .pdf-pages::after {
     transition: none;
   }
+}
+
+.pdf-stage.is-restoring .pdf-pages {
+  visibility: hidden;
+}
+.pdf-stage.is-closing .stf__block {
+  transform: translateX(25%) scaleX(0.05);
+  opacity: 0;
 }
