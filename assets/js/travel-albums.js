@@ -6,13 +6,22 @@ function loadLibraries(reader) {
   });
   return libraryPromise;
 }
+function progressKeys(pdfUrl) {
+  // Language editions of one book share a bookmark; keep the old edition key as a fallback.
+  const sharedUrl = pdfUrl.replace(/\.en(?=\.pdf$)/i, "");
+  return [`travel-book:page:${sharedUrl}`, `travel-book:page:${pdfUrl}`];
+}
 function initializeReader(reader) {
   const stage = reader.querySelector(".pdf-stage");
   const pages = reader.querySelector(".pdf-pages");
   const status = reader.querySelector(".pdf-status");
   const input = reader.querySelector("input");
   const count = reader.querySelector("[data-page-count]");
+  const english = reader.dataset.lang === "en";
   const hasCover = reader.dataset.cover !== "false";
+  const [progressKey, legacyProgressKey] = progressKeys(reader.dataset.pdfUrl);
+  let restoring = true,
+    closing = false;
   const cache = new Map();
   const pendingTurns = [];
   let suppressClick = false;
@@ -42,12 +51,19 @@ function initializeReader(reader) {
     input.value = String(current);
     const visible = numbers();
     count.textContent = `${visible.length > 1 ? `–${visible[1]}` : ""} / ${pdf.numPages}`;
-    status.textContent = `第 ${visible.join("–")} 页，共 ${pdf.numPages} 页`;
+    status.textContent = english ? `Pages ${visible.join("–")} of ${pdf.numPages}` : `第 ${visible.join("–")} 页，共 ${pdf.numPages} 页`;
     status.classList.remove("is-visible");
     stage.classList.toggle("is-cover", hasCover && current === 1);
     stage.classList.toggle("is-single", visible.length === 1);
     pages.style.setProperty("--paper-left", String((current - 1) / pdf.numPages));
     pages.style.setProperty("--paper-right", String((pdf.numPages - visible.at(-1)) / pdf.numPages));
+    if (!restoring) {
+      try {
+        localStorage.setItem(progressKey, String(current));
+      } catch {
+        // Reading remains available when browser storage is disabled or full.
+      }
+    }
   }
   async function rasterize(number, epoch) {
     const page = await pdf.getPage(number);
@@ -122,11 +138,27 @@ function initializeReader(reader) {
     } catch (error) {
       console.error("PDF rendering failed", error.message, error);
       cache.clear();
-      status.textContent = "这一页未能显示，请刷新页面重试。";
+      status.textContent = english ? "This page could not be displayed. Please refresh and try again." : "这一页未能显示，请刷新页面重试。";
       status.classList.add("is-visible");
       return false;
     } finally {
       if (epoch === generation && request === preparation) stage.setAttribute("aria-busy", "false");
+    }
+  }
+  async function closeToCover() {
+    closing = true;
+    pendingTurns.length = 0;
+    stage.classList.add("is-closing");
+    try {
+      const delay = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 350;
+      const prepared = await Promise.all([prepare(1), new Promise((resolve) => setTimeout(resolve, delay))]);
+      if (prepared[0]) {
+        book.turnToPage(0);
+        updateCaption();
+      }
+    } finally {
+      stage.classList.remove("is-closing");
+      closing = false;
     }
   }
   async function drainTurns() {
@@ -140,7 +172,11 @@ function initializeReader(reader) {
       if (performance.now() > pendingDeadline) pendingTurns.length = 0;
       while (pendingTurns.length && book.getState() === "read" && !gesture?.canDrag) {
         const direction = pendingTurns.shift();
-        if ((direction < 0 && current === 1) || (direction > 0 && numbers().at(-1) === pdf.numPages)) continue;
+        if (direction < 0 && current === 1) continue;
+        if (direction > 0 && numbers().at(-1) === pdf.numPages) {
+          await closeToCover();
+          break;
+        }
         book.getSettings().flippingTime = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 1 : rapidTurning ? 90 : 350;
         if (direction < 0) book.flipPrev("bottom");
         else book.flipNext("bottom");
@@ -152,7 +188,7 @@ function initializeReader(reader) {
     }
   }
   function advance(direction, defer = false) {
-    if (!book || gesture?.canDrag) return;
+    if (!book || closing || gesture?.canDrag) return;
     const now = performance.now();
     rapidTurning = now - lastTurnRequest < 250;
     lastTurnRequest = now;
@@ -164,7 +200,8 @@ function initializeReader(reader) {
     void drainTurns();
   }
   function startPendingGesture() {
-    if (!gesture || gesture.canDrag || !ready || pendingTurns.length || book.getState() !== "read") return;
+    if (!gesture || closing || gesture.canDrag || !ready || pendingTurns.length || book.getState() !== "read") return;
+    if (gesture.direction > 0 && numbers().at(-1) === pdf.numPages) return;
     gesture.canDrag = true;
     book.startUserTouch(gesture.startPosition);
     if (gesture.moved) book.userMove(gesture.lastPosition, true);
@@ -178,8 +215,19 @@ function initializeReader(reader) {
     const finished = gesture;
     // Clear first: releasing capture can synchronously dispatch lostpointercapture.
     gesture = null;
-    if (finished.canDrag) book.userStop(event ? position(event) : finished.lastPosition, !finished.moved);
-    else if (navigate && finished.moved && (finished.lastPosition.x - finished.startPosition.x) * finished.direction < -stage.clientWidth / 4) {
+    if (finished.canDrag) {
+      book.userStop(event ? position(event) : finished.lastPosition, !finished.moved);
+      if (
+        navigate &&
+        finished.moved &&
+        finished.direction > 0 &&
+        numbers().at(-1) === pdf.numPages &&
+        finished.lastPosition.x - finished.startPosition.x < -stage.clientWidth / 4
+      ) {
+        book.getRender().finishAnimation();
+        advance(1, true);
+      }
+    } else if (navigate && finished.moved && (finished.lastPosition.x - finished.startPosition.x) * finished.direction < -stage.clientWidth / 4) {
       // A fast swipe released before rasterization finishes still counts as a turn.
       advance(finished.direction, true);
     }
@@ -203,7 +251,7 @@ function initializeReader(reader) {
   });
   stage.addEventListener("pointerdown", (event) => {
     if (event.button === 0 && event.pointerType === "mouse") event.preventDefault();
-    if (!book || event.button !== 0 || !event.isPrimary) return;
+    if (!book || closing || event.button !== 0 || !event.isPrimary) return;
     if (gesture) finishGesture();
     // Released hand folds retain "user_fold" while their settling animation runs.
     if (book.getState() === "flipping" || book.getState() === "user_fold") book.getRender().finishAnimation();
@@ -259,7 +307,7 @@ function initializeReader(reader) {
   reader.querySelector("form").addEventListener("submit", async (event) => {
     event.preventDefault();
     const value = Number(input.value);
-    if (!book || !Number.isFinite(value) || book.getState() !== "read") return;
+    if (!book || closing || !Number.isFinite(value) || book.getState() !== "read") return;
     pendingTurns.length = 0;
     const target = spreadStart(Math.max(1, Math.min(pdf.numPages, Math.floor(value))));
     if (await prepare(target)) {
@@ -297,6 +345,14 @@ function initializeReader(reader) {
         standardFontDataUrl: `${library}standard_fonts/`,
         wasmUrl: `${library}wasm/`,
       }).promise;
+      let restoredPage = 1;
+      try {
+        const saved = Number(localStorage.getItem(progressKey) ?? localStorage.getItem(legacyProgressKey));
+        if (Number.isInteger(saved) && saved >= 1) restoredPage = spreadStart(Math.min(saved, pdf.numPages));
+      } catch {
+        // Storage is optional; fall back to the cover.
+      }
+      stage.classList.add("is-restoring");
       const first = await pdf.getPage(1);
       const viewport = first.getViewport({ scale: 1 });
       first.cleanup();
@@ -304,7 +360,7 @@ function initializeReader(reader) {
         const leaf = document.createElement("div");
         leaf.className = "pdf-leaf";
         const image = document.createElement("img");
-        image.alt = `PDF 第 ${index + 1} 页`;
+        image.alt = english ? `PDF page ${index + 1}` : `PDF 第 ${index + 1} 页`;
         image.draggable = false;
         leaf.append(image);
         return leaf;
@@ -337,13 +393,16 @@ function initializeReader(reader) {
       });
       book.loadFromHTML(leaves);
       updateCaption();
-      await prepare();
+      if (await prepare(restoredPage)) book.turnToPage(restoredPage - 1);
+      restoring = false;
+      updateCaption();
+      stage.classList.remove("is-restoring");
       input.max = String(pdf.numPages);
       input.disabled = false;
       void drainTurns();
     } catch (error) {
       console.error("PDF loading failed", error);
-      status.textContent = "相册未能加载，请刷新页面重试。";
+      status.textContent = english ? "The album could not be loaded. Please refresh and try again." : "相册未能加载，请刷新页面重试。";
       status.classList.add("is-visible");
     }
   }

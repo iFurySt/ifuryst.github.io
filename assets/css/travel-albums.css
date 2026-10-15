@@ -1,6 +1,21 @@
 .walkers-books {
   scroll-margin-top: 90px;
 }
+.travel-book {
+  margin-top: 2rem;
+  scroll-margin-top: 90px;
+}
+.pdf-book-title {
+  grid-column: 2;
+  margin: 0;
+  text-align: center;
+  text-wrap: balance;
+  font-size: 18px;
+  font-style: italic;
+  font-weight: inherit;
+  line-height: inherit;
+  color: var(--global-text-color);
+}
 .pdf-reader {
   position: relative;
   background: var(--global-bg-color);
@@ -91,8 +106,59 @@
   border: 0;
   object-fit: fill;
 }
+.pdf-stage .stf__block {
+  transform: translateX(0);
+  transition:
+    transform 350ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 200ms ease;
+}
 .pdf-stage.is-cover .stf__block {
   transform: translateX(-25%);
+}
+.pdf-footer {
+  display: grid;
+  grid-template-columns: minmax(65px, 1fr) minmax(0, auto) minmax(65px, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0 2px;
+  color: var(--global-text-color-light);
+}
+.pdf-page-form {
+  grid-column: 3;
+  justify-self: end;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  margin: 0;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.07em;
+}
+.pdf-page-label {
+  margin: 0;
+}
+.pdf-page-form input {
+  width: 2.6em;
+  padding: 3px 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  color: var(--global-text-color);
+  text-align: right;
+  font: inherit;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.pdf-page-form input::-webkit-inner-spin-button,
+.pdf-page-form input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.pdf-page-form input:focus {
+  border-bottom-color: var(--global-theme-color);
 }
 .pdf-status {
   position: absolute;
@@ -115,10 +181,25 @@
   font-size: 0.9rem;
   color: var(--global-text-color-light);
 }
+@media (max-width: 600px) {
+  .pdf-footer {
+    padding-top: 10px;
+    gap: 6px;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
+  .pdf-stage .stf__block,
   .pdf-pages::before,
   .pdf-pages::after {
     transition: none;
   }
+}
+
+.pdf-stage.is-restoring .pdf-pages {
+  visibility: hidden;
+}
+.pdf-stage.is-closing .stf__block {
+  transform: translateX(25%) scaleX(0.05);
+  opacity: 0;
 }
